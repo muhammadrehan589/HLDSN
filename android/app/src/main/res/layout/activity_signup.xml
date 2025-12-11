@@ -1,208 +1,189 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login_gradient"
-    tools:context=".SignupActivity">
+    android:fillViewport="true"
+    android:background="@drawable/login_gradient">
 
-    <ImageView
-        android:id="@+id/statusBar"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:src="@drawable/signup_status_bar"
-        android:scaleType="fitXY"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/backArrow"
-        android:layout_width="16dp"
-        android:layout_height="23dp"
-        android:src="@android:drawable/ic_menu_revert"
-        android:tint="#FFFFFF"
-        app:layout_constraintTop_toBottomOf="@id/statusBar"
-        app:layout_constraintTop_margin="24dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintStart_margin="32dp" />
-
-    <TextView
-        android:id="@+id/signupTitle"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sign-up"
-        android:textSize="32sp"
-        android:textColor="#FFFFFF"
-        android:fontFamily="serif"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/statusBar"
-        app:layout_constraintTop_margin="48dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
-    <TextView
-        android:id="@+id/welcomeText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Welcome to HLDSN –\nYour safety companion — alerts, SOS, and local help at your fingertips.\nAlready have an account? login"
-        android:textSize="18sp"
-        android:textColor="#FFFFFF"
-        android:fontFamily="sans-serif"
-        android:lineSpacingExtra="4sp"
-        app:layout_constraintTop_toBottomOf="@id/signupTitle"
-        app:layout_constraintTop_margin="18dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_margin="35dp"
-        app:layout_constraintEnd_margin="35dp" />
+        <ImageView
+            android:id="@+id/backArrow"
+            android:layout_width="16dp"
+            android:layout_height="23dp"
+            android:src="@android:drawable/ic_menu_revert"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/statusBar"
+            app:tint="#FFFFFF"
+            tools:ignore="NotSibling" />
 
-    <EditText
-        android:id="@+id/firstNameField"
-        android:layout_width="0dp"
-        android:layout_height="52dp"
-        android:hint="First Name"
-        android:textColorHint="#BFFFFFFF"
-        android:textColor="#FFFFFFFF"
-        android:background="@drawable/signup_field_background"
-        android:paddingStart="22dp"
-        android:paddingEnd="22dp"
-        app:layout_constraintTop_toBottomOf="@id/welcomeText"
-        app:layout_constraintTop_margin="24dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_margin="35dp"
-        app:layout_constraintEnd_margin="35dp" />
+        <TextView
+            android:id="@+id/signupTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="serif"
+            android:text="Sign-up"
+            android:textColor="#FFFFFF"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="84dp"
+            tools:ignore="MissingConstraints" />
 
-    <EditText
-        android:id="@+id/lastNameField"
-        android:layout_width="0dp"
-        android:layout_height="52dp"
-        android:hint="Last Name"
-        android:textColorHint="#BFFFFFFF"
-        android:textColor="#FFFFFFFF"
-        android:background="@drawable/signup_field_background"
-        android:paddingStart="21dp"
-        android:paddingEnd="21dp"
-        app:layout_constraintTop_toBottomOf="@id/firstNameField"
-        app:layout_constraintTop_margin="18dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_margin="35dp"
-        app:layout_constraintEnd_margin="35dp" />
+        <TextView
+            android:id="@+id/welcomeText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Welcome to HLDSN –\nYour safety companion — alerts, SOS, and local help at your fingertips.\nAlready have an account? login"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:fontFamily="sans-serif"
+            android:lineSpacingExtra="4sp"
+            app:layout_constraintTop_toBottomOf="@id/signupTitle"
+            android:layout_marginTop="18dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <EditText
-        android:id="@+id/mobileNumberField"
-        android:layout_width="0dp"
-        android:layout_height="52dp"
-        android:hint="Mobile Number"
-        android:textColorHint="#BFFFFFFF"
-        android:textColor="#FFFFFFFF"
-        android:inputType="phone"
-        android:background="@drawable/signup_field_background"
-        android:paddingStart="23dp"
-        android:paddingEnd="23dp"
-        app:layout_constraintTop_toBottomOf="@id/lastNameField"
-        app:layout_constraintTop_margin="18dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_margin="35dp"
-        app:layout_constraintEnd_margin="35dp" />
+        <!-- First Name -->
+        <EditText
+            android:id="@+id/firstNameField"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="First Name"
+            android:textColorHint="#BFFFFFFF"
+            android:textColor="#FFFFFFFF"
+            android:background="@drawable/signup_field_background"
+            android:padding="12dp"
+            app:layout_constraintTop_toBottomOf="@id/welcomeText"
+            android:layout_marginTop="24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <EditText
-        android:id="@+id/emailField"
-        android:layout_width="0dp"
-        android:layout_height="52dp"
-        android:hint="Email"
-        android:textColorHint="#BFFFFFFF"
-        android:textColor="#FFFFFFFF"
-        android:inputType="textEmailAddress"
-        android:background="@drawable/signup_field_background"
-        android:paddingStart="23dp"
-        android:paddingEnd="23dp"
-        app:layout_constraintTop_toBottomOf="@id/mobileNumberField"
-        app:layout_constraintTop_margin="18dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_margin="35dp"
-        app:layout_constraintEnd_margin="35dp" />
+        <!-- Last Name -->
+        <EditText
+            android:id="@+id/lastNameField"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Last Name"
+            android:textColorHint="#BFFFFFFF"
+            android:textColor="#FFFFFFFF"
+            android:background="@drawable/signup_field_background"
+            android:padding="12dp"
+            app:layout_constraintTop_toBottomOf="@id/firstNameField"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <EditText
-        android:id="@+id/passwordField"
-        android:layout_width="0dp"
-        android:layout_height="52dp"
-        android:hint="Password"
-        android:textColorHint="#BFFFFFFF"
-        android:textColor="#FFFFFFFF"
-        android:inputType="textPassword"
-        android:background="@drawable/signup_field_background"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
-        app:layout_constraintTop_toBottomOf="@id/emailField"
-        app:layout_constraintTop_margin="18dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_margin="35dp"
-        app:layout_constraintEnd_margin="35dp" />
+        <!-- Mobile Number -->
+        <EditText
+            android:id="@+id/mobileNumberField"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Mobile Number"
+            android:inputType="phone"
+            android:textColorHint="#BFFFFFFF"
+            android:textColor="#FFFFFFFF"
+            android:background="@drawable/signup_field_background"
+            android:padding="12dp"
+            app:layout_constraintTop_toBottomOf="@id/lastNameField"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <EditText
-        android:id="@+id/confirmPasswordField"
-        android:layout_width="0dp"
-        android:layout_height="52dp"
-        android:hint="Confirm Password"
-        android:textColorHint="#BFFFFFFF"
-        android:textColor="#FFFFFFFF"
-        android:inputType="textPassword"
-        android:background="@drawable/signup_field_background"
-        android:paddingStart="22dp"
-        android:paddingEnd="22dp"
-        app:layout_constraintTop_toBottomOf="@id/passwordField"
-        app:layout_constraintTop_margin="18dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_margin="35dp"
-        app:layout_constraintEnd_margin="35dp" />
+        <!-- Email -->
+        <EditText
+            android:id="@+id/emailField"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:textColorHint="#BFFFFFFF"
+            android:textColor="#FFFFFFFF"
+            android:background="@drawable/signup_field_background"
+            android:padding="12dp"
+            app:layout_constraintTop_toBottomOf="@id/mobileNumberField"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <CheckBox
-        android:id="@+id/termsCheckbox"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:buttonTint="#FFFFFF"
-        app:layout_constraintTop_toBottomOf="@id/confirmPasswordField"
-        app:layout_constraintTop_margin="24dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintStart_margin="43dp" />
+        <!-- Password -->
+        <EditText
+            android:id="@+id/passwordField"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:textColorHint="#BFFFFFFF"
+            android:textColor="#FFFFFFFF"
+            android:background="@drawable/signup_field_background"
+            android:padding="12dp"
+            app:layout_constraintTop_toBottomOf="@id/emailField"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <TextView
-        android:id="@+id/termsText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="by signing up, you agree to the SLDA terms & condition"
-        android:textSize="10sp"
-        android:textColor="#FFFFFF"
-        android:fontFamily="sans-serif"
-        android:maxLines="2"
-        app:layout_constraintTop_toTopOf="@id/termsCheckbox"
-        app:layout_constraintStart_toEndOf="@id/termsCheckbox"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_margin="9dp"
-        app:layout_constraintEnd_margin="43dp" />
+        <!-- Confirm Password -->
+        <EditText
+            android:id="@+id/confirmPasswordField"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Confirm Password"
+            android:inputType="textPassword"
+            android:textColorHint="#BFFFFFFF"
+            android:textColor="#FFFFFFFF"
+            android:background="@drawable/signup_field_background"
+            android:padding="12dp"
+            app:layout_constraintTop_toBottomOf="@id/passwordField"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <Button
-        android:id="@+id/submitButton"
-        android:layout_width="0dp"
-        android:layout_height="55dp"
-        android:text="Submit"
-        android:textSize="20sp"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#FE8E00"
-        android:fontFamily="sans-serif-medium"
-        app:cornerRadius="15dp"
-        app:layout_constraintTop_toBottomOf="@id/termsCheckbox"
-        app:layout_constraintTop_margin="20dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_margin="35dp"
-        app:layout_constraintEnd_margin="35dp" />
+        <!-- Terms & Checkbox -->
+        <CheckBox
+            android:id="@+id/termsCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="#FFFFFF"
+            app:layout_constraintTop_toBottomOf="@id/confirmPasswordField"
+            android:layout_marginTop="24dp"
+            app:layout_constraintStart_toStartOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/termsText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="By signing up, you agree to the SLDA terms conditions"
+            android:textSize="10sp"
+            android:textColor="#FFFFFF"
+            android:fontFamily="sans-serif"
+            app:layout_constraintTop_toTopOf="@id/termsCheckbox"
+            app:layout_constraintStart_toEndOf="@id/termsCheckbox"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="0dp"/>
 
+        <!-- Submit Button -->
+        <Button
+            android:id="@+id/submitButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Submit"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:backgroundTint="#FE8E00"
+            android:fontFamily="sans-serif-medium"
+            app:cornerRadius="15dp"
+            app:layout_constraintTop_toBottomOf="@id/termsCheckbox"
+            android:layout_marginTop="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>
