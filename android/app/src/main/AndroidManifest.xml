@@ -13,7 +13,7 @@
         android:theme="@style/Theme.HLDSN"
         tools:targetApi="31">
         <activity
-            android:name=".LoginActivity"
+            android:name=".LaunchActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,6 +22,7 @@
             </intent-filter>
         </activity>
 <!--        <activity android:name=".LoginActivity"/>-->
+        <activity android:name=".LoginActivity"/>
         <activity android:name=".SignupActivity"/>
         <activity android:name=".Main"/>
         <activity android:name=".OtpVerificationActivity"/>
