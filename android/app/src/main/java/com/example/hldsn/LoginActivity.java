@@ -17,7 +17,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class LoginActivity extends AppCompatActivity {
 
     EditText emailField, passwordField;
-    Button loginButton;
+    Button loginButton,signupButton;
     TextView dontHaveAccount;
 
     FirebaseAuth auth;
@@ -34,9 +34,9 @@ public class LoginActivity extends AppCompatActivity {
         emailField = findViewById(R.id.emailField);
         passwordField = findViewById(R.id.passwordField);
         loginButton = findViewById(R.id.loginButton);
-        dontHaveAccount = findViewById(R.id.dontHaveAccount);
+        signupButton = findViewById(R.id.signupButton);
 
-        dontHaveAccount.setOnClickListener(v -> {
+        signupButton.setOnClickListener(v -> {
             startActivity(new Intent(LoginActivity.this, SignupActivity.class));
         });
 
