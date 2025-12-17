@@ -9,15 +9,16 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="32dp">
 
         <!-- Status Bar -->
         <ImageView
             android:id="@+id/statusBar"
             android:layout_width="match_parent"
             android:layout_height="36dp"
-            android:src="@drawable/login_status_bar"
             android:scaleType="fitXY"
+            android:src="@drawable/login_status_bar"
             app:layout_constraintTop_toTopOf="parent" />
 
         <!-- App Bar Header -->
@@ -32,37 +33,37 @@
                 android:id="@+id/menuIcon"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_menu"
-                android:contentDescription="Menu"
-                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginStart="15dp"
                 android:layout_marginTop="35dp"
+                android:contentDescription="Menu"
+                android:src="@drawable/ic_menu"
                 app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="15dp" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/profileTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Profile"
-                android:textSize="32sp"
-                android:textColor="#FFFFFF"
-                android:fontFamily="serif"
-                android:textStyle="bold"
-                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginStart="11dp"
                 android:layout_marginTop="27dp"
+                android:fontFamily="serif"
+                android:text="Profile"
+                android:textColor="#FFFFFF"
+                android:textSize="32sp"
+                android:textStyle="bold"
                 app:layout_constraintStart_toEndOf="@id/menuIcon"
-                android:layout_marginStart="11dp" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/notificationIcon"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_notification"
-                android:contentDescription="Notifications"
-                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginEnd="15dp"
                 android:layout_marginTop="44dp"
+                android:contentDescription="Notifications"
+                android:src="@drawable/ic_notification"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginEnd="15dp" />
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -71,40 +72,41 @@
             android:id="@+id/backArrow"
             android:layout_width="16dp"
             android:layout_height="23dp"
-            android:src="@drawable/ic_back"
-            android:contentDescription="Back"
-            app:layout_constraintTop_toBottomOf="@id/header"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="24dp"
+            android:contentDescription="Back"
+            android:src="@drawable/ic_back"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="32dp" />
+            app:layout_constraintTop_toBottomOf="@id/header" />
 
-        <!-- Profile Image -->
+        <!-- Profile Image (Clickable) -->
         <ImageView
             android:id="@+id/profileImage"
             android:layout_width="140dp"
             android:layout_height="140dp"
-            android:src="@drawable/ic_profile_avatar"
-            android:background="@drawable/profile_avatar_background"
-            android:scaleType="centerCrop"
-            android:padding="4dp"
-            app:layout_constraintTop_toBottomOf="@id/header"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="32dp"
+            android:background="@drawable/profile_avatar_background"
+            android:contentDescription="Profile Picture"
+            android:padding="4dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_profile_avatar"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="16dp" />
+            app:layout_constraintTop_toBottomOf="@id/header" />
 
         <!-- Name, Address, Phone Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            app:cardBackgroundColor="#1A2B2B2B"
             app:cardCornerRadius="32dp"
             app:cardElevation="12dp"
-            app:cardBackgroundColor="#1A2B2B2B"
-            app:layout_constraintTop_toTopOf="@id/profileImage"
-            app:layout_constraintStart_toEndOf="@id/profileImage"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp">
+            app:layout_constraintStart_toEndOf="@id/profileImage"
+            app:layout_constraintTop_toTopOf="@id/profileImage">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -115,84 +117,83 @@
                     android:id="@+id/nameLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
                     android:text="Name"
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
-                    android:fontFamily="sans-serif"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
+                <EditText
                     android:id="@+id/nameField"
                     android:layout_width="120dp"
                     android:layout_height="32dp"
                     android:background="@drawable/profile_field_background"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:hint=""
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
-                    android:hint=""
+                    android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
-                    app:layout_constraintTop_toTopOf="@id/nameLabel"
+                    android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="@id/nameLabel"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/nameLabel" />
 
                 <TextView
                     android:id="@+id/addressLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="sans-serif"
                     android:text="Address"
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
-                    android:fontFamily="sans-serif"
-                    app:layout_constraintTop_toBottomOf="@id/nameLabel"
-                    android:layout_marginTop="12dp"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/nameLabel" />
 
-                <TextView
+                <EditText
                     android:id="@+id/addressField"
                     android:layout_width="120dp"
                     android:layout_height="32dp"
                     android:background="@drawable/profile_field_background"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:hint=""
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
-                    android:hint=""
+                    android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
-                    app:layout_constraintTop_toTopOf="@id/addressLabel"
+                    android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="@id/addressLabel"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/addressLabel" />
 
                 <TextView
                     android:id="@+id/phoneLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="sans-serif"
                     android:text="Phone no."
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
-                    android:fontFamily="sans-serif"
-                    app:layout_constraintTop_toBottomOf="@id/addressLabel"
-                    android:layout_marginTop="12dp"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/addressLabel" />
 
-                <TextView
+                <EditText
                     android:id="@+id/phoneField"
                     android:layout_width="120dp"
                     android:layout_height="32dp"
                     android:background="@drawable/profile_field_background"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:hint=""
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
-                    android:hint=""
+                    android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
-                    app:layout_constraintTop_toTopOf="@id/phoneLabel"
+                    android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="@id/phoneLabel"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/phoneLabel" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
         </androidx.cardview.widget.CardView>
 
         <!-- Age, Blood, Height, Weight Card -->
@@ -200,15 +201,15 @@
             android:id="@+id/cardStats"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            app:cardBackgroundColor="#1A2B2B2B"
             app:cardCornerRadius="32dp"
             app:cardElevation="12dp"
-            app:cardBackgroundColor="#1A2B2B2B"
-            app:layout_constraintTop_toBottomOf="@id/profileImage"
-            android:layout_marginTop="24dp"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/profileImage">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -219,111 +220,110 @@
                     android:id="@+id/ageLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
                     android:text="Age"
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
-                    android:fontFamily="sans-serif"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
+                <EditText
                     android:id="@+id/ageField"
                     android:layout_width="100dp"
                     android:layout_height="32dp"
                     android:background="@drawable/profile_field_background"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:hint=""
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
-                    android:hint=""
+                    android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
-                    app:layout_constraintTop_toTopOf="@id/ageLabel"
+                    android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="@id/ageLabel"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/ageLabel" />
 
                 <TextView
                     android:id="@+id/bloodLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="sans-serif"
                     android:text="Blood group"
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
-                    android:fontFamily="sans-serif"
-                    app:layout_constraintTop_toBottomOf="@id/ageLabel"
-                    android:layout_marginTop="12dp"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/ageLabel" />
 
-                <TextView
+                <EditText
                     android:id="@+id/bloodField"
                     android:layout_width="100dp"
                     android:layout_height="32dp"
                     android:background="@drawable/profile_field_background"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:hint=""
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
-                    android:hint=""
+                    android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
-                    app:layout_constraintTop_toTopOf="@id/bloodLabel"
+                    android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="@id/bloodLabel"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/bloodLabel" />
 
                 <TextView
                     android:id="@+id/heightLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="sans-serif"
                     android:text="Height"
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
-                    android:fontFamily="sans-serif"
-                    app:layout_constraintTop_toBottomOf="@id/bloodLabel"
-                    android:layout_marginTop="12dp"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/bloodLabel" />
 
-                <TextView
+                <EditText
                     android:id="@+id/heightField"
                     android:layout_width="100dp"
                     android:layout_height="32dp"
                     android:background="@drawable/profile_field_background"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:hint=""
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
-                    android:hint=""
+                    android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
-                    app:layout_constraintTop_toTopOf="@id/heightLabel"
+                    android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="@id/heightLabel"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/heightLabel" />
 
                 <TextView
                     android:id="@+id/weightLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="sans-serif"
                     android:text="Weight"
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
-                    android:fontFamily="sans-serif"
-                    app:layout_constraintTop_toBottomOf="@id/heightLabel"
-                    android:layout_marginTop="12dp"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/heightLabel" />
 
-                <TextView
+                <EditText
                     android:id="@+id/weightField"
                     android:layout_width="100dp"
                     android:layout_height="32dp"
                     android:background="@drawable/profile_field_background"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:hint=""
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
-                    android:hint=""
+                    android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
-                    app:layout_constraintTop_toTopOf="@id/weightLabel"
+                    android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="@id/weightLabel"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/weightLabel" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
         </androidx.cardview.widget.CardView>
 
         <!-- Allergies Card -->
@@ -331,15 +331,15 @@
             android:id="@+id/cardAllergies"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            app:cardBackgroundColor="#1A2B2B2B"
             app:cardCornerRadius="32dp"
             app:cardElevation="12dp"
-            app:cardBackgroundColor="#1A2B2B2B"
-            app:layout_constraintTop_toBottomOf="@id/cardStats"
-            android:layout_marginTop="24dp"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardStats">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -350,64 +350,63 @@
                     android:id="@+id/allergiesTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
                     android:text="Allergies and Reactions"
                     android:textColor="#FFFFFF"
                     android:textSize="22sp"
-                    android:fontFamily="sans-serif"
                     android:textStyle="bold"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
+                <EditText
                     android:id="@+id/allergyField1"
                     android:layout_width="0dp"
                     android:layout_height="32dp"
+                    android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:hint="e.g. Penicillin"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
-                    android:hint=""
+                    android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
-                    app:layout_constraintTop_toBottomOf="@id/allergiesTitle"
-                    android:layout_marginTop="16dp"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@id/allergiesTitle" />
 
-                <TextView
+                <EditText
                     android:id="@+id/allergyField2"
                     android:layout_width="0dp"
                     android:layout_height="32dp"
+                    android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:hint=""
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
-                    android:hint=""
+                    android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
-                    app:layout_constraintTop_toBottomOf="@id/allergyField1"
-                    android:layout_marginTop="16dp"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@id/allergyField1" />
 
-                <TextView
+                <EditText
                     android:id="@+id/allergyField3"
                     android:layout_width="0dp"
                     android:layout_height="32dp"
+                    android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:hint=""
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
-                    android:hint=""
+                    android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
-                    app:layout_constraintTop_toBottomOf="@id/allergyField2"
-                    android:layout_marginTop="16dp"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@id/allergyField2" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
         </androidx.cardview.widget.CardView>
 
         <!-- Injuries Card -->
@@ -415,16 +414,15 @@
             android:id="@+id/cardInjuries"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            app:cardBackgroundColor="#1A2B2B2B"
             app:cardCornerRadius="32dp"
             app:cardElevation="12dp"
-            app:cardBackgroundColor="#1A2B2B2B"
-            app:layout_constraintTop_toBottomOf="@id/cardAllergies"
-            android:layout_marginTop="24dp"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginBottom="24dp">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardAllergies">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -435,66 +433,80 @@
                     android:id="@+id/injuriesTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Post injuries and Operations done"
+                    android:fontFamily="sans-serif"
+                    android:text="Past injuries and Operations done"
                     android:textColor="#FFFFFF"
                     android:textSize="22sp"
-                    android:fontFamily="sans-serif"
                     android:textStyle="bold"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
+                <EditText
                     android:id="@+id/injuryField1"
                     android:layout_width="0dp"
                     android:layout_height="32dp"
+                    android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:hint="e.g. Knee surgery 2022"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
-                    android:hint=""
+                    android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
-                    app:layout_constraintTop_toBottomOf="@id/injuriesTitle"
-                    android:layout_marginTop="16dp"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@id/injuriesTitle" />
 
-                <TextView
+                <EditText
                     android:id="@+id/injuryField2"
                     android:layout_width="0dp"
                     android:layout_height="32dp"
+                    android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:hint=""
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
-                    android:hint=""
+                    android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
-                    app:layout_constraintTop_toBottomOf="@id/injuryField1"
-                    android:layout_marginTop="16dp"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@id/injuryField1" />
 
-                <TextView
+                <EditText
                     android:id="@+id/injuryField3"
                     android:layout_width="0dp"
                     android:layout_height="32dp"
+                    android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
+                    android:hint=""
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
-                    android:hint=""
+                    android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
-                    app:layout_constraintTop_toBottomOf="@id/injuryField2"
-                    android:layout_marginTop="16dp"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@id/injuryField2" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
         </androidx.cardview.widget.CardView>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Save Button (Now correctly placed outside the last card) -->
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="32dp"
+            android:backgroundTint="@color/purple_500"
+            android:text="Save Profile"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardInjuries" />
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

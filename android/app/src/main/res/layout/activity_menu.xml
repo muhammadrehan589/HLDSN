@@ -93,10 +93,10 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:src="@drawable/ic_profile_avatar"
-                        android:tint="#FFFFFF"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:tint="#FFFFFF" />
 
                     <TextView
                         android:id="@+id/profileText"
@@ -140,10 +140,10 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:src="@drawable/ic_home"
-                        android:tint="#FFFFFF"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:tint="#FFFFFF" />
 
                     <TextView
                         android:id="@+id/homeText"
@@ -187,10 +187,10 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:src="@drawable/ic_settings"
-                        android:tint="#FFFFFF"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:tint="#FFFFFF" />
 
                     <TextView
                         android:id="@+id/settingsText"
@@ -234,10 +234,10 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:src="@drawable/ic_info"
-                        android:tint="#FFFFFF"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:tint="#FFFFFF" />
 
                     <TextView
                         android:id="@+id/aboutText"
@@ -280,10 +280,10 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:src="@drawable/ic_logout"
-                        android:tint="#FFFFFF"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:tint="#FFFFFF" />
 
                     <TextView
                         android:id="@+id/logoutText"

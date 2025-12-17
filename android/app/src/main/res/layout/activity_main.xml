@@ -1,745 +1,484 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    tools:context=".MainActivity">
+    android:background="#FFFFFF">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="0dp">
 
-        <!-- Status Bar -->
-        <ImageView
-            android:id="@+id/statusBar"
-            android:layout_width="match_parent"
-            android:layout_height="36dp"
-            android:src="@drawable/login_status_bar"
-            android:scaleType="fitXY"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <!-- App Bar with Gradient -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/appBar"
+        <!-- Header with gradient and icons -->
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="88dp"
             android:background="@drawable/header_gradient"
-            app:layout_constraintTop_toBottomOf="@id/statusBar">
+            android:elevation="4dp">
 
             <ImageView
-                android:id="@+id/menuIcon"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:id="@+id/menu_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="20dp"
                 android:src="@drawable/ic_menu"
-                android:contentDescription="Menu"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="35dp"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="15dp" />
+                android:contentDescription="Menu" />
 
             <TextView
-                android:id="@+id/appTitle"
+                android:id="@+id/app_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
                 android:text="HLDSN"
-                android:textSize="32sp"
                 android:textColor="#FFFFFF"
-                android:fontFamily="serif"
                 android:textStyle="bold"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="27dp"
-                app:layout_constraintStart_toEndOf="@id/menuIcon"
-                android:layout_marginStart="11dp" />
+                android:textSize="28sp"
+                android:fontFamily="serif"
+                android:letterSpacing="0.05"
+                android:shadowColor="#33000000"
+                android:shadowDx="0"
+                android:shadowDy="2"
+                android:shadowRadius="2" />
 
             <ImageView
-                android:id="@+id/bellIcon"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:id="@+id/notification_icon"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"
                 android:src="@drawable/ic_notification"
-                android:contentDescription="Notifications"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="44dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginEnd="15dp" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:contentDescription="Notifications" />
+        </RelativeLayout>
 
         <!-- Banner Section -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/bannerCard"
-            android:layout_width="0dp"
-            android:layout_height="164dp"
-            android:layout_marginStart="39dp"
-            android:layout_marginEnd="39dp"
-            android:layout_marginTop="27dp"
-            app:cardCornerRadius="18dp"
-            app:cardElevation="0dp"
-            app:layout_constraintTop_toBottomOf="@id/appBar"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:elevation="2dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <ImageView
+                android:id="@+id/banner_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#EFEFEF">
+                android:scaleType="centerCrop"
+                android:src="@drawable/flood_banner" />
 
-                <ImageView
-                    android:id="@+id/bannerImage"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/flood_banner"
-                    android:contentDescription="Disaster Banner"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="bottom|start"
+                android:padding="16dp">
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2025 Flood"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:shadowColor="#80000000"
+                    android:shadowDx="0"
+                    android:shadowDy="2"
+                    android:shadowRadius="2" />
 
-        </androidx.cardview.widget.CardView>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Peshawar, Pakistan"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:shadowColor="#80000000"
+                    android:shadowDx="0"
+                    android:shadowDy="2"
+                    android:shadowRadius="2" />
+            </LinearLayout>
 
-        <!-- Dots Indicator -->
+            <!-- Carousel Dots -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="8dp">
+                <View android:layout_width="8dp" android:layout_height="8dp" android:background="@drawable/dot_active" android:layout_margin="2dp" />
+                <View android:layout_width="8dp" android:layout_height="8dp" android:background="@drawable/dot_inactive" android:layout_margin="2dp" />
+                <View android:layout_width="8dp" android:layout_height="8dp" android:background="@drawable/dot_inactive" android:layout_margin="2dp" />
+                <View android:layout_width="8dp" android:layout_height="8dp" android:background="@drawable/dot_inactive" android:layout_margin="2dp" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Emergency Button -->
+        <Button
+            android:id="@+id/btn_emergency"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_margin="16dp"
+            android:backgroundTint="#E94F7A"
+            android:text="Emergency | SOS"
+            android:textAllCaps="false"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:fontFamily="sans-serif" />
+
+        <!-- Contacts Section -->
         <LinearLayout
-            android:id="@+id/dotsIndicator"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="17dp"
-            app:layout_constraintTop_toBottomOf="@id/bannerCard"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:orientation="vertical"
+            android:background="#E5E5E5"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
 
-            <ImageView
-                android:layout_width="7dp"
-                android:layout_height="7dp"
-                android:src="@drawable/dot_active"
-                android:layout_marginEnd="12dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:text="Contacts"
+                android:textStyle="bold"
+                android:textColor="#000"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif" />
 
-            <ImageView
-                android:layout_width="7dp"
-                android:layout_height="7dp"
-                android:src="@drawable/dot_inactive"
-                android:layout_marginEnd="12dp" />
+            <!-- Individual Contact Items -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="8dp">
 
-            <ImageView
-                android:layout_width="7dp"
-                android:layout_height="7dp"
-                android:src="@drawable/dot_inactive"
-                android:layout_marginEnd="12dp" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
 
-            <ImageView
-                android:layout_width="7dp"
-                android:layout_height="7dp"
-                android:src="@drawable/dot_inactive" />
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/ic_fire"
+                        android:background="@drawable/circle_bg" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Fire Rescue"
+                        android:textColor="#000"
+                        android:textSize="12sp"
+                        android:gravity="center" />
+                </LinearLayout>
+
+                <!-- Repeat similar for other contacts (Edhi, Hospital, Police) -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/ic_edhi"
+                        android:background="@drawable/circle_bg" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Edhi Foundation"
+                        android:textColor="#000"
+                        android:textSize="12sp"
+                        android:gravity="center" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/ic_hospital"
+                        android:background="@drawable/circle_bg" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hospital"
+                        android:textColor="#000"
+                        android:textSize="12sp"
+                        android:gravity="center" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/ic_police"
+                        android:background="@drawable/circle_bg" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Police"
+                        android:textColor="#000"
+                        android:textSize="12sp"
+                        android:gravity="center" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+        <!-- Services Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#E5E5E5"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:text="Services"
+                android:textStyle="bold"
+                android:textColor="#000"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="8dp">
+
+                <!-- CAMP Locations -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/ic_camp"
+                        android:background="@drawable/circle_bg" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CAMP Locations"
+                        android:textColor="#000"
+                        android:textSize="12sp"
+                        android:gravity="center" />
+                </LinearLayout>
+
+                <!-- Volunteer Network -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/ic_volunteer"
+                        android:background="@drawable/circle_bg" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Volunteer Network"
+                        android:textColor="#000"
+                        android:textSize="12sp"
+                        android:gravity="center" />
+                </LinearLayout>
+
+                <!-- Hazard Alert -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/ic_hazard"
+                        android:background="@drawable/circle_bg" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hazard Alert"
+                        android:textColor="#000"
+                        android:textSize="12sp"
+                        android:gravity="center" />
+                </LinearLayout>
+
+                <!-- Disaster Recovery -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/ic_disaster"
+                        android:background="@drawable/circle_bg" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Disaster Recovery"
+                        android:textColor="#000"
+                        android:textSize="12sp"
+                        android:gravity="center" />
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- Emergency SOS Button -->
-        <Button
-            android:id="@+id/emergencyButton"
-            android:layout_width="0dp"
-            android:layout_height="76dp"
-            android:text="Emergency | SOS"
-            android:textSize="32sp"
-            android:textColor="#FFFFFF"
-            android:fontFamily="sans-serif"
-            android:textStyle="bold"
-            android:background="@drawable/homepage_emergency_button"
-            android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginTop="24dp"
-            app:layout_constraintTop_toBottomOf="@id/dotsIndicator"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+        <!-- Information Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#E5E5E5"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:layout_marginBottom="16dp">
 
-        <!-- Contact Tile Section -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/contactTile"
-            android:layout_width="0dp"
-            android:layout_height="134dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginTop="24dp"
-            app:cardCornerRadius="0dp"
-            app:cardElevation="0dp"
-            app:cardBackgroundColor="#D9D9D9"
-            app:layout_constraintTop_toBottomOf="@id/emergencyButton"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:text="Information"
+                android:textStyle="bold"
+                android:textColor="#000"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="8dp">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
 
-                <TextView
-                    android:id="@+id/contactsLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Contacts"
-                    android:textSize="14sp"
-                    android:textColor="#000000"
-                    android:fontFamily="sans-serif"
-                    android:textStyle="bold"
-                    android:background="@drawable/homepage_tile_label_background"
-                    android:paddingStart="36dp"
-                    android:paddingEnd="36dp"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
-                    android:layout_marginStart="0dp"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
+                <!-- Safety Tips -->
                 <LinearLayout
-                    android:id="@+id/contactsGrid"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:layout_marginTop="43dp"
-                    app:layout_constraintTop_toBottomOf="@id/contactsLabel"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginEnd="24dp">
-
-                    <!-- Fire Rescue -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/ic_safety"
+                        android:background="@drawable/circle_bg" />
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp">
-
-                        <ImageButton
-                            android:id="@+id/fireRescueButton"
-                            android:layout_width="47dp"
-                            android:layout_height="59dp"
-                            android:src="@drawable/ic_fire"
-                            android:scaleType="fitXY"
-                            android:background="@android:color/transparent"
-                            android:contentDescription="Fire Rescue"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Fire Rescue"
-                            android:textSize="14sp"
-                            android:textColor="#000000"
-                            android:fontFamily="sans-serif"
-                            android:layout_marginTop="8dp"
-                            app:layout_constraintTop_toBottomOf="@id/fireRescueButton"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- Edhi Foundation -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp">
-
-                        <ImageButton
-                            android:id="@+id/edhiButton"
-                            android:layout_width="48dp"
-                            android:layout_height="45dp"
-                            android:src="@drawable/ic_edhi"
-                            android:scaleType="fitXY"
-                            android:background="@android:color/transparent"
-                            android:contentDescription="Edhi Foundation"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Edhi Foundation"
-                            android:textSize="14sp"
-                            android:textColor="#000000"
-                            android:fontFamily="sans-serif"
-                            android:layout_marginTop="8dp"
-                            android:maxLines="2"
-                            android:gravity="center"
-                            app:layout_constraintTop_toBottomOf="@id/edhiButton"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- Hospital -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp">
-
-                        <ImageButton
-                            android:id="@+id/hospitalButton"
-                            android:layout_width="42dp"
-                            android:layout_height="37dp"
-                            android:src="@drawable/ic_hospital"
-                            android:scaleType="fitXY"
-                            android:background="@android:color/transparent"
-                            android:contentDescription="Hospital"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Hospital"
-                            android:textSize="14sp"
-                            android:textColor="#000000"
-                            android:fontFamily="sans-serif"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center"
-                            app:layout_constraintTop_toBottomOf="@id/hospitalButton"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- Police -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1">
-
-                        <ImageButton
-                            android:id="@+id/policeButton"
-                            android:layout_width="53dp"
-                            android:layout_height="57dp"
-                            android:src="@drawable/ic_police"
-                            android:scaleType="fitXY"
-                            android:background="@android:color/transparent"
-                            android:contentDescription="Police"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Police"
-                            android:textSize="14sp"
-                            android:textColor="#000000"
-                            android:fontFamily="sans-serif"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center"
-                            app:layout_constraintTop_toBottomOf="@id/policeButton"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
+                        android:text="Safety Tips"
+                        android:textColor="#000"
+                        android:textSize="12sp"
+                        android:gravity="center" />
                 </LinearLayout>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <!-- Service Tile Section -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/serviceTile"
-            android:layout_width="0dp"
-            android:layout_height="140dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginTop="18dp"
-            app:cardCornerRadius="0dp"
-            app:cardElevation="0dp"
-            app:cardBackgroundColor="#D9D9D9"
-            app:layout_constraintTop_toBottomOf="@id/contactTile"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="8dp">
-
-                <TextView
-                    android:id="@+id/servicesLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Services"
-                    android:textSize="14sp"
-                    android:textColor="#000000"
-                    android:fontFamily="sans-serif"
-                    android:textStyle="bold"
-                    android:background="@drawable/homepage_tile_label_background"
-                    android:paddingStart="36dp"
-                    android:paddingEnd="36dp"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
-                    android:layout_marginStart="0dp"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
+                <!-- Emergency Preparedness -->
                 <LinearLayout
-                    android:id="@+id/servicesGrid"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:layout_marginTop="44dp"
-                    app:layout_constraintTop_toBottomOf="@id/servicesLabel"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginEnd="24dp">
-
-                    <!-- CAMP Locations -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/ic_preparedness"
+                        android:background="@drawable/circle_bg" />
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp">
-
-                        <ImageButton
-                            android:id="@+id/campButton"
-                            android:layout_width="45dp"
-                            android:layout_height="44dp"
-                            android:src="@drawable/ic_camp"
-                            android:scaleType="fitXY"
-                            android:background="@android:color/transparent"
-                            android:contentDescription="CAMP Locations"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="CAMP\nLocations"
-                            android:textSize="14sp"
-                            android:textColor="#000000"
-                            android:fontFamily="sans-serif"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center"
-                            app:layout_constraintTop_toBottomOf="@id/campButton"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- Volunteer Network -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp">
-
-                        <ImageButton
-                            android:id="@+id/volunteerButton"
-                            android:layout_width="48dp"
-                            android:layout_height="47dp"
-                            android:src="@drawable/ic_volunteer"
-                            android:scaleType="fitXY"
-                            android:background="@android:color/transparent"
-                            android:contentDescription="Volunteer Network"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Volunteer\nNetwork"
-                            android:textSize="14sp"
-                            android:textColor="#000000"
-                            android:fontFamily="sans-serif"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center"
-                            android:maxLines="2"
-                            app:layout_constraintTop_toBottomOf="@id/volunteerButton"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- Hazard alert -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp">
-
-                        <ImageButton
-                            android:id="@+id/hazardButton"
-                            android:layout_width="67dp"
-                            android:layout_height="64dp"
-                            android:src="@drawable/ic_hazard"
-                            android:scaleType="fitXY"
-                            android:background="@android:color/transparent"
-                            android:contentDescription="Hazard alert"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Hazard alert"
-                            android:textSize="14sp"
-                            android:textColor="#000000"
-                            android:fontFamily="sans-serif"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center"
-                            app:layout_constraintTop_toBottomOf="@id/hazardButton"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- Disaster recovery -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1">
-
-                        <ImageButton
-                            android:id="@+id/disasterButton"
-                            android:layout_width="49dp"
-                            android:layout_height="50dp"
-                            android:src="@drawable/ic_disaster"
-                            android:scaleType="fitXY"
-                            android:background="@android:color/transparent"
-                            android:contentDescription="Disaster recovery"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Disaster recovery"
-                            android:textSize="14sp"
-                            android:textColor="#000000"
-                            android:fontFamily="sans-serif"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center"
-                            android:maxLines="2"
-                            app:layout_constraintTop_toBottomOf="@id/disasterButton"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
+                        android:text="Emergency Preparedness"
+                        android:textColor="#000"
+                        android:textSize="12sp"
+                        android:gravity="center" />
                 </LinearLayout>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <!-- Information Tile Section -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/informationTile"
-            android:layout_width="0dp"
-            android:layout_height="136dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginTop="18dp"
-            android:layout_marginBottom="24dp"
-            app:cardCornerRadius="0dp"
-            app:cardElevation="0dp"
-            app:cardBackgroundColor="#D9D9D9"
-            app:layout_constraintTop_toBottomOf="@id/serviceTile"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="8dp">
-
-                <TextView
-                    android:id="@+id/informationLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Information"
-                    android:textSize="14sp"
-                    android:textColor="#000000"
-                    android:fontFamily="sans-serif"
-                    android:textStyle="bold"
-                    android:background="@drawable/homepage_tile_label_background"
-                    android:paddingStart="36dp"
-                    android:paddingEnd="36dp"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
-                    android:layout_marginStart="0dp"
-                    android:layout_marginTop="7dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
+                <!-- First Aid Tips -->
                 <LinearLayout
-                    android:id="@+id/informationGrid"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:layout_marginTop="27dp"
-                    app:layout_constraintTop_toBottomOf="@id/informationLabel"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginEnd="24dp">
-
-                    <!-- Safety Tips -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/ic_firstaid"
+                        android:background="@drawable/circle_bg" />
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp">
-
-                        <ImageButton
-                            android:id="@+id/safetyButton"
-                            android:layout_width="42dp"
-                            android:layout_height="41dp"
-                            android:src="@drawable/ic_safety"
-                            android:scaleType="fitXY"
-                            android:background="@android:color/transparent"
-                            android:contentDescription="Safety Tips"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Safety Tips"
-                            android:textSize="14sp"
-                            android:textColor="#000000"
-                            android:fontFamily="sans-serif"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center"
-                            app:layout_constraintTop_toBottomOf="@id/safetyButton"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- Emergency preparedness -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp">
-
-                        <ImageButton
-                            android:id="@+id/preparednessButton"
-                            android:layout_width="114dp"
-                            android:layout_height="116dp"
-                            android:src="@drawable/ic_preparedness"
-                            android:scaleType="fitXY"
-                            android:background="@android:color/transparent"
-                            android:contentDescription="Emergency preparedness"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Emergency preparedness"
-                            android:textSize="14sp"
-                            android:textColor="#000000"
-                            android:fontFamily="sans-serif"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center"
-                            android:maxLines="2"
-                            app:layout_constraintTop_toBottomOf="@id/preparednessButton"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- First Aid tips -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp">
-
-                        <ImageButton
-                            android:id="@+id/firstAidButton"
-                            android:layout_width="54dp"
-                            android:layout_height="49dp"
-                            android:src="@drawable/ic_firstaid"
-                            android:scaleType="fitXY"
-                            android:background="@android:color/transparent"
-                            android:contentDescription="First Aid tips"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="First Aid tips"
-                            android:textSize="14sp"
-                            android:textColor="#000000"
-                            android:fontFamily="sans-serif"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center"
-                            android:maxLines="2"
-                            app:layout_constraintTop_toBottomOf="@id/firstAidButton"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <!-- News -->
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1">
-
-                        <ImageButton
-                            android:id="@+id/newsButton"
-                            android:layout_width="56dp"
-                            android:layout_height="60dp"
-                            android:src="@drawable/ic_news"
-                            android:scaleType="fitXY"
-                            android:background="@android:color/transparent"
-                            android:contentDescription="News"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="News"
-                            android:textSize="14sp"
-                            android:textColor="#000000"
-                            android:fontFamily="sans-serif"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center"
-                            app:layout_constraintTop_toBottomOf="@id/newsButton"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
+                        android:text="First Aid Tips"
+                        android:textColor="#000"
+                        android:textSize="12sp"
+                        android:gravity="center" />
                 </LinearLayout>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                <!-- News -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/ic_news"
+                        />
 
-        </androidx.cardview.widget.CardView>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="News"
+                        android:textColor="#000"
+                        android:textSize="12sp"
+                        android:gravity="center" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.core.widget.NestedScrollView>
+        <!-- You can repeat the same approach for Services and Information sections -->
+
+    </LinearLayout>
+</ScrollView>

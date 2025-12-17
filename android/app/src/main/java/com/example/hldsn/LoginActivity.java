@@ -4,24 +4,19 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginActivity extends AppCompatActivity {
 
-    EditText emailField, passwordField;
-    Button loginButton,signupButton;
-    TextView dontHaveAccount;
+    private EditText emailField, passwordField;
+    private Button loginButton, signupButton;
 
-    FirebaseAuth auth;
-    FirebaseFirestore db;
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,17 +24,18 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         auth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
 
         emailField = findViewById(R.id.emailField);
         passwordField = findViewById(R.id.passwordField);
         loginButton = findViewById(R.id.loginButton);
         signupButton = findViewById(R.id.signupButton);
 
+        // Navigate to SignupActivity
         signupButton.setOnClickListener(v -> {
             startActivity(new Intent(LoginActivity.this, SignupActivity.class));
         });
 
+        // Login button click
         loginButton.setOnClickListener(v -> {
             String email = emailField.getText().toString().trim();
             String password = passwordField.getText().toString().trim();
@@ -49,38 +45,33 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            auth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            FirebaseUser user = auth.getCurrentUser();
-                            if (user != null) {
-                                String uid = user.getUid(); // unique user id
-
-                                // Fetch user's phone number from Firestore
-                                DocumentReference docRef = db.collection("users").document(uid);
-                                docRef.get().addOnSuccessListener(documentSnapshot -> {
-                                    if (documentSnapshot.exists()) {
-                                        String phone = documentSnapshot.getString("mobile");
-                                        if (phone != null && !phone.isEmpty()) {
-                                            // Go to OTP verification screen
-                                            Intent intent = new Intent(LoginActivity.this, Main.class);
-                                            intent.putExtra("PHONE_NUMBER", phone);
-                                            startActivity(intent);
-                                            finish();
-                                        } else {
-                                            Toast.makeText(this, "Phone number not found!", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                }).addOnFailureListener(e -> {
-                                    Toast.makeText(this, "Error fetching user data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                });
-                            }
-                        } else {
-                            Toast.makeText(this,
-                                    "Login Failed: " + task.getException().getMessage(),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
+            loginUser(email, password);
         });
+    }
+
+    private void loginUser(String email, String password) {
+        loginButton.setEnabled(false);
+        auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    loginButton.setEnabled(true);
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = auth.getCurrentUser();
+                        if (user != null) {
+                            // User successfully logged in
+                            Intent intent = new Intent(LoginActivity.this, HomePageActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                            finish();
+                        }
+                    } else {
+                        Toast.makeText(LoginActivity.this,
+                                "Login Failed: " + task.getException().getMessage(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    loginButton.setEnabled(true);
+                    Toast.makeText(LoginActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 }
