@@ -26,6 +26,10 @@
         <activity android:name=".SignupActivity"/>
         <activity android:name=".Main"/>
         <activity android:name=".OtpVerificationActivity"/>
+        <activity android:name=".HomePageActivity"/>
+        <activity android:name=".MenuActivity"/>
+        <activity android:name=".SaveUserProfileActivity"/>
+        <activity android:name=".UserProfileActivity"/>
 
 
     </application>
