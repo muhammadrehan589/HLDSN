@@ -29,6 +29,11 @@
         <activity android:name=".HomePageActivity"/>
         <activity android:name=".ChatsActivity"/>
         <activity android:name=".CommunityActivity"/>
+
+
+        <activity android:name=".CommunityReportActivity"/>
+        <activity android:name=".MenuActivity"/>
+
         <activity android:name=".SaveUserProfileActivity"/>
         <activity android:name=".UserProfileActivity"/>
 

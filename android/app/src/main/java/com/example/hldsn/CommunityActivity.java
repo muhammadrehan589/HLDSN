@@ -1,5 +1,6 @@
 package com.example.hldsn;
 
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -251,4 +252,5 @@ public class CommunityActivity extends AppCompatActivity {
         inputStream.close();
         return buffer.toByteArray();
     }
-}
+
+
