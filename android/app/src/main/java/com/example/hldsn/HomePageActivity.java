@@ -19,7 +19,7 @@ public class HomePageActivity extends AppCompatActivity {
 
     private static final String TAG = "HomePageActivity";
     private DrawerLayout drawerLayout;
-    private ImageView menuIcon;
+    private ImageView menuIcon,alertIcon;
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -44,11 +44,18 @@ public class HomePageActivity extends AppCompatActivity {
 
         drawerLayout = findViewById(R.id.drawer_layout);
         menuIcon = findViewById(R.id.menu_icon);
+        alertIcon = findViewById(R.id.alert);
+
 
         menuIcon.setOnClickListener(v -> {
             if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
                 drawerLayout.openDrawer(GravityCompat.START);
             }
+        });
+        alertIcon.setOnClickListener(v->{
+            Intent intent=new Intent(this,CommunityActivity.class);
+            startActivity(intent);
+
         });
 
         // Drawer menu items
@@ -57,6 +64,7 @@ public class HomePageActivity extends AppCompatActivity {
         View settingsItem = findViewById(R.id.settingsMenuItem);
         View aboutItem = findViewById(R.id.aboutMenuItem);
         View logoutItem = findViewById(R.id.logoutMenuItem);
+
 
         profileItem.setOnClickListener(v -> {
             // Check if profile exists **only when profile menu is clicked**
