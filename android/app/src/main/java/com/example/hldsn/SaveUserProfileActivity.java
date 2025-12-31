@@ -22,6 +22,7 @@ public class SaveUserProfileActivity extends AppCompatActivity {
     private EditText nameField, addressField, phoneField;
     private EditText ageField, bloodField, heightField, weightField;
     private EditText allergyField1, allergyField2, allergyField3;
+    private EditText contactField1, contactField2, contactField3;
     private EditText injuryField1, injuryField2, injuryField3;
     private Button saveButton;
 
@@ -58,6 +59,11 @@ public class SaveUserProfileActivity extends AppCompatActivity {
         injuryField2 = findViewById(R.id.injuryField2);
         injuryField3 = findViewById(R.id.injuryField3);
 
+       contactField1=findViewById(R.id.contactField1);
+       contactField2=findViewById(R.id.contactField2);
+       contactField3=findViewById(R.id.contactField3);
+
+
         saveButton = findViewById(R.id.saveButton);
     }
 
@@ -93,6 +99,12 @@ public class SaveUserProfileActivity extends AppCompatActivity {
         addIfNotEmpty(injuries, injuryField2.getText().toString());
         addIfNotEmpty(injuries, injuryField3.getText().toString());
         profile.put("injuries", injuries);
+
+        List<String> contacts = new ArrayList<>();
+        addIfNotEmpty(contacts, contactField1.getText().toString());
+        addIfNotEmpty(contacts, contactField2.getText().toString());
+        addIfNotEmpty(contacts, contactField3.getText().toString());
+        profile.put("contacts", contacts);
 
         db.collection("users")
                 .document(uid)

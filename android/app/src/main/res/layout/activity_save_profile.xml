@@ -10,7 +10,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="32dp">
+        android:paddingBottom="100dp">
 
         <!-- Status Bar -->
         <ImageView
@@ -79,7 +79,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/header" />
 
-        <!-- Profile Image (Clickable) -->
+        <!-- Profile Image -->
         <ImageView
             android:id="@+id/profileImage"
             android:layout_width="140dp"
@@ -126,8 +126,9 @@
 
                 <EditText
                     android:id="@+id/nameField"
-                    android:layout_width="120dp"
-                    android:layout_height="32dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="32dp"
                     android:background="@drawable/profile_field_background"
                     android:hint=""
                     android:paddingStart="12dp"
@@ -135,26 +136,30 @@
                     android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
                     android:textSize="14sp"
-                    app:layout_constraintBottom_toBottomOf="@id/nameLabel"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/nameLabel" />
+                    android:inputType="textPersonName"
+                    android:imeOptions="actionNext"
+                    app:layout_constraintTop_toBottomOf="@id/nameLabel"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
                 <TextView
                     android:id="@+id/addressLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="16dp"
                     android:fontFamily="sans-serif"
                     android:text="Address"
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/nameLabel" />
+                    app:layout_constraintTop_toBottomOf="@id/nameField" />
 
                 <EditText
                     android:id="@+id/addressField"
-                    android:layout_width="120dp"
-                    android:layout_height="32dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="32dp"
                     android:background="@drawable/profile_field_background"
                     android:hint=""
                     android:paddingStart="12dp"
@@ -162,26 +167,30 @@
                     android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
                     android:textSize="14sp"
-                    app:layout_constraintBottom_toBottomOf="@id/addressLabel"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/addressLabel" />
+                    android:inputType="textPostalAddress"
+                    android:imeOptions="actionNext"
+                    app:layout_constraintTop_toBottomOf="@id/addressLabel"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
                 <TextView
                     android:id="@+id/phoneLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="16dp"
                     android:fontFamily="sans-serif"
                     android:text="Phone no."
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/addressLabel" />
+                    app:layout_constraintTop_toBottomOf="@id/addressField" />
 
                 <EditText
                     android:id="@+id/phoneField"
-                    android:layout_width="120dp"
-                    android:layout_height="32dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="32dp"
                     android:background="@drawable/profile_field_background"
                     android:hint=""
                     android:paddingStart="12dp"
@@ -189,9 +198,12 @@
                     android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
                     android:textSize="14sp"
-                    app:layout_constraintBottom_toBottomOf="@id/phoneLabel"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/phoneLabel" />
+                    android:inputType="phone"
+                    android:imeOptions="actionDone"
+                    app:layout_constraintTop_toBottomOf="@id/phoneLabel"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
@@ -202,7 +214,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="130dp"
             android:layout_marginEnd="24dp"
             app:cardBackgroundColor="#1A2B2B2B"
             app:cardCornerRadius="32dp"
@@ -229,8 +241,9 @@
 
                 <EditText
                     android:id="@+id/ageField"
-                    android:layout_width="100dp"
-                    android:layout_height="32dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="32dp"
                     android:background="@drawable/profile_field_background"
                     android:hint=""
                     android:paddingStart="12dp"
@@ -238,26 +251,30 @@
                     android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
                     android:textSize="14sp"
-                    app:layout_constraintBottom_toBottomOf="@id/ageLabel"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/ageLabel" />
+                    android:inputType="number"
+                    android:imeOptions="actionNext"
+                    app:layout_constraintTop_toBottomOf="@id/ageLabel"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
                 <TextView
                     android:id="@+id/bloodLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="16dp"
                     android:fontFamily="sans-serif"
                     android:text="Blood group"
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/ageLabel" />
+                    app:layout_constraintTop_toBottomOf="@id/ageField" />
 
                 <EditText
                     android:id="@+id/bloodField"
-                    android:layout_width="100dp"
-                    android:layout_height="32dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="32dp"
                     android:background="@drawable/profile_field_background"
                     android:hint=""
                     android:paddingStart="12dp"
@@ -265,26 +282,30 @@
                     android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
                     android:textSize="14sp"
-                    app:layout_constraintBottom_toBottomOf="@id/bloodLabel"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/bloodLabel" />
+                    android:inputType="text"
+                    android:imeOptions="actionNext"
+                    app:layout_constraintTop_toBottomOf="@id/bloodLabel"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
                 <TextView
                     android:id="@+id/heightLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="16dp"
                     android:fontFamily="sans-serif"
                     android:text="Height"
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/bloodLabel" />
+                    app:layout_constraintTop_toBottomOf="@id/bloodField" />
 
                 <EditText
                     android:id="@+id/heightField"
-                    android:layout_width="100dp"
-                    android:layout_height="32dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="32dp"
                     android:background="@drawable/profile_field_background"
                     android:hint=""
                     android:paddingStart="12dp"
@@ -292,26 +313,30 @@
                     android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
                     android:textSize="14sp"
-                    app:layout_constraintBottom_toBottomOf="@id/heightLabel"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/heightLabel" />
+                    android:inputType="text"
+                    android:imeOptions="actionNext"
+                    app:layout_constraintTop_toBottomOf="@id/heightLabel"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
                 <TextView
                     android:id="@+id/weightLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="16dp"
                     android:fontFamily="sans-serif"
                     android:text="Weight"
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/heightLabel" />
+                    app:layout_constraintTop_toBottomOf="@id/heightField" />
 
                 <EditText
                     android:id="@+id/weightField"
-                    android:layout_width="100dp"
-                    android:layout_height="32dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="32dp"
                     android:background="@drawable/profile_field_background"
                     android:hint=""
                     android:paddingStart="12dp"
@@ -319,9 +344,101 @@
                     android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
                     android:textSize="14sp"
-                    app:layout_constraintBottom_toBottomOf="@id/weightLabel"
+                    android:inputType="numberDecimal"
+                    android:imeOptions="actionDone"
+                    app:layout_constraintTop_toBottomOf="@id/weightLabel"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Emergency Contacts Card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardEmergencyContacts"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            app:cardBackgroundColor="#1A2B2B2B"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardStats">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="24dp">
+
+                <TextView
+                    android:id="@+id/emergencyTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="Emergency Contacts"
+                    android:textColor="#FFFFFF"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <EditText
+                    android:id="@+id/contactField1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="32dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/profile_field_background"
+                    android:hint="Contact 1"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#BFFFFFFF"
+                    android:textSize="14sp"
+                    android:inputType="phone"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/weightLabel" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/emergencyTitle" />
+
+                <EditText
+                    android:id="@+id/contactField2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="32dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/profile_field_background"
+                    android:hint="Contact 2"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#BFFFFFFF"
+                    android:textSize="14sp"
+                    android:inputType="phone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/contactField1" />
+
+                <EditText
+                    android:id="@+id/contactField3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="32dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/profile_field_background"
+                    android:hint="Contact 3"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#BFFFFFFF"
+                    android:textSize="14sp"
+                    android:inputType="phone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/contactField2" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
@@ -339,7 +456,7 @@
             app:cardElevation="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardStats">
+            app:layout_constraintTop_toBottomOf="@id/cardEmergencyContacts">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -361,7 +478,8 @@
                 <EditText
                     android:id="@+id/allergyField1"
                     android:layout_width="0dp"
-                    android:layout_height="32dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="32dp"
                     android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
                     android:hint="e.g. Penicillin"
@@ -370,6 +488,7 @@
                     android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
                     android:textSize="14sp"
+                    android:inputType="text"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/allergiesTitle" />
@@ -377,7 +496,8 @@
                 <EditText
                     android:id="@+id/allergyField2"
                     android:layout_width="0dp"
-                    android:layout_height="32dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="32dp"
                     android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
                     android:hint=""
@@ -386,6 +506,7 @@
                     android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
                     android:textSize="14sp"
+                    android:inputType="text"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/allergyField1" />
@@ -393,7 +514,8 @@
                 <EditText
                     android:id="@+id/allergyField3"
                     android:layout_width="0dp"
-                    android:layout_height="32dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="32dp"
                     android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
                     android:hint=""
@@ -402,6 +524,7 @@
                     android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
                     android:textSize="14sp"
+                    android:inputType="text"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/allergyField2" />
@@ -444,7 +567,8 @@
                 <EditText
                     android:id="@+id/injuryField1"
                     android:layout_width="0dp"
-                    android:layout_height="32dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="32dp"
                     android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
                     android:hint="e.g. Knee surgery 2022"
@@ -453,6 +577,7 @@
                     android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
                     android:textSize="14sp"
+                    android:inputType="text"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/injuriesTitle" />
@@ -460,7 +585,8 @@
                 <EditText
                     android:id="@+id/injuryField2"
                     android:layout_width="0dp"
-                    android:layout_height="32dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="32dp"
                     android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
                     android:hint=""
@@ -469,6 +595,7 @@
                     android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
                     android:textSize="14sp"
+                    android:inputType="text"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/injuryField1" />
@@ -476,7 +603,8 @@
                 <EditText
                     android:id="@+id/injuryField3"
                     android:layout_width="0dp"
-                    android:layout_height="32dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="32dp"
                     android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
                     android:hint=""
@@ -485,6 +613,7 @@
                     android:textColor="#FFFFFF"
                     android:textColorHint="#BFFFFFFF"
                     android:textSize="14sp"
+                    android:inputType="text"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/injuryField2" />
@@ -492,7 +621,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Save Button (Now correctly placed outside the last card) -->
+        <!-- Save Button -->
         <Button
             android:id="@+id/saveButton"
             android:layout_width="0dp"

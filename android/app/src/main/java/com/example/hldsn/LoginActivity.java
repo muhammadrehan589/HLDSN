@@ -51,9 +51,12 @@ public class LoginActivity extends AppCompatActivity {
 
     private void loginUser(String email, String password) {
         loginButton.setEnabled(false);
+        loginButton.setText("Logging in...");
         auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     loginButton.setEnabled(true);
+
+
                     if (task.isSuccessful()) {
                         FirebaseUser user = auth.getCurrentUser();
                         if (user != null) {

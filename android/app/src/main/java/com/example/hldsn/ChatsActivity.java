@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class ChatsActivity extends AppCompatActivity {
+    TextView communitybtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,5 +26,22 @@ public class ChatsActivity extends AppCompatActivity {
             communityTab.setOnClickListener(v ->
                     startActivity(new Intent(ChatsActivity.this, CommunityActivity.class)));
         }
+        init();
+        listners();
     }
+
+    public void init(){
+        communitybtn=findViewById(R.id.communitybtn);
+
+    }
+    public void listners(){
+        communitybtn.setOnClickListener(v->{
+            Intent intent=new Intent(this,CommunityActivity.class);
+            startActivity(intent);
+        });
+    }
+
+
+
+
 }

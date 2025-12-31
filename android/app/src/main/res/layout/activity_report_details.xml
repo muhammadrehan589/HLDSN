@@ -5,33 +5,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/login_gradient"
-    tools:context=".ReportDetailsActivity">
-
-    <ImageView
-        android:id="@+id/statusBar"
-        android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:contentDescription="Decorative status bar"
-        android:scaleType="fitXY"
-        android:src="@drawable/login_status_bar"
-        app:layout_constraintTop_toTopOf="parent" />
+    >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="0dp"
         android:layout_height="88dp"
         android:background="@drawable/header_gradient"
-        app:layout_constraintTop_toBottomOf="@id/statusBar"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        tools:layout_editor_absoluteY="36dp"
+        tools:ignore="MissingConstraints">
 
         <ImageView
             android:id="@+id/backIcon"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:contentDescription="Back"
             android:layout_marginStart="16dp"
             android:layout_marginTop="35dp"
+            android:contentDescription="Back"
             android:src="@drawable/ic_back"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -54,8 +46,8 @@
             android:id="@+id/shareIcon"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginTop="40dp"
+            android:layout_marginEnd="16dp"
             android:contentDescription="Share"
             android:src="@drawable/ic_notification"
             app:layout_constraintEnd_toEndOf="parent"

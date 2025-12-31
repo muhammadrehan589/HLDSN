@@ -2,6 +2,58 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- ==================== HARDWARE FEATURES (Optional) ==================== -->
+    <!-- Camera is optional -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+
+    <!-- Location is optional (app works without it) -->
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+
+    <!-- Bluetooth is optional -->
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
+
+    <!-- Wi-Fi is optional -->
+    <uses-feature android:name="android.hardware.wifi" android:required="false" />
+
+    <!-- ==================== PERMISSIONS ==================== -->
+
+    <!-- Media Images (Android 13+) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <!-- Camera -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- Location -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Nearby Devices Discovery (Recommended for Android 12+ / API 31+) -->
+    <!-- These replace old BLUETOOTH/ADMIN permissions for discovery & connection -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="31" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE"
+        tools:targetApi="31" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"
+        tools:targetApi="31" />
+    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="31" />
+
+    <!-- Optional: Legacy Bluetooth (for devices below Android 12) -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+
+    <!-- Wi-Fi State (needed for Wi-Fi Direct on older versions) -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+
+    <!-- Internet (required for Firebase, ImageKit, etc.) -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- ==================== APPLICATION ==================== -->
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,31 +64,28 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HLDSN"
         tools:targetApi="31">
+
+        <!-- Launcher Activity -->
         <activity
             android:name=".LaunchActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-<!--        <activity android:name=".LoginActivity"/>-->
-        <activity android:name=".LoginActivity"/>
-        <activity android:name=".SignupActivity"/>
-        <activity android:name=".Main"/>
-        <activity android:name=".OtpVerificationActivity"/>
-        <activity android:name=".HomePageActivity"/>
-        <activity android:name=".ChatsActivity"/>
-        <activity android:name=".CommunityActivity"/>
 
-
-        <activity android:name=".CommunityReportActivity"/>
-        <activity android:name=".MenuActivity"/>
-
-        <activity android:name=".SaveUserProfileActivity"/>
-        <activity android:name=".UserProfileActivity"/>
-
+        <!-- Other Activities -->
+        <activity android:name=".LoginActivity" android:exported="false" />
+        <activity android:name=".SignupActivity" android:exported="false" />
+        <activity android:name=".Main" android:exported="false" />
+        <activity android:name=".OtpVerificationActivity" android:exported="false" />
+        <activity android:name=".HomePageActivity" android:exported="false" />
+        <activity android:name=".ChatsActivity" android:exported="false" />
+        <activity android:name=".CommunityActivity" android:exported="false" />
+        <activity android:name=".ReportDetailsActivity" android:exported="false" />
+        <activity android:name=".SaveUserProfileActivity" android:exported="false" />
+        <activity android:name=".UserProfileActivity" android:exported="false" />
 
     </application>
 

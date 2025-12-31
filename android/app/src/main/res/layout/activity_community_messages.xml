@@ -123,7 +123,7 @@
                         android:layout_gravity="center_horizontal"
                         android:contentDescription="Empty State"
                         android:src="@drawable/ic_notification"
-                        android:tint="#B0FFFFFF" />
+                        app:tint="#B0FFFFFF" />
 
                     <TextView
                         android:id="@+id/emptyTitle"
