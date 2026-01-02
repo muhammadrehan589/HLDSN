@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="incident_types">
+        <item>Flood</item>
+        <item>Earthquake</item>
+        <item>Landslide</item>
+        <item>Fire</item>
+        <item>Storm</item>
+        <item>Others</item>
+    </string-array>
+</resources>
