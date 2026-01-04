@@ -5,106 +5,166 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/login_gradient"
-    tools:context=".CommunityActivity">
+    tools:context=".DisplayReportActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- Status Bar -->
+        <ImageView
+            android:id="@+id/communityStatusBar"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/login_status_bar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Header -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/communityHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/header_gradient"
+            android:paddingStart="20dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/communityStatusBar">
+
             <ImageView
-                android:id="@+id/communityStatusBar"
-                android:layout_width="0dp"
-                android:layout_height="36dp"
-                android:scaleType="fitXY"
-                android:src="@drawable/login_status_bar"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:id="@+id/backIcon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:contentDescription="Navigate back"
+                android:src="@drawable/ic_back"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/communityHeader"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/header_gradient"
-                android:paddingStart="20dp"
-                android:paddingTop="16dp"
-                android:paddingEnd="20dp"
-                android:paddingBottom="16dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/communityStatusBar">
-
-                <ImageView
-                    android:id="@+id/backIcon"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:contentDescription="Navigate back"
-                    android:src="@drawable/ic_back"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/communityTitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-black"
-                    android:gravity="center"
-                    android:text="Community"
-                    android:textColor="#FFFFFF"
-                    android:textSize="30sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/communityBell"
-                    app:layout_constraintStart_toEndOf="@id/backIcon"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.5" />
-
-                <ImageView
-                    android:id="@+id/communityBell"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:contentDescription="Notifications"
-                    android:src="@drawable/ic_notification"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
             <TextView
-                android:id="@+id/communitySubtitle"
+                android:id="@+id/communityTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="32dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="32dp"
-                android:text="Stay informed with real-time alerts from responders and neighbors."
-                android:textColor="#E6FFFFFF"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/communityHeader" />
-            
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/communityRecyclerView"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="16dp"
-                android:clipToPadding="false"
-                android:overScrollMode="never"
-                android:paddingBottom="96dp"
-                app:layout_constraintTop_toBottomOf="@id/communitySubtitle"
+                android:fontFamily="sans-serif-black"
+                android:gravity="center"
+                android:text="Community"
+                android:textColor="#FFFFFF"
+                android:textSize="30sp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                tools:listitem="@android:layout/simple_list_item_2"
-                tools:itemCount="4" />
+                app:layout_constraintEnd_toStartOf="@+id/communityBell"
+                app:layout_constraintStart_toEndOf="@id/backIcon"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5" />
 
+            <ImageView
+                android:id="@+id/communityBell"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:contentDescription="Notifications"
+                android:src="@drawable/ic_notification"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <!-- Subtitle -->
+        <TextView
+            android:id="@+id/communitySubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="32dp"
+            android:text="Stay informed with real-time alerts from responders and neighbors."
+            android:textColor="#E6FFFFFF"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/communityHeader" />
+
+        <!-- SwipeRefreshLayout wrapping content area -->
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/communitySubtitle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <!-- Shimmer Loading Placeholder -->
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/shimmerLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:shimmer_auto_start="true"
+                    app:shimmer_duration="1400"
+                    app:shimmer_base_color="#1A2B2B2B"
+                    app:shimmer_highlight_color="#33FFFFFF">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:paddingTop="20dp"
+                        android:paddingBottom="100dp">
+
+                        <!-- 6 fake shimmer items -->
+                        <include layout="@layout/item_shimmer_incident" />
+                        <include layout="@layout/item_shimmer_incident" />
+                        <include layout="@layout/item_shimmer_incident" />
+                        <include layout="@layout/item_shimmer_incident" />
+                        <include layout="@layout/item_shimmer_incident" />
+                        <include layout="@layout/item_shimmer_incident" />
+
+                    </LinearLayout>
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+                <!-- RecyclerView (real content) -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/communityRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:overScrollMode="never"
+                    android:paddingBottom="96dp"
+                    android:visibility="gone"
+                    tools:itemCount="4" />
+
+                <!-- Empty State Message - Shown when no incidents -->
+                <TextView
+                    android:id="@+id/emptyStateText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Currently no incident reported"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#CCFFFFFF"
+                    android:textAlignment="center"
+                    android:padding="32dp"
+                    android:visibility="gone"
+                    android:drawableTop="@drawable/ic_no_incidents"
+                android:drawablePadding="16dp" />
+
+            </FrameLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Floating Action Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addCommunityPostFab"
         android:layout_width="wrap_content"

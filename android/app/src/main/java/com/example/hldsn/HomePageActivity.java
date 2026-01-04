@@ -28,10 +28,12 @@ public class HomePageActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private View news;
-    private View menuIcon, alertIcon;
+    private View menuIcon;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     private String currentUserId;
+    MaterialButton chatBtn;
+
 
     // Separate launchers for clarity and debugging
     private final ActivityResultLauncher<String> locationLauncher =
@@ -89,16 +91,12 @@ public class HomePageActivity extends AppCompatActivity {
     private void initViews() {
         drawerLayout = findViewById(R.id.drawer_layout);
         menuIcon = findViewById(R.id.menu_icon);
-        alertIcon = findViewById(R.id.alert);
-        news = findViewById(R.id.news);
+      chatBtn=findViewById(R.id.btn_service_chats);
     }
 
     private void initListeners() {
-        news.setOnClickListener(v -> startActivity(new Intent(this, ReportDetailsActivity.class)));
 
         menuIcon.setOnClickListener(v -> drawerLayout.openDrawer(androidx.core.view.GravityCompat.START));
-
-        alertIcon.setOnClickListener(v -> startActivity(new Intent(this, ChatsActivity.class)));
 
         // Drawer items (unchanged)
         findViewById(R.id.profileMenuItem).setOnClickListener(v -> {
@@ -127,6 +125,10 @@ public class HomePageActivity extends AppCompatActivity {
             auth.signOut();
             startActivity(new Intent(this, LoginActivity.class));
             finish();
+        });
+        chatBtn.setOnClickListener(v -> {
+            startActivity(new Intent(this, ChatsActivity.class));
+            drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START);
         });
     }
 

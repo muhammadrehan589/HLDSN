@@ -1,94 +1,63 @@
 package com.example.hldsn;
 
-import com.google.firebase.Timestamp;
+import java.util.Date;
 
 public class IncidentModel {
 
-    public String userId;
-    public String incidentType;
-    public String mediaUrl;
-    public String location;
-    public String description;
-    public boolean isSafe;
-    public String status;
-    public Timestamp createdAt;
+    private String userId;
+    private String incidentType;
+    private String mediaUrl;
+    private String location;
+    private String description;
+    private boolean isSafe;
+    private String status;
 
+    private Date createdAt; // Firestore Timestamp
+    private Double reporterLat;
+    private Double reporterLng;
+
+    // REQUIRED empty constructor
     public IncidentModel() {}
 
-    public IncidentModel(String userId, String incidentType, String location,
-                    String description, boolean isSafe,String mediaUrl,Long createdAt) {
-
+    // Constructor WITHOUT createdAt
+    public IncidentModel(
+            String userId,
+            String incidentType,
+            String location,
+            String description,
+            boolean isSafe,
+            String mediaUrl,
+            Double reporterLat,
+            Double reporterLng
+    ) {
         this.userId = userId;
         this.incidentType = incidentType;
         this.location = location;
         this.description = description;
         this.isSafe = isSafe;
-        this.status = "PENDING";
-        this.mediaUrl=mediaUrl;
-        this.createdAt = Timestamp.now();
-    }
-
-    public String getMediaUrl() {
-        return mediaUrl;
-    }
-
-    public void setMediaUrl(String mediaUrl) {
         this.mediaUrl = mediaUrl;
+        this.status = "PENDING";
+        this.reporterLat = reporterLat;
+        this.reporterLng = reporterLng;
+
+
+        // ❌ DO NOT set createdAt here
     }
 
-    public String getUserId() {
-        return userId;
-    }
+    // Getters
+    public String getUserId() { return userId; }
+    public String getIncidentType() { return incidentType; }
+    public String getMediaUrl() { return mediaUrl; }
+    public String getLocation() { return location; }
+    public String getDescription() { return description; }
+    public boolean isSafe() { return isSafe; }
+    public String getStatus() { return status; }
+    public Date getCreatedAt() { return createdAt; }
+    public Double getReporterLat() { return reporterLat; }
+    public Double getReporterLng() { return reporterLng; }
 
-    public String getIncidentType() {
-        return incidentType;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public boolean isSafe() {
-        return isSafe;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public void setIncidentType(String incidentType) {
-        this.incidentType = incidentType;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setSafe(boolean safe) {
-        isSafe = safe;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
+    // Setters
+    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+    public void setReporterLat(Double reporterLat) { this.reporterLat = reporterLat; }
+    public void setReporterLng(Double reporterLng) { this.reporterLng = reporterLng; }
 }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/login_gradient"
-    tools:context=".CommunityActivity">
+    tools:context=".ReportIncidentActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -62,7 +62,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Card -->
+        <!-- Report Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/reportCard"
             android:layout_width="0dp"
@@ -80,7 +80,7 @@
                 android:layout_height="wrap_content"
                 android:padding="24dp">
 
-                <!-- Title -->
+                <!-- Title & Subtitle -->
                 <TextView
                     android:id="@+id/cardTitle"
                     android:layout_width="wrap_content"
@@ -104,7 +104,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
-                <!-- Type -->
+                <!-- Type of Incident Label -->
                 <TextView
                     android:id="@+id/typeLabel"
                     android:layout_width="wrap_content"
@@ -115,14 +115,15 @@
                     app:layout_constraintTop_toBottomOf="@id/cardSubtitle"
                     app:layout_constraintStart_toStartOf="parent" />
 
+                <!-- CORRECTED DROPDOWN -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/typeDropdown"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    app:boxBackgroundMode="none"
-                    app:endIconMode="dropdown_menu"
                     app:endIconTint="#FFFFFF"
+                    app:hintTextColor="#80FFFFFF"
                     app:layout_constraintTop_toBottomOf="@id/typeLabel"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
@@ -137,13 +138,9 @@
                         android:textColorHint="#80FFFFFF"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp"
-                        android:dropDownHeight="wrap_content"
-                        android:dropDownVerticalOffset="8dp"
-                        android:completionThreshold="1"
-                        android:inputType="none"
-                        android:cursorVisible="false"
-                        android:importantForAutofill="no"
-                        android:entries="@array/incident_types" />
+                        android:inputType="text"
+                        android:imeOptions="actionNext" />
+
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Location -->
@@ -172,7 +169,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
-                <!-- Upload -->
+                <!-- Upload Media Section -->
                 <TextView
                     android:id="@+id/mediaLabel"
                     android:layout_width="wrap_content"
@@ -216,7 +213,7 @@
                         app:layout_constraintBottom_toBottomOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <!-- Preview -->
+                <!-- Image Preview & Progress -->
                 <ImageView
                     android:id="@+id/imagePreview"
                     android:layout_width="0dp"
@@ -235,8 +232,8 @@
                     android:visibility="gone"
                     app:layout_constraintTop_toTopOf="@id/imagePreview"
                     app:layout_constraintBottom_toBottomOf="@id/imagePreview"
-                    app:layout_constraintStart_toStartOf="@id/imagePreview"
-                    app:layout_constraintEnd_toEndOf="@id/imagePreview" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
                 <!-- Description -->
                 <TextView
@@ -263,7 +260,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
-                <!-- Buttons -->
+                <!-- Action Buttons -->
                 <Button
                     android:id="@+id/safeButton"
                     android:layout_width="0dp"
@@ -281,6 +278,7 @@
                     android:layout_width="0dp"
                     android:layout_height="60dp"
                     android:layout_marginTop="16dp"
+                    android:layout_marginBottom="24dp"
                     android:text="Submit Incident"
                     android:backgroundTint="#E94F7A"
                     android:textColor="#FFFFFF"

@@ -182,8 +182,8 @@
                             android:layout_height="match_parent"
                             android:contentDescription="Landslide photo"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/ic_launcher_background"
-                            tools:src="@drawable/ic_launcher_background" />
+                            android:src="@drawable/ic_launcher_background_2"
+                            tools:src="@drawable/ic_launcher_background_2" />
 
                     </androidx.cardview.widget.CardView>
 

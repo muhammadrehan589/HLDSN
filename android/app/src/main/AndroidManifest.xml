@@ -82,10 +82,11 @@
         <activity android:name=".OtpVerificationActivity" android:exported="false" />
         <activity android:name=".HomePageActivity" android:exported="false" />
         <activity android:name=".ChatsActivity" android:exported="false" />
-        <activity android:name=".CommunityActivity" android:exported="false" />
+        <activity android:name=".ReportIncidentActivity" android:exported="false" />
         <activity android:name=".ReportDetailsActivity" android:exported="false" />
         <activity android:name=".SaveUserProfileActivity" android:exported="false" />
         <activity android:name=".UserProfileActivity" android:exported="false" />
+        <activity android:name=".DisplayReportActivity" android:exported="false"/>
 
     </application>
 

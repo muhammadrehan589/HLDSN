@@ -24,7 +24,7 @@ public class ChatsActivity extends AppCompatActivity {
         View communityTab = findViewById(R.id.communityTab);
         if (communityTab != null) {
             communityTab.setOnClickListener(v ->
-                    startActivity(new Intent(ChatsActivity.this, CommunityActivity.class)));
+                    startActivity(new Intent(ChatsActivity.this, ReportIncidentActivity.class)));
         }
         init();
         listners();
@@ -36,7 +36,7 @@ public class ChatsActivity extends AppCompatActivity {
     }
     public void listners(){
         communitybtn.setOnClickListener(v->{
-            Intent intent=new Intent(this,CommunityActivity.class);
+            Intent intent=new Intent(this, DisplayReportActivity.class);
             startActivity(intent);
         });
     }

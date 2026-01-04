@@ -4,4 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#5D5B5B</color>
     <color name="teal_700">#FF018786</color>
+    <color name="safe_green">#2DD09E</color>
+    <color name="shimmer_placeholder">#33FFFFFF</color>
 </resources>
