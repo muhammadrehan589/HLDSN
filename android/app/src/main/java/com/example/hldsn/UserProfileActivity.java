@@ -1,6 +1,10 @@
 package com.example.hldsn;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -10,6 +14,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
@@ -24,7 +29,10 @@ private static String TAG = "UserProfileActivity";
     private TextView ageField, bloodField, heightField, weightField;
     private TextView allergyField1, allergyField2, allergyField3;
     private TextView injuryField1, injuryField2, injuryField3;
+    TextView contactField1, contactField2, contactField3;
     private ImageView profileImage;
+    Button editProfile ;
+
 
     // Firebase
     private FirebaseFirestore db;
@@ -52,12 +60,15 @@ private static String TAG = "UserProfileActivity";
             return;
         }
 
+
         // Initialize views
         initViews();
 
         // Fetch and display user data
         fetchUserData();
     }
+
+
 
     private void initViews() {
         profileImage = findViewById(R.id.profileImage);
@@ -78,7 +89,23 @@ private static String TAG = "UserProfileActivity";
         injuryField1 = findViewById(R.id.injuryField1);
         injuryField2 = findViewById(R.id.injuryField2);
         injuryField3 = findViewById(R.id.injuryField3);
+
+       editProfile = findViewById(R.id.editprofile);
+
+       contactField1=findViewById(R.id.contactField1);
+       contactField2=findViewById(R.id.contactField2);
+       contactField3=findViewById(R.id.contactField3);
+
+        editProfile.setOnClickListener(v->{
+            Intent intent=new Intent(this,SaveUserProfileActivity.class);
+            startActivity(intent);
+            finish();
+
+
+        });
+
     }
+
 
     private void fetchUserData() {
         String uid = auth.getCurrentUser().getUid();
@@ -114,10 +141,23 @@ private static String TAG = "UserProfileActivity";
                     setTextSafe(injuryField2, getListItemOrNone(injuries, 1));
                     setTextSafe(injuryField3, getListItemOrNone(injuries, 2));
 
+                    List<String> contacts = (List<String>) documentSnapshot.get("contacts");
+                    setTextSafe(contactField1, getListItemOrNone(contacts, 0));
+                    setTextSafe(contactField2, getListItemOrNone(contacts, 1));
+                    setTextSafe(contactField3, getListItemOrNone(contacts, 2));
+
                     // Profile image
                     String profileUrl = documentSnapshot.getString("profileImageUrl");
+                    Log.d("UserProfileActivity", "Profile URL: "+profileUrl);
                     if (profileUrl != null && !profileUrl.isEmpty()) {
-                        Picasso.get().load(profileUrl).placeholder(R.drawable.image_3).into(profileImage);
+
+                        Glide.with(this)
+                                .load(profileUrl)
+
+                                .placeholder(R.drawable.image_3)
+                                .error(R.drawable.image_3)
+                                .circleCrop()
+                                .into(profileImage);
                     } else {
                         profileImage.setImageResource(R.drawable.image_3);
                     }

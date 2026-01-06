@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="#F4F4F4"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -61,6 +63,9 @@
             android:layout_marginTop="12dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/banner_card_bg"
+            android:clipToOutline="true"
             android:elevation="2dp">
 
             <ImageView
@@ -69,37 +74,6 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:src="@drawable/flood_banner" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="bottom|start"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="2025 Flood"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:textSize="20sp"
-                    android:shadowColor="#80000000"
-                    android:shadowDx="0"
-                    android:shadowDy="2"
-                    android:shadowRadius="2" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Peshawar, Pakistan"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:shadowColor="#80000000"
-                    android:shadowDx="0"
-                    android:shadowDy="2"
-                    android:shadowRadius="2" />
-            </LinearLayout>
 
             <!-- Carousel Dots -->
             <LinearLayout
@@ -130,142 +104,194 @@
             android:fontFamily="sans-serif" />
 
         <!-- Contacts Section -->
+        <!-- Services Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="#D8D8D8"
+            android:elevation="1dp"
             android:orientation="vertical"
-            android:background="#E5E5E5"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp">
+            android:paddingHorizontal="8dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
+                android:layout_width="120dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/section_chip_bg"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
                 android:text="Contacts"
-                android:textStyle="bold"
-                android:textColor="#000"
-                android:layout_marginBottom="8dp"
-                android:fontFamily="sans-serif" />
+                android:textColor="#3A3A3A"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <!-- Individual Contact Items -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginBottom="8dp"
                 android:gravity="center"
-                android:layout_marginBottom="8dp">
+                android:orientation="horizontal">
 
-                <LinearLayout
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_contact_fire"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_margin="6dp"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:letterSpacing="0"
+                    android:lineSpacingExtra="2dp"
+                    android:maxLines="2"
+                    android:minHeight="120dp"
+                    android:paddingStart="12dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="12dp"
+                    android:text="Fire Rescue"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="#0A1F1F"
+                    android:textSize="12sp"
+                    app:backgroundTint="#FFFFFFFF"
+                    app:cornerRadius="22dp"
+                    app:icon="@drawable/ic_fire"
+                    app:iconGravity="textTop"
+                    app:iconPadding="8dp"
+                    app:iconSize="48dp"
+                    app:iconTint="@null"
+                    app:strokeColor="#1A000000"
+                    app:strokeWidth="1dp" />
 
-                    <ImageView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:src="@drawable/ic_fire"
-                        android:background="@drawable/circle_bg" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Fire Rescue"
-                        android:textColor="#000"
-                        android:textSize="12sp"
-                        android:gravity="center" />
-                </LinearLayout>
-
-                <!-- Repeat similar for other contacts (Edhi, Hospital, Police) -->
-                <LinearLayout
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_contact_edhi"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_margin="6dp"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-                    <ImageView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:src="@drawable/ic_edhi"
-                        android:background="@drawable/circle_bg" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Edhi Foundation"
-                        android:textColor="#000"
-                        android:textSize="12sp"
-                        android:gravity="center" />
-                </LinearLayout>
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:letterSpacing="0"
+                    android:lineSpacingExtra="2dp"
+                    android:maxLines="2"
+                    android:minHeight="120dp"
+                    android:paddingStart="12dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="12dp"
+                    android:text="Edhi Foundation"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="#0A1F1F"
+                    android:textSize="12sp"
+                    app:backgroundTint="#FFFFFFFF"
+                    app:cornerRadius="22dp"
+                    app:icon="@drawable/ic_edhi"
+                    app:iconGravity="textTop"
+                    app:iconPadding="8dp"
+                    app:iconSize="48dp"
+                    app:iconTint="@null"
+                    app:strokeColor="#1A000000"
+                    app:strokeWidth="1dp" />
 
-                <LinearLayout
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_contact_hospital"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_margin="6dp"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-                    <ImageView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:src="@drawable/ic_hospital"
-                        android:background="@drawable/circle_bg" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Hospital"
-                        android:textColor="#000"
-                        android:textSize="12sp"
-                        android:gravity="center" />
-                </LinearLayout>
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:letterSpacing="0"
+                    android:lineSpacingExtra="2dp"
+                    android:maxLines="2"
+                    android:minHeight="120dp"
+                    android:paddingStart="12dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="12dp"
+                    android:text="Hospital"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="#0A1F1F"
+                    android:textSize="12sp"
+                    app:backgroundTint="#FFFFFFFF"
+                    app:cornerRadius="22dp"
+                    app:icon="@drawable/ic_hospital"
+                    app:iconGravity="textTop"
+                    app:iconPadding="8dp"
+                    app:iconSize="48dp"
+                    app:iconTint="@null"
+                    app:strokeColor="#1A000000"
+                    app:strokeWidth="1dp" />
 
-                <LinearLayout
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_contact_police"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_margin="6dp"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-                    <ImageView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:src="@drawable/ic_police"
-                        android:background="@drawable/circle_bg" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Police"
-                        android:textColor="#000"
-                        android:textSize="12sp"
-                        android:gravity="center" />
-                </LinearLayout>
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:letterSpacing="0"
+                    android:lineSpacingExtra="2dp"
+                    android:maxLines="2"
+                    android:minHeight="120dp"
+                    android:paddingStart="12dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="12dp"
+                    android:text="Police"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="#0A1F1F"
+                    android:textSize="12sp"
+                    app:backgroundTint="#FFFFFFFF"
+                    app:cornerRadius="22dp"
+                    app:icon="@drawable/ic_police"
+                    app:iconGravity="textTop"
+                    app:iconPadding="8dp"
+                    app:iconSize="48dp"
+                    app:iconTint="@null"
+                    app:strokeColor="#1A000000"
+                    app:strokeWidth="1dp" />
             </LinearLayout>
         </LinearLayout>
-        <!-- Services Section -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="#E5E5E5"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp">
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="#D8D8D8"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:paddingHorizontal="8dp"
+            android:elevation="1dp">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
+                android:layout_width="120dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/section_chip_bg"
+                android:gravity="center"
                 android:text="Services"
                 android:textStyle="bold"
-                android:textColor="#000"
-                android:layout_marginBottom="8dp"
-                android:fontFamily="sans-serif" />
+                android:textColor="#3A3A3A"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginBottom="12dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -274,89 +300,133 @@
                 android:gravity="center"
                 android:layout_marginBottom="8dp">
 
-                <!-- CAMP Locations -->
-                <LinearLayout
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_service_camp"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-                    <ImageView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:src="@drawable/ic_camp"
-                        android:background="@drawable/circle_bg" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="CAMP Locations"
-                        android:textColor="#000"
-                        android:textSize="12sp"
-                        android:gravity="center" />
-                </LinearLayout>
+                    android:layout_margin="6dp"
+                    android:gravity="center"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:minHeight="120dp"
+                    android:text="CAMP Locations"
+                    android:textAllCaps="false"
+                    android:textColor="#0A1F1F"
+                    android:textSize="12sp"
+                    android:textAlignment="center"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:lineSpacingExtra="2dp"
+                    android:letterSpacing="0"
+                    app:backgroundTint="#FFFFFFFF"
+                    app:cornerRadius="22dp"
+                    app:icon="@drawable/ic_camp"
+                    app:iconGravity="textTop"
+                    app:iconPadding="8dp"
+                    app:iconSize="48dp"
+                    app:iconTint="@null"
+                    app:strokeColor="#1A000000"
+                    app:strokeWidth="1dp" />
 
-                <!-- Volunteer Network -->
-                <LinearLayout
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_service_volunteer"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-                    <ImageView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:src="@drawable/ic_volunteer"
-                        android:background="@drawable/circle_bg" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Volunteer Network"
-                        android:textColor="#000"
-                        android:textSize="12sp"
-                        android:gravity="center" />
-                </LinearLayout>
+                    android:layout_margin="6dp"
+                    android:gravity="center"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:minHeight="120dp"
+                    android:text="Volunteer Network"
+                    android:textAllCaps="false"
+                    android:textColor="#0A1F1F"
+                    android:textSize="12sp"
+                    android:textAlignment="center"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:lineSpacingExtra="2dp"
+                    android:letterSpacing="0"
+                    app:backgroundTint="#FFFFFFFF"
+                    app:cornerRadius="22dp"
+                    app:icon="@drawable/ic_volunteer"
+                    app:iconGravity="textTop"
+                    app:iconPadding="8dp"
+                    app:iconSize="48dp"
+                    app:iconTint="@null"
+                    app:strokeColor="#1A000000"
+                    app:strokeWidth="1dp" />
 
-                <!-- Hazard Alert -->
-                <LinearLayout
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_service_alert"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-                    <ImageView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:src="@drawable/ic_hazard"
-                        android:background="@drawable/circle_bg" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Hazard Alert"
-                        android:textColor="#000"
-                        android:textSize="12sp"
-                        android:gravity="center" />
-                </LinearLayout>
+                    android:layout_margin="6dp"
+                    android:gravity="center"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:minHeight="120dp"
+                    android:text="Hazard Alert"
+                    android:textAllCaps="false"
+                    android:textColor="#0A1F1F"
+                    android:textSize="12sp"
+                    android:textAlignment="center"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:lineSpacingExtra="2dp"
+                    android:letterSpacing="0"
+                    app:backgroundTint="#FFFFFFFF"
+                    app:cornerRadius="22dp"
+                    app:icon="@drawable/ic_hazard"
+                    app:iconGravity="textTop"
+                    app:iconPadding="8dp"
+                    app:iconSize="48dp"
+                    app:iconTint="@null"
+                    app:strokeColor="#1A000000"
+                    app:strokeWidth="1dp" />
 
-                <!-- Disaster Recovery -->
-                <LinearLayout
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_service_chats"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-                    <ImageView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:src="@drawable/ic_disaster"
-                        android:background="@drawable/circle_bg" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Disaster Recovery"
-                        android:textColor="#000"
-                        android:textSize="12sp"
-                        android:gravity="center" />
-                </LinearLayout>
+                    android:layout_margin="6dp"
+                    android:gravity="center"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:minHeight="120dp"
+                    android:text="Chats"
+                    android:textAllCaps="false"
+                    android:textColor="#0A1F1F"
+                    android:textSize="12sp"
+                    android:textAlignment="center"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:lineSpacingExtra="2dp"
+                    android:letterSpacing="0"
+                    app:backgroundTint="#FFFFFFFF"
+                    app:cornerRadius="22dp"
+                    app:icon="@drawable/ic_chat"
+                    app:iconGravity="textTop"
+                    app:iconPadding="8dp"
+                    app:iconSize="48dp"
+                    app:iconTint="@null"
+                    app:strokeColor="#1A000000"
+                    app:strokeWidth="1dp" />
             </LinearLayout>
         </LinearLayout>
 
@@ -365,24 +435,26 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="#E5E5E5"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:layout_marginBottom="16dp">
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginBottom="24dp"
+            android:background="#D8D8D8"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:paddingHorizontal="8dp"
+            android:elevation="1dp">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
+                android:layout_width="140dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/section_chip_bg"
+                android:gravity="center"
                 android:text="Information"
                 android:textStyle="bold"
-                android:textColor="#000"
-                android:layout_marginBottom="8dp"
-                android:fontFamily="sans-serif" />
+                android:textColor="#3A3A3A"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginBottom="12dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -390,90 +462,133 @@
                 android:orientation="horizontal"
                 android:gravity="center">
 
-                <!-- Safety Tips -->
-                <LinearLayout
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_info_safety"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-                    <ImageView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:src="@drawable/ic_safety"
-                        android:background="@drawable/circle_bg" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Safety Tips"
-                        android:textColor="#000"
-                        android:textSize="12sp"
-                        android:gravity="center" />
-                </LinearLayout>
+                    android:layout_margin="6dp"
+                    android:gravity="center"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:minHeight="120dp"
+                    android:text="Safety Tips"
+                    android:textAllCaps="false"
+                    android:textColor="#0A1F1F"
+                    android:textSize="12sp"
+                    android:textAlignment="center"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:lineSpacingExtra="2dp"
+                    android:letterSpacing="0"
+                    app:backgroundTint="#FFFFFFFF"
+                    app:cornerRadius="22dp"
+                    app:icon="@drawable/ic_safety"
+                    app:iconGravity="textTop"
+                    app:iconPadding="8dp"
+                    app:iconSize="48dp"
+                    app:iconTint="@null"
+                    app:strokeColor="#1A000000"
+                    app:strokeWidth="1dp" />
 
-                <!-- Emergency Preparedness -->
-                <LinearLayout
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_info_preparedness"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-                    <ImageView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:src="@drawable/ic_preparedness"
-                        android:background="@drawable/circle_bg" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Emergency Preparedness"
-                        android:textColor="#000"
-                        android:textSize="12sp"
-                        android:gravity="center" />
-                </LinearLayout>
+                    android:layout_margin="6dp"
+                    android:gravity="center"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:minHeight="120dp"
+                    android:text="Emergency Preparedness"
+                    android:textAllCaps="false"
+                    android:textColor="#0A1F1F"
+                    android:textSize="12sp"
+                    android:textAlignment="center"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:lineSpacingExtra="2dp"
+                    android:letterSpacing="0"
+                    app:backgroundTint="#FFFFFFFF"
+                    app:cornerRadius="22dp"
+                    app:icon="@drawable/ic_preparedness"
+                    app:iconGravity="textTop"
+                    app:iconPadding="8dp"
+                    app:iconSize="48dp"
+                    app:iconTint="@null"
+                    app:strokeColor="#1A000000"
+                    app:strokeWidth="1dp" />
 
-                <!-- First Aid Tips -->
-                <LinearLayout
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_info_first_aid"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-                    <ImageView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:src="@drawable/ic_firstaid"
-                        android:background="@drawable/circle_bg" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="First Aid Tips"
-                        android:textColor="#000"
-                        android:textSize="12sp"
-                        android:gravity="center" />
-                </LinearLayout>
+                    android:layout_margin="6dp"
+                    android:gravity="center"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:minHeight="120dp"
+                    android:text="First Aid Tips"
+                    android:textAllCaps="false"
+                    android:textColor="#0A1F1F"
+                    android:textSize="12sp"
+                    android:textAlignment="center"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:lineSpacingExtra="2dp"
+                    android:letterSpacing="0"
+                    app:backgroundTint="#FFFFFFFF"
+                    app:cornerRadius="22dp"
+                    app:icon="@drawable/ic_firstaid"
+                    app:iconGravity="textTop"
+                    app:iconPadding="8dp"
+                    app:iconSize="48dp"
+                    app:iconTint="@null"
+                    app:strokeColor="#1A000000"
+                    app:strokeWidth="1dp" />
 
-                <!-- News -->
-                <LinearLayout
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_info_news"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-                    <ImageView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:src="@drawable/ic_news"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="News"
-                        android:textColor="#000"
-                        android:textSize="12sp"
-                        android:gravity="center" />
-                </LinearLayout>
+                    android:layout_margin="6dp"
+                    android:gravity="center"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:minHeight="120dp"
+                    android:text="News"
+                    android:textAllCaps="false"
+                    android:textColor="#0A1F1F"
+                    android:textSize="12sp"
+                    android:textAlignment="center"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:lineSpacingExtra="2dp"
+                    android:letterSpacing="0"
+                    app:backgroundTint="#FFFFFFFF"
+                    app:cornerRadius="22dp"
+                    app:icon="@drawable/ic_news"
+                    app:iconGravity="textTop"
+                    app:iconPadding="8dp"
+                    app:iconSize="48dp"
+                    app:iconTint="@null"
+                    app:strokeColor="#1A000000"
+                    app:strokeWidth="1dp" />
             </LinearLayout>
         </LinearLayout>
 
