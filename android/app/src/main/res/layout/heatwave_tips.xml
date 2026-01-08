@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_landslide_screen"
-    tools:context=".HeatwaveTipsActivity">
+   >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/appBar"
@@ -146,8 +146,7 @@
                             android:layout_height="match_parent"
                             android:contentDescription="Heatwave photo"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/ic_launcher_background_2"
-                            tools:src="@drawable/ic_launcher_background_heatwave_tips" />
+                            android:src="@drawable/ic_launcher_background_heatwave_tips" />
 
                     </androidx.cardview.widget.CardView>
 

@@ -83,10 +83,12 @@
         <activity android:name=".HomePageActivity" android:exported="false" />
         <activity android:name=".ChatsActivity" android:exported="false" />
         <activity android:name=".ReportIncidentActivity" android:exported="false" />
-        <activity android:name=".ReportDetailsActivity" android:exported="false" />
+        <activity android:name=".SafetyTipsActivity" android:exported="false" />
         <activity android:name=".SaveUserProfileActivity" android:exported="false" />
         <activity android:name=".UserProfileActivity" android:exported="false" />
         <activity android:name=".DisplayReportActivity" android:exported="false"/>
+        <activity android:name=".SafetyTypeActivity" android:exported="false"/>
+
 
     </application>
 

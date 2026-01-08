@@ -146,8 +146,7 @@
                             android:layout_height="match_parent"
                             android:contentDescription="Earthquake photo"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/ic_launcher_background_2"
-                            tools:src="@drawable/ic_launcher_background_earthquake_tips" />
+                            android:src="@drawable/ic_launcher_background_earthquake_tips" />
 
                     </androidx.cardview.widget.CardView>
 

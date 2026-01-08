@@ -19,7 +19,7 @@ public class LaunchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launch);
 
-        ImageView background = findViewById(R.id.imageView);
+        ImageView background = findViewById(R.id.logoMark);
 
 
         // Load animations

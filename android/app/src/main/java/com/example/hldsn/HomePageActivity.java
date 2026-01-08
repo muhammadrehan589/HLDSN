@@ -32,7 +32,7 @@ public class HomePageActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     private String currentUserId;
-    MaterialButton chatBtn;
+    MaterialButton chatBtn,tipsBtn;
 
 
     // Separate launchers for clarity and debugging
@@ -92,6 +92,7 @@ public class HomePageActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawer_layout);
         menuIcon = findViewById(R.id.menu_icon);
       chatBtn=findViewById(R.id.btn_service_chats);
+      tipsBtn=findViewById(R.id.btn_info_safety);
     }
 
     private void initListeners() {
@@ -129,6 +130,12 @@ public class HomePageActivity extends AppCompatActivity {
         chatBtn.setOnClickListener(v -> {
             startActivity(new Intent(this, ChatsActivity.class));
             drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START);
+        });
+
+        tipsBtn.setOnClickListener(v->{
+            Intent intent=new Intent(this,SafetyTipsActivity.class);
+            startActivity(intent);
+
         });
     }
 

@@ -136,8 +136,7 @@
                         android:layout_height="match_parent"
                         android:contentDescription="Flood card"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/ic_launcher_background_2"
-                        tools:src="@drawable/ic_launcher_background_flood_alltips_screen" />
+                        android:src="@drawable/ic_launcher_background_flood_alltips_screen" />
 
                     <TextView
                         android:id="@+id/floodChip"
@@ -184,8 +183,7 @@
                         android:layout_height="match_parent"
                         android:contentDescription="Earthquake card"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/ic_launcher_background_2"
-                        tools:src="@drawable/ic_launcher_background_earthquake_alltips_screen" />
+                        android:src="@drawable/ic_launcher_background_earthquake_alltips_screen" />
 
                     <TextView
                         android:id="@+id/earthquakeChip"
@@ -234,8 +232,8 @@
                         android:layout_height="match_parent"
                         android:contentDescription="Heatwave card"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/ic_launcher_background_2"
-                        tools:src="@drawable/ic_launcher_background_heatwave_alltips_screen" />
+
+                        android:src="@drawable/ic_launcher_background_heatwave_alltips_screen" />
 
                     <TextView
                         android:id="@+id/heatwaveChip"
@@ -281,8 +279,7 @@
                         android:layout_height="match_parent"
                         android:contentDescription="Landslide card"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/ic_launcher_background_2"
-                        tools:src="@drawable/ic_launcher_background_landslide_alltips_screen" />
+                        android:src="@drawable/ic_launcher_background_landslide_alltips_screen" />
 
                     <TextView
                         android:id="@+id/landslideChip"
