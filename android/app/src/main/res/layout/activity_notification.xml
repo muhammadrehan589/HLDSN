@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/notification_gradient_bg"
+    tools:context=".NotificationActivity">
+
+    <ImageView
+        android:id="@+id/backButton"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="32dp"
+        android:contentDescription="Back"
+        android:src="@drawable/ic_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/screenTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:text="Notification"
+        android:textColor="#FFFFFF"
+        android:textSize="26sp"
+        android:fontFamily="sans-serif-medium"
+        app:layout_constraintBottom_toBottomOf="@id/backButton"
+        app:layout_constraintStart_toEndOf="@id/backButton"
+        app:layout_constraintTop_toTopOf="@id/backButton" />
+
+    <FrameLayout
+        android:id="@+id/homeButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="18dp"
+        android:background="@drawable/notification_home_button_bg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/backButton">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_home"
+            android:contentDescription="Home"
+            android:tint="#FFFFFF" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/tabRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/backButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tabGeneral"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:text="General"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            app:backgroundTint="@android:color/transparent"
+            app:cornerRadius="0dp"
+            app:strokeWidth="0dp" />
+
+        <FrameLayout
+            android:id="@+id/tabRecommended"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tabRecommendedButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="36dp"
+                android:text="Recomanded"
+                android:textAllCaps="false"
+                android:textColor="#9EDCC6"
+                android:textSize="15sp"
+                android:fontFamily="sans-serif-medium"
+                app:backgroundTint="@android:color/transparent"
+                app:cornerRadius="0dp"
+                app:strokeWidth="0dp" />
+
+            <TextView
+                android:id="@+id/tabRecommendedBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/notification_tab_badge_bg"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:text="12"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium" />
+        </FrameLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tabCommunity"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:text="Community"
+            android:textAllCaps="false"
+            android:textColor="#9EDCC6"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium"
+            app:backgroundTint="@android:color/transparent"
+            app:cornerRadius="0dp"
+            app:strokeWidth="0dp" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/tabIndicator"
+        android:layout_width="70dp"
+        android:layout_height="3dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="6dp"
+        android:background="#FFFFFF"
+        android:alpha="0.85"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tabRow" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/notificationScroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginBottom="32dp"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tabIndicator"
+        app:layout_constraintBottom_toTopOf="@+id/gestureIndicator"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <include layout="@layout/notification_item_flood" />
+            <include layout="@layout/notification_item_earthquake" />
+            <include layout="@layout/notification_item_landslide" />
+            <include layout="@layout/notification_item_storm" />
+            <include layout="@layout/notification_item_heatwave" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <View
+        android:id="@+id/gestureIndicator"
+        android:layout_width="110dp"
+        android:layout_height="4dp"
+        android:layout_marginBottom="18dp"
+        android:background="#FFFFFF"
+        android:alpha="0.6"
+        android:layout_gravity="center_horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
