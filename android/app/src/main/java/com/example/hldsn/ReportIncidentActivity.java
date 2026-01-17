@@ -67,6 +67,7 @@ public class ReportIncidentActivity extends AppCompatActivity {
 
     private Uri selectedMediaUri;
     private boolean isSafe = false;
+    private int safeColor, unsafeColor;
 
     // Firebase
     private FirebaseFirestore firestore;
@@ -145,15 +146,42 @@ public class ReportIncidentActivity extends AppCompatActivity {
             }
         });
     }
+    private void setupSafeButtonUI() {
+        if (isSafe) {
+            safeButton.setText("I am safe");
+            safeButton.setBackgroundColor(safeColor);
+        } else {
+            safeButton.setText("I am not safe");
+            safeButton.setBackgroundColor(unsafeColor);
+        }
+    }
+
 
     private void initListeners() {
+
+        safeColor = getResources().getColor(R.color.safe_green);
+        unsafeColor = getResources().getColor(R.color.lightred);
+
+        // INITIAL UI STATE
+        setupSafeButtonUI();
+
         uploadButton.setOnClickListener(v -> showMediaDialog());
+
         safeButton.setOnClickListener(v -> {
-            isSafe = true;
-            Toast.makeText(this, "Marked as Safe", Toast.LENGTH_SHORT).show();
+            isSafe = !isSafe; // toggle
+
+            setupSafeButtonUI();
+
+            Toast.makeText(
+                    this,
+                    isSafe ? "Marked as Safe" : "Marked as NOT Safe",
+                    Toast.LENGTH_SHORT
+            ).show();
         });
+
         submitReportButton.setOnClickListener(v -> submitIncident());
     }
+
 
     // ================= PERMISSIONS =================
     private void checkPermissions() {
@@ -178,6 +206,16 @@ public class ReportIncidentActivity extends AppCompatActivity {
     }
 
     private void fetchLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, location -> {
                     if (location != null) {

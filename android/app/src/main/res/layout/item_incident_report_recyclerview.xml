@@ -47,8 +47,8 @@
             android:id="@+id/incidentDescription"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="6dp"
             android:text="A major fire has broken out in the downtown area, affecting multiple buildings."
             android:textColor="#D9F3F0"
             android:textSize="14sp"
@@ -58,13 +58,13 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/incidentType" />
 
-        <!-- Location (FIXED) -->
+        <!-- Location -->
         <TextView
             android:id="@+id/incidentLocation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="6dp"
             android:text="Location: Downtown District, City Center"
             android:textColor="#E6FFFFFF"
             android:textSize="14sp"
@@ -72,7 +72,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/incidentDescription" />
 
-        <!-- Reporter Safety Status -->
+        <!-- Reporter Safety -->
         <TextView
             android:id="@+id/reporterSafety"
             android:layout_width="wrap_content"
@@ -84,81 +84,6 @@
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@id/incidentLocation"
             app:layout_constraintTop_toBottomOf="@id/incidentLocation" />
-
-        <!-- View More trigger -->
-        <Button
-            android:id="@+id/viewMoreCommentsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="View more"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            app:layout_constraintStart_toStartOf="@id/reporterSafety"
-            app:layout_constraintTop_toBottomOf="@id/reporterSafety" />
-
-        <!-- Scrollable inline comments (revealed after View More) -->
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/commentPreviewContainer"
-            android:layout_width="0dp"
-            android:layout_height="200dp"
-            android:layout_marginTop="12dp"
-            android:background="#1AFFFFFF"
-            android:padding="12dp"
-            android:visibility="gone"
-            android:overScrollMode="never"
-            android:nestedScrollingEnabled="true"
-            app:layout_constraintStart_toStartOf="@id/viewMoreCommentsButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/viewMoreCommentsButton">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingVertical="6dp"
-                    android:text="\"Emergency services responded within minutes.\""
-                    android:textColor="#E6FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingVertical="6dp"
-                    android:text="\"Evacuation assisted by nearby residents.\""
-                    android:textColor="#E6FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingVertical="6dp"
-                    android:text="\"Need additional water tankers on-site.\""
-                    android:textColor="#E6FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingVertical="6dp"
-                    android:text="\"Coordination with local shelters is ongoing.\""
-                    android:textColor="#E6FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingVertical="6dp"
-                    android:text="\"Volunteers are distributing water and blankets.\""
-                    android:textColor="#E6FFFFFF"
-                    android:textSize="14sp" />
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

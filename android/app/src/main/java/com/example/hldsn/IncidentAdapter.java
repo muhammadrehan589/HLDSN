@@ -39,10 +39,10 @@ public class IncidentAdapter extends RecyclerView.Adapter<IncidentAdapter.Incide
         holder.incidentLocation.setText("Location: " + incident.getLocation());
 
         // Safety status
-        String safetyText = "Reporter is safe: " + (incident.isSafe() ? "Yes" : "No");
+        String safetyText = "Reporter is safe: " + (incident.getSafe() ? "Yes" : "No");
         holder.reporterSafety.setText(safetyText);
         holder.reporterSafety.setTextColor(
-                incident.isSafe()
+                incident.getSafe()
                         ? holder.itemView.getContext().getColor(R.color.safe_green) // #2DD09E
                         : holder.itemView.getContext().getColor(android.R.color.holo_red_light)
         );

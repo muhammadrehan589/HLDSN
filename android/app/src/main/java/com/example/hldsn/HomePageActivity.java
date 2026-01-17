@@ -2,12 +2,15 @@ package com.example.hldsn;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -15,53 +18,71 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class HomePageActivity extends AppCompatActivity {
 
-    private static final String TAG = "PermissionDebug";
+    private static final String TAG = "HomePageActivity";
 
     private DrawerLayout drawerLayout;
-    private View news;
-    private View menuIcon;
+    private ImageView menuIcon, notificationIcon;
+    private TextView tvNotificationCount;
+    private MaterialButton chatBtn, tipsBtn;
+
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     private String currentUserId;
-    MaterialButton chatBtn,tipsBtn;
 
+    // Notification drawer
+    private RecyclerView notificationRecyclerView;
+    private NotificationAdapter notificationAdapter;
 
-    // Separate launchers for clarity and debugging
+    // Firestore listener
+    private ListenerRegistration incidentsListener;
+
+    // Track seen incidents
+    private Set<String> seenIncidentIds = new HashSet<>();
+
+    // Badge counter
+    private int unreadCount = 0;
+    private View emptyStateLayout;
+    List<IncidentModel> unreadIncidents = new ArrayList<>();
+
+    // Permission launchers
     private final ActivityResultLauncher<String> locationLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                Log.d(TAG, "Location permission result: " + isGranted);
+                Log.d(TAG, "Location permission: " + isGranted);
                 if (isGranted) {
-                    Toast.makeText(this, "Location permission granted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Location granted", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(this, "Location denied – some features limited", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Location denied", Toast.LENGTH_LONG).show();
                 }
-                requestNearbyGroupIfNeeded();  // Proceed to Nearby group
+                requestNearbyGroupIfNeeded();
             });
 
     private final ActivityResultLauncher<String[]> nearbyLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), results -> {
-                Log.d(TAG, "Nearby permissions result: " + results);
-
-                boolean allGranted = true;
-                for (Boolean granted : results.values()) {
-                    if (!granted) {
-                        allGranted = false;
-                    }
-                }
-
+                boolean allGranted = results.values().stream().allMatch(Boolean::booleanValue);
                 if (allGranted) {
-                    Toast.makeText(this, "Nearby devices permissions granted!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Nearby permissions granted", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(this, "Some nearby permissions denied – features limited", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Some nearby permissions denied", Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -73,158 +94,269 @@ public class HomePageActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        FirebaseUser user = auth.getCurrentUser();
-        if (user == null) {
+        if (auth.getCurrentUser() == null) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
             return;
         }
-        currentUserId = user.getUid();
+
+        currentUserId = auth.getCurrentUser().getUid();
 
         initViews();
+        initNotificationDrawer();
         initListeners();
+        loadSeenIncidentIds();
 
-        // Start permission check with debug logs
         checkAndRequestPermissions();
     }
 
     private void initViews() {
         drawerLayout = findViewById(R.id.drawer_layout);
         menuIcon = findViewById(R.id.menu_icon);
-      chatBtn=findViewById(R.id.btn_service_chats);
-      tipsBtn=findViewById(R.id.btn_info_safety);
+        notificationIcon = findViewById(R.id.notification_icon);
+        tvNotificationCount = findViewById(R.id.tv_notification_count);
+        chatBtn = findViewById(R.id.btn_service_chats);
+        tipsBtn = findViewById(R.id.btn_info_safety);
+    }
+
+    private void initNotificationDrawer() {
+        notificationRecyclerView = findViewById(R.id.notificationRecyclerView);
+        emptyStateLayout = findViewById(R.id.empty_state_layout);
+        if (notificationRecyclerView == null) {
+            Log.e(TAG, "notificationRecyclerView not found in layout!");
+            return;
+        }
+
+        // TEMP: Force red background to see if RecyclerView is visible
+
+        notificationRecyclerView.setVisibility(View.VISIBLE);
+
+        notificationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        notificationAdapter = new NotificationAdapter(this);
+        notificationRecyclerView.setAdapter(notificationAdapter);
+
+
     }
 
     private void initListeners() {
+        menuIcon.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
-        menuIcon.setOnClickListener(v -> drawerLayout.openDrawer(androidx.core.view.GravityCompat.START));
+        notificationIcon.setOnClickListener(v -> {
+            if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
+                drawerLayout.closeDrawer(GravityCompat.END);
+                markCurrentNotificationsAsSeen();
+            } else {
+                drawerLayout.openDrawer(GravityCompat.END);
+                updateNotificationBadge(0);
 
-        // Drawer items (unchanged)
+            }
+        });
+
+        chatBtn.setOnClickListener(v -> startActivity(new Intent(this, ChatsActivity.class)));
+        tipsBtn.setOnClickListener(v -> startActivity(new Intent(this, SafetyTipsActivity.class)));
+
+        // Profile menu example
         findViewById(R.id.profileMenuItem).setOnClickListener(v -> {
-            db.collection("users").document(currentUserId).get()
-                    .addOnSuccessListener(snapshot -> {
-                        Intent intent = snapshot.exists()
-                                ? new Intent(this, UserProfileActivity.class)
-                                : new Intent(this, SaveUserProfileActivity.class);
-                        intent.putExtra("USER_ID", currentUserId);
-                        startActivity(intent);
-                        drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START);
-                    })
-                    .addOnFailureListener(e -> Toast.makeText(this, "Error fetching profile", Toast.LENGTH_SHORT).show());
+            Intent intent = new Intent(this,
+                    auth.getCurrentUser() != null ? UserProfileActivity.class : SaveUserProfileActivity.class);
+            startActivity(intent);
+            drawerLayout.closeDrawer(GravityCompat.START);
         });
 
-        findViewById(R.id.homeMenuItem).setOnClickListener(v -> drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START));
-        findViewById(R.id.settingsMenuItem).setOnClickListener(v -> {
-            Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show();
-            drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START);
-        });
-        findViewById(R.id.aboutMenuItem).setOnClickListener(v -> {
-            Toast.makeText(this, "About clicked", Toast.LENGTH_SHORT).show();
-            drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START);
-        });
         findViewById(R.id.logoutMenuItem).setOnClickListener(v -> {
             auth.signOut();
             startActivity(new Intent(this, LoginActivity.class));
             finish();
         });
-        chatBtn.setOnClickListener(v -> {
-            startActivity(new Intent(this, ChatsActivity.class));
-            drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START);
-        });
+    }
 
-        tipsBtn.setOnClickListener(v->{
-            Intent intent=new Intent(this,SafetyTipsActivity.class);
-            startActivity(intent);
+    private void loadSeenIncidentIds() {
+        SharedPreferences prefs = getSharedPreferences("notification_prefs", MODE_PRIVATE);
+        seenIncidentIds = new HashSet<>(prefs.getStringSet("seen_incident_ids", new HashSet<>()));
+        Log.d(TAG, "Loaded " + seenIncidentIds.size() + " seen incident IDs");
+    }
 
+    private void saveSeenIncidentIds() {
+        SharedPreferences prefs = getSharedPreferences("notification_prefs", MODE_PRIVATE);
+        prefs.edit().putStringSet("seen_incident_ids", seenIncidentIds).apply();
+        Log.d(TAG, "Saved " + seenIncidentIds.size() + " seen IDs");
+    }
+
+    private void startListeningToIncidents() {
+        Log.d(TAG, "===== Starting incidents listener =====");
+
+        if (incidentsListener != null) {
+            incidentsListener.remove();
+        }
+
+        incidentsListener = db.collection("incidents")
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .limit(50)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, "Listener error:", error);
+                        runOnUiThread(() -> Toast.makeText(this, "Error loading incidents", Toast.LENGTH_SHORT).show());
+                        return;
+                    }
+
+                    if (value == null || value.isEmpty()) {
+                        runOnUiThread(() -> {
+                            updateNotificationBadge(0);
+                        });
+                        return;
+
+                    }
+
+                    unreadIncidents.clear();  // Clear before adding new
+
+                    for (DocumentSnapshot doc : value.getDocuments()) {
+                        String id = doc.getId();
+                        if (!seenIncidentIds.contains(id)) {
+                            IncidentModel incident = doc.toObject(IncidentModel.class);
+                            if (incident != null) {
+                                incident.setId(id);
+                                unreadIncidents.add(incident);
+                            }
+                        }
+                    }
+
+                    final int unread = unreadIncidents.size();
+                    Log.d(TAG, "Unread incidents count: " + unread);
+
+                    runOnUiThread(() -> {
+                        updateNotificationBadge(unread);
+                        if (notificationAdapter != null) {
+                            Log.d(TAG, "Calling updateList with " + unread + " items");
+                            notificationAdapter.updateList(unreadIncidents);
+
+                            if (unreadIncidents.isEmpty()) {
+                                notificationRecyclerView.setVisibility(View.GONE);
+                                emptyStateLayout.setVisibility(View.VISIBLE);
+                            } else {
+                                notificationRecyclerView.setVisibility(View.VISIBLE);
+                                emptyStateLayout.setVisibility(View.GONE);
+                            }
+
+                        }
+                    });
+                });
+    }
+
+    private void markCurrentNotificationsAsSeen() {
+        if (notificationAdapter == null) return;
+
+        List<IncidentModel> current = notificationAdapter.getCurrentList();
+        if (current.isEmpty()) return;
+
+        for (IncidentModel incident : current) {
+            if (incident.getId() != null) {
+                seenIncidentIds.add(incident.getId());
+            }
+        }
+
+        saveSeenIncidentIds();
+        updateNotificationBadge(0);
+
+        // Refresh list to show empty after marking seen
+        if (notificationAdapter != null) {
+            notificationAdapter.updateList(new ArrayList<>());
+            notificationRecyclerView.setVisibility(View.GONE);
+            emptyStateLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void updateNotificationBadge(int count) {
+        if (tvNotificationCount == null) return;
+
+        runOnUiThread(() -> {
+            if (count <= 0) {
+                tvNotificationCount.setVisibility(View.GONE);
+            } else if (count >= 10) {
+                tvNotificationCount.setText("10+");
+                tvNotificationCount.setVisibility(View.VISIBLE);
+            } else {
+                tvNotificationCount.setText(String.valueOf(count));
+                tvNotificationCount.setVisibility(View.VISIBLE);
+            }
         });
     }
 
-    // Main permission check with extensive debug logs
+    // Permission methods (kept mostly same)
     private void checkAndRequestPermissions() {
-        Log.d(TAG, "=== Starting permission check ===");
-
-        boolean hasLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED;
-        Log.d(TAG, "Location permission granted? " + hasLocation);
-
-        boolean hasNearby = areNearbyPermissionsGranted();
-        Log.d(TAG, "Nearby group permissions all granted? " + hasNearby);
-        Log.d(TAG, "BLUETOOTH_SCAN: " + (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED));
-        Log.d(TAG, "BLUETOOTH_CONNECT: " + (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED));
-        Log.d(TAG, "BLUETOOTH_ADVERTISE: " + (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED));
-        Log.d(TAG, "NEARBY_WIFI_DEVICES: " + (ContextCompat.checkSelfPermission(this, Manifest.permission.NEARBY_WIFI_DEVICES) == PackageManager.PERMISSION_GRANTED));
-
-        if (hasLocation && hasNearby) {
-            Log.d(TAG, "All permissions already granted – nothing to do");
-            return;
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            showBeautifulPermissionDialog();
         }
-
-        // Show the beautiful explanation dialog first
-        showBeautifulPermissionDialog();
     }
 
     private boolean areNearbyPermissionsGranted() {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.NEARBY_WIFI_DEVICES) == PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN)
+                == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+                        == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADVERTISE)
+                        == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.NEARBY_WIFI_DEVICES)
+                        == PackageManager.PERMISSION_GRANTED;
     }
 
-    // Shows your beautiful custom dialog (matching dialog_permission_explain_new.xml)
     private void showBeautifulPermissionDialog() {
-        Log.d(TAG, "Showing permission explanation dialog");
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_permission_explain, null);
 
         MaterialButton btnAllow = dialogView.findViewById(R.id.btn_allow);
-        Button btnDeny = dialogView.findViewById(R.id.btn_deny);
+        android.widget.Button btnDeny = dialogView.findViewById(R.id.btn_deny);
 
-        AlertDialog dialog = builder.setView(dialogView)
-                .setCancelable(false)
-                .create();
+        AlertDialog dialog = builder.setView(dialogView).setCancelable(false).create();
 
         btnAllow.setOnClickListener(v -> {
-            Log.d(TAG, "User clicked Allow – starting with Location permission");
             dialog.dismiss();
             locationLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
         });
 
         btnDeny.setOnClickListener(v -> {
-            Log.d(TAG, "User clicked Deny");
             dialog.dismiss();
-            Toast.makeText(this, "Permissions denied – some features will be limited", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Permissions denied", Toast.LENGTH_LONG).show();
         });
 
         dialog.show();
     }
 
-    // Called after Location result
     private void requestNearbyGroupIfNeeded() {
-        Log.d(TAG, "Checking if Nearby group permissions are needed");
-
-        if (areNearbyPermissionsGranted()) {
-            Log.d(TAG, "Nearby permissions already granted");
-            return;
-        }
-
-        String[] nearbyPermissions = {
+        if (areNearbyPermissionsGranted()) return;
+        String[] perms = {
                 Manifest.permission.BLUETOOTH_SCAN,
-                Manifest.permission.BLUETOOTH_ADVERTISE,
                 Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.BLUETOOTH_ADVERTISE,
                 Manifest.permission.NEARBY_WIFI_DEVICES
         };
-
-        Log.d(TAG, "Requesting Nearby devices group permissions");
-        nearbyLauncher.launch(nearbyPermissions);
+        nearbyLauncher.launch(perms);
     }
 
     @Override
     public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(androidx.core.view.GravityCompat.START)) {
-            drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START);
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
+            drawerLayout.closeDrawer(GravityCompat.END);
+            markCurrentNotificationsAsSeen();
         } else {
             super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        startListeningToIncidents();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (incidentsListener != null) {
+            incidentsListener.remove();
+            incidentsListener = null;
         }
     }
 }

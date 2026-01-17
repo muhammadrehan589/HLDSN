@@ -272,7 +272,6 @@
                     app:layout_constraintTop_toBottomOf="@id/descriptionField"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
-
                 <Button
                     android:id="@+id/submitReportButton"
                     android:layout_width="0dp"

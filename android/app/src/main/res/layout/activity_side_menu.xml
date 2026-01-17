@@ -26,5 +26,16 @@
         <include layout="@layout/activity_menu" />
 
     </FrameLayout>
+<!--    notification drawr-->
+
+
+    <FrameLayout
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end">  <!-- 'end' for right-side drawer -->
+
+        <include layout="@layout/activity_notification" />  <!-- Your notification layout -->
+
+    </FrameLayout>
 
 </androidx.drawerlayout.widget.DrawerLayout>

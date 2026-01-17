@@ -1,203 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/notification_gradient_bg"
-    tools:context=".NotificationActivity">
+    android:paddingTop="24dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
 
-    <ImageView
-        android:id="@+id/backButton"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:layout_marginStart="18dp"
-        android:layout_marginTop="32dp"
-        android:contentDescription="Back"
-        android:src="@drawable/ic_back"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/screenTitle"
-        android:layout_width="wrap_content"
+    <!-- Header -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:text="Notification"
-        android:textColor="#FFFFFF"
-        android:textSize="26sp"
-        android:fontFamily="sans-serif-medium"
-        app:layout_constraintBottom_toBottomOf="@id/backButton"
-        app:layout_constraintStart_toEndOf="@id/backButton"
-        app:layout_constraintTop_toTopOf="@id/backButton" />
-
-    <FrameLayout
-        android:id="@+id/homeButton"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="18dp"
-        android:background="@drawable/notification_home_button_bg"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/backButton">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_home"
-            android:contentDescription="Home"
-            android:tint="#FFFFFF" />
-    </FrameLayout>
+            android:id="@+id/backButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_back"
+            app:tint="#FFFFFF" />
 
+        <TextView
+            android:id="@+id/screenTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Notifications"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:paddingStart="12dp"/>
+
+    </LinearLayout>
+
+    <!-- Tabs -->
     <LinearLayout
         android:id="@+id/tabRow"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:gravity="center_vertical"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/backButton"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/tabGeneral"
             style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:paddingStart="0dp"
-            android:paddingEnd="0dp"
-            android:text="General"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
+            android:text="Community"
             android:textSize="16sp"
-            android:textStyle="bold"
-            android:fontFamily="sans-serif-medium"
-            app:backgroundTint="@android:color/transparent"
-            app:cornerRadius="0dp"
-            app:strokeWidth="0dp" />
-
-        <FrameLayout
-            android:id="@+id/tabRecommended"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/tabRecommendedButton"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:paddingStart="0dp"
-                android:paddingEnd="36dp"
-                android:text="Recomanded"
-                android:textAllCaps="false"
-                android:textColor="#9EDCC6"
-                android:textSize="15sp"
-                android:fontFamily="sans-serif-medium"
-                app:backgroundTint="@android:color/transparent"
-                app:cornerRadius="0dp"
-                app:strokeWidth="0dp" />
-
-            <TextView
-                android:id="@+id/tabRecommendedBadge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|end"
-                android:layout_marginStart="6dp"
-                android:background="@drawable/notification_tab_badge_bg"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:text="12"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:fontFamily="sans-serif-medium" />
-        </FrameLayout>
+            android:textColor="#FFFFFF"
+            android:backgroundTint="@android:color/transparent"/>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/tabCommunity"
+            android:id="@+id/tabRecommended"
             style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:paddingStart="0dp"
-            android:paddingEnd="0dp"
-            android:text="Community"
-            android:textAllCaps="false"
-            android:textColor="#9EDCC6"
+            android:text="Recommended"
             android:textSize="16sp"
-            android:fontFamily="sans-serif-medium"
-            app:backgroundTint="@android:color/transparent"
-            app:cornerRadius="0dp"
-            app:strokeWidth="0dp" />
+            android:textColor="#9EDCC6"
+            android:backgroundTint="@android:color/transparent"/>
     </LinearLayout>
 
+    <!-- Tab Indicator -->
     <View
         android:id="@+id/tabIndicator"
-        android:layout_width="70dp"
+        android:layout_width="24dp"
         android:layout_height="3dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="4dp"
         android:background="#FFFFFF"
         android:alpha="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tabRow" />
+        app:layout_constraintTop_toBottomOf="@id/tabRow"
+        app:layout_constraintStart_toStartOf="parent"/>
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/notificationScroll"
+    <!-- Notification List (RecyclerView) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/notificationRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="18dp"
-        android:layout_marginBottom="32dp"
-        android:clipToPadding="false"
-        android:paddingBottom="16dp"
+        android:layout_marginTop="16dp"
+        android:textAlignment="center"
         app:layout_constraintTop_toBottomOf="@id/tabIndicator"
-        app:layout_constraintBottom_toTopOf="@+id/gestureIndicator"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+    <LinearLayout
+        android:id="@+id/empty_state_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tabIndicator"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_notification_empty"
+        android:contentDescription="No notifications" />
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginTop="24dp"
+            android:text="No new incidents to show"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"/>
 
-            <include layout="@layout/notification_item_flood" />
-            <include layout="@layout/notification_item_earthquake" />
-            <include layout="@layout/notification_item_landslide" />
-            <include layout="@layout/notification_item_storm" />
-            <include layout="@layout/notification_item_heatwave" />
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-
-    <View
-        android:id="@+id/gestureIndicator"
-        android:layout_width="110dp"
-        android:layout_height="4dp"
-        android:layout_marginBottom="18dp"
-        android:background="#FFFFFF"
-        android:alpha="0.6"
-        android:layout_gravity="center_horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Stay safe — we'll notify you when something new happens"
+            android:textColor="#B0FFFFFF"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:textAlignment="center"/>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

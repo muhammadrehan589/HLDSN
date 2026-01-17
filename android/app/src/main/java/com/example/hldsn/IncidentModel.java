@@ -9,15 +9,15 @@ public class IncidentModel {
     private String mediaUrl;
     private String location;
     private String description;
-    private boolean isSafe;
+    private Boolean safe;
     private String status;
-
     private Date createdAt; // Firestore Timestamp
     private Double reporterLat;
     private Double reporterLng;
+    private String id;
 
-    // REQUIRED empty constructor
-    public IncidentModel() {}
+    public IncidentModel() {
+    }
 
     // Constructor WITHOUT createdAt
     public IncidentModel(
@@ -25,7 +25,7 @@ public class IncidentModel {
             String incidentType,
             String location,
             String description,
-            boolean isSafe,
+            Boolean safe,
             String mediaUrl,
             Double reporterLat,
             Double reporterLng
@@ -34,30 +34,87 @@ public class IncidentModel {
         this.incidentType = incidentType;
         this.location = location;
         this.description = description;
-        this.isSafe = isSafe;
+        this.safe = safe;
         this.mediaUrl = mediaUrl;
         this.status = "PENDING";
         this.reporterLat = reporterLat;
         this.reporterLng = reporterLng;
 
-
-        // ❌ DO NOT set createdAt here
     }
 
     // Getters
-    public String getUserId() { return userId; }
-    public String getIncidentType() { return incidentType; }
-    public String getMediaUrl() { return mediaUrl; }
-    public String getLocation() { return location; }
-    public String getDescription() { return description; }
-    public boolean isSafe() { return isSafe; }
-    public String getStatus() { return status; }
-    public Date getCreatedAt() { return createdAt; }
-    public Double getReporterLat() { return reporterLat; }
-    public Double getReporterLng() { return reporterLng; }
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getIncidentType() {
+        return incidentType;
+    }
+
+    public String getMediaUrl() {
+        return mediaUrl;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    //    public Boolean isSafe() { return safe; }
+    public String getStatus() {
+        return status;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public Double getReporterLat() {
+        return reporterLat;
+    }
+
+    public Double getReporterLng() {
+        return reporterLng;
+    }
 
     // Setters
-    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
-    public void setReporterLat(Double reporterLat) { this.reporterLat = reporterLat; }
-    public void setReporterLng(Double reporterLng) { this.reporterLng = reporterLng; }
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setReporterLat(Double reporterLat) {
+        this.reporterLat = reporterLat;
+    }
+
+    public void setReporterLng(Double reporterLng) {
+        this.reporterLng = reporterLng;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setIncidentType(String incidentType) {
+        this.incidentType = incidentType;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Boolean getSafe() {
+        return safe;
+    }
+
+    public void setSafe(Boolean safe) {
+        this.safe = safe;
+    }
+
 }
