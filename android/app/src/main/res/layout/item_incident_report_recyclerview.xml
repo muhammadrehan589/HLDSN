@@ -47,8 +47,8 @@
             android:id="@+id/incidentDescription"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
             android:layout_marginTop="6dp"
+            android:layout_marginStart="16dp"
             android:text="A major fire has broken out in the downtown area, affecting multiple buildings."
             android:textColor="#D9F3F0"
             android:textSize="14sp"
@@ -58,13 +58,13 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/incidentType" />
 
-        <!-- Location -->
+        <!-- Location (FIXED) -->
         <TextView
             android:id="@+id/incidentLocation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
             android:layout_marginTop="6dp"
+            android:layout_marginStart="16dp"
             android:text="Location: Downtown District, City Center"
             android:textColor="#E6FFFFFF"
             android:textSize="14sp"
@@ -72,7 +72,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/incidentDescription" />
 
-        <!-- Reporter Safety -->
+        <!-- Reporter Safety Status -->
         <TextView
             android:id="@+id/reporterSafety"
             android:layout_width="wrap_content"
@@ -84,6 +84,164 @@
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@id/incidentLocation"
             app:layout_constraintTop_toBottomOf="@id/incidentLocation" />
+
+        <!-- Scrollable inline comments (revealed after comment button pressed) -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/commentPreviewContainer"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="12dp"
+            android:background="#1AFFFFFF"
+            android:padding="12dp"
+            android:visibility="gone"
+            android:overScrollMode="never"
+            android:nestedScrollingEnabled="true"
+            app:layout_constraintStart_toStartOf="@id/reporterSafety"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/reporterSafety"
+            app:layout_goneMarginTop="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="6dp"
+                    android:text="&quot;Emergency services responded within minutes.&quot;"
+                    android:textColor="#E6FFFFFF"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="6dp"
+                    android:text="&quot;Evacuation assisted by nearby residents.&quot;"
+                    android:textColor="#E6FFFFFF"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="6dp"
+                    android:text="&quot;Need additional water tankers on-site.&quot;"
+                    android:textColor="#E6FFFFFF"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="6dp"
+                    android:text="&quot;Coordination with local shelters is ongoing.&quot;"
+                    android:textColor="#E6FFFFFF"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="6dp"
+                    android:text="&quot;Volunteers are distributing water and blankets.&quot;"
+                    android:textColor="#E6FFFFFF"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Reaction bar -->
+        <LinearLayout
+            android:id="@+id/reactionBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="4dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/reporterSafety"
+            app:layout_constraintTop_toBottomOf="@id/commentPreviewContainer"
+            app:layout_goneMarginTop="16dp">
+
+            <LinearLayout
+                android:id="@+id/likeContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/likeIcon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="Incident like count"
+                    android:src="@drawable/ic_thumb_up"
+                    app:tint="#4DA3FF" />
+
+                <TextView
+                    android:id="@+id/likeCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="113"
+                    android:textColor="#E6FFFFFF"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/dislikeContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/dislikeIcon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="Incident dislike count"
+                    android:src="@drawable/ic_thumb_down"
+                    app:tint="#F06A6A" />
+
+                <TextView
+                    android:id="@+id/dislikeCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="8"
+                    android:textColor="#E6FFFFFF"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/commentContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/commentIcon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="Incident comments count"
+                    android:src="@drawable/ic_comment"
+                    app:tint="#E6FFFFFF" />
+
+                <TextView
+                    android:id="@+id/commentCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="172"
+                    android:textColor="#E6FFFFFF"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

@@ -4,9 +4,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -58,6 +60,20 @@ public class IncidentAdapter extends RecyclerView.Adapter<IncidentAdapter.Incide
         } else {
             holder.incidentImage.setImageResource(R.drawable.ic_fire);
         }
+
+        boolean commentsExpanded = incident.isCommentsExpanded();
+        holder.commentPreviewContainer.setVisibility(commentsExpanded ? View.VISIBLE : View.GONE);
+
+        holder.commentContainer.setOnClickListener(v -> {
+            int adapterPosition = holder.getBindingAdapterPosition();
+            if (adapterPosition == RecyclerView.NO_POSITION) {
+                return;
+            }
+            IncidentModel current = incidentList.get(adapterPosition);
+            boolean newState = !current.isCommentsExpanded();
+            current.setCommentsExpanded(newState);
+            notifyItemChanged(adapterPosition);
+        });
     }
 
     @Override
@@ -74,6 +90,8 @@ public class IncidentAdapter extends RecyclerView.Adapter<IncidentAdapter.Incide
     static class IncidentViewHolder extends RecyclerView.ViewHolder {
         ImageView incidentImage;
         TextView incidentType, incidentDescription, incidentLocation, reporterSafety;
+        LinearLayout commentContainer;
+        NestedScrollView commentPreviewContainer;
 
         public IncidentViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -82,6 +100,8 @@ public class IncidentAdapter extends RecyclerView.Adapter<IncidentAdapter.Incide
             incidentDescription = itemView.findViewById(R.id.incidentDescription);
             incidentLocation = itemView.findViewById(R.id.incidentLocation);
             reporterSafety = itemView.findViewById(R.id.reporterSafety);
+            commentContainer = itemView.findViewById(R.id.commentContainer);
+            commentPreviewContainer = itemView.findViewById(R.id.commentPreviewContainer);
         }
     }
 }

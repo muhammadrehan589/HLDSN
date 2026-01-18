@@ -15,6 +15,7 @@ public class IncidentModel {
     private Double reporterLat;
     private Double reporterLng;
     private String id;
+    private boolean commentsExpanded;
 
     public IncidentModel() {
     }
@@ -115,6 +116,14 @@ public class IncidentModel {
 
     public void setSafe(Boolean safe) {
         this.safe = safe;
+    }
+
+    public boolean isCommentsExpanded() {
+        return commentsExpanded;
+    }
+
+    public void setCommentsExpanded(boolean commentsExpanded) {
+        this.commentsExpanded = commentsExpanded;
     }
 
 }
