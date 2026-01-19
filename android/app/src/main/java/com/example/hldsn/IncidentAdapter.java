@@ -8,7 +8,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -62,8 +61,6 @@ public class IncidentAdapter extends RecyclerView.Adapter<IncidentAdapter.Incide
             holder.incidentImage.setImageResource(R.drawable.ic_fire);
         }
 
-        holder.commentPreviewContainer.setVisibility(View.GONE);
-
         holder.commentContainer.setOnClickListener(v -> {
             int adapterPosition = holder.getBindingAdapterPosition();
             if (adapterPosition == RecyclerView.NO_POSITION) {
@@ -94,7 +91,6 @@ public class IncidentAdapter extends RecyclerView.Adapter<IncidentAdapter.Incide
         ImageView incidentImage;
         TextView incidentType, incidentDescription, incidentLocation, reporterSafety;
         LinearLayout commentContainer;
-        NestedScrollView commentPreviewContainer;
 
         public IncidentViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -104,7 +100,6 @@ public class IncidentAdapter extends RecyclerView.Adapter<IncidentAdapter.Incide
             incidentLocation = itemView.findViewById(R.id.incidentLocation);
             reporterSafety = itemView.findViewById(R.id.reporterSafety);
             commentContainer = itemView.findViewById(R.id.commentContainer);
-            commentPreviewContainer = itemView.findViewById(R.id.commentPreviewContainer);
         }
     }
 }

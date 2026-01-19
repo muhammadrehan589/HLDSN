@@ -64,18 +64,15 @@
             android:id="@+id/editprofile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-
-            android:layout_marginEnd="200dp"
+            android:layout_marginTop="8dp"
             android:backgroundTint="@color/purple_500"
             android:text="Edit Profile"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.183"
+            app:layout_constraintHorizontal_bias="0.109"
             app:layout_constraintStart_toStartOf="parent"
-            tools:ignore="MissingConstraints"
-            tools:layout_editor_absoluteY="112dp" />
+            app:layout_constraintTop_toBottomOf="@id/profileImage" />
 
         <ImageView
             android:id="@+id/backArrow"

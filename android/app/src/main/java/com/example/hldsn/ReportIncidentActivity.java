@@ -220,16 +220,26 @@ public class ReportIncidentActivity extends AppCompatActivity {
                 .addOnSuccessListener(this, location -> {
                     if (location != null) {
                         saveAndDisplayLocation(location);
-                    } else {
-                        // Request fresh location
-                        CancellationTokenSource token = new CancellationTokenSource();
-                        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, token.getToken())
-                                .addOnSuccessListener(this, this::saveAndDisplayLocation);
+                        return;
                     }
+
+                    // Request fresh location when lastLocation is null
+                    CancellationTokenSource token = new CancellationTokenSource();
+                    fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, token.getToken())
+                            .addOnSuccessListener(this, this::saveAndDisplayLocation)
+                            .addOnFailureListener(e -> {
+                                Log.w(TAG, "getCurrentLocation failed", e);
+                                Toast.makeText(this, "Could not detect location. Please try again. Or see if location is enabled.", Toast.LENGTH_SHORT).show();
+                            });
                 });
     }
 
     private void saveAndDisplayLocation(Location location) {
+        if (location == null) {
+            Log.w(TAG, "Location callback returned null; skipping update");
+            Toast.makeText(this, "Could not detect location. Please try again.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         currentLatitude = location.getLatitude();
         currentLongitude = location.getLongitude();
 

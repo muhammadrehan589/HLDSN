@@ -12,14 +12,6 @@
         android:layout_height="wrap_content"
         android:paddingBottom="100dp">
 
-        <!-- Status Bar -->
-        <ImageView
-            android:id="@+id/statusBar"
-            android:layout_width="match_parent"
-            android:layout_height="36dp"
-            android:scaleType="fitXY"
-            android:src="@drawable/login_status_bar"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- App Bar Header -->
         <androidx.constraintlayout.widget.ConstraintLayout
