@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,10 +24,13 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DisplayReportActivity extends AppCompatActivity {
 
@@ -91,7 +95,7 @@ public class DisplayReportActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        adapter = new IncidentAdapter();
+        adapter = new IncidentAdapter(this::showCommentsBottomSheet);
         communityRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         communityRecyclerView.setAdapter(adapter);
     }
@@ -250,6 +254,49 @@ public class DisplayReportActivity extends AppCompatActivity {
         locationPermissionGranted = false;
         currentUserLocation = null;
         loadIncidents(); // Will skip filtering
+    }
+
+    private void showCommentsBottomSheet(IncidentModel incident) {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_comments, null);
+
+        TextView title = sheetView.findViewById(R.id.commentsTitle);
+        TextView subtitle = sheetView.findViewById(R.id.commentsSubtitle);
+        RecyclerView commentsRecyclerView = sheetView.findViewById(R.id.commentsRecyclerView);
+        View closeSheet = sheetView.findViewById(R.id.closeSheet);
+
+        title.setText("Comments");
+        subtitle.setText("Discussion on " + incident.getIncidentType());
+
+        commentsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        CommentAdapter commentAdapter = new CommentAdapter();
+        commentsRecyclerView.setAdapter(commentAdapter);
+        commentAdapter.updateList(buildPlaceholderComments(incident));
+
+        closeSheet.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.setContentView(sheetView);
+        dialog.setOnShowListener(dialogInterface -> {
+            FrameLayout bottomSheet = dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (bottomSheet != null) {
+                BottomSheetBehavior<FrameLayout> behavior = BottomSheetBehavior.from(bottomSheet);
+                int halfHeight = (int) (getResources().getDisplayMetrics().heightPixels * 0.5f);
+                behavior.setPeekHeight(halfHeight, true);
+                behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        });
+
+        dialog.show();
+    }
+
+    private List<CommentModel> buildPlaceholderComments(IncidentModel incident) {
+        List<CommentModel> comments = new ArrayList<>();
+        comments.add(new CommentModel("Operations Desk", "Incident type: " + incident.getIncidentType() + " acknowledged. Dispatch alerted.", "2m ago"));
+        comments.add(new CommentModel("Community Lead", "Verified location at " + incident.getLocation() + ". Crowd control volunteers en route.", "5m ago"));
+        comments.add(new CommentModel("Logistics", "Water and blankets staged near the perimeter entrance.", "9m ago"));
+        comments.add(new CommentModel("Medical", "EMS triage point set at the north exit. ETA 3 minutes.", "11m ago"));
+        comments.add(new CommentModel("Safety", "Please keep a 50m radius clear for responders.", "15m ago"));
+        return comments;
     }
 
     private void hideShimmerAndShowRecycler() {

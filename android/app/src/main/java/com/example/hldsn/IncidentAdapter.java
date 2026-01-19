@@ -14,15 +14,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class IncidentAdapter extends RecyclerView.Adapter<IncidentAdapter.IncidentViewHolder> {
+    private final OnCommentClickListener commentClickListener;
+    private final List<IncidentModel> incidentList = new ArrayList<>();
 
-    private List<IncidentModel> incidentList = new ArrayList<>();
+    public IncidentAdapter(OnCommentClickListener commentClickListener) {
+        this.commentClickListener = commentClickListener;
+    }
 
     @NonNull
     @Override
@@ -61,18 +62,16 @@ public class IncidentAdapter extends RecyclerView.Adapter<IncidentAdapter.Incide
             holder.incidentImage.setImageResource(R.drawable.ic_fire);
         }
 
-        boolean commentsExpanded = incident.isCommentsExpanded();
-        holder.commentPreviewContainer.setVisibility(commentsExpanded ? View.VISIBLE : View.GONE);
+        holder.commentPreviewContainer.setVisibility(View.GONE);
 
         holder.commentContainer.setOnClickListener(v -> {
             int adapterPosition = holder.getBindingAdapterPosition();
             if (adapterPosition == RecyclerView.NO_POSITION) {
                 return;
             }
-            IncidentModel current = incidentList.get(adapterPosition);
-            boolean newState = !current.isCommentsExpanded();
-            current.setCommentsExpanded(newState);
-            notifyItemChanged(adapterPosition);
+            if (commentClickListener != null) {
+                commentClickListener.onCommentClicked(incidentList.get(adapterPosition));
+            }
         });
     }
 
@@ -85,6 +84,10 @@ public class IncidentAdapter extends RecyclerView.Adapter<IncidentAdapter.Incide
         incidentList.clear();
         incidentList.addAll(newList);
         notifyDataSetChanged();
+    }
+
+    public interface OnCommentClickListener {
+        void onCommentClicked(IncidentModel incident);
     }
 
     static class IncidentViewHolder extends RecyclerView.ViewHolder {
