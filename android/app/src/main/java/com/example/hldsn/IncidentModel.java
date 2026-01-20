@@ -16,6 +16,10 @@ public class IncidentModel {
     private Double reporterLng;
     private String id;
     private boolean commentsExpanded;
+    private long likes = 0;
+    private long dislikes = 0;
+    private  String userVote;
+
 
     public IncidentModel() {
     }
@@ -43,7 +47,19 @@ public class IncidentModel {
 
     }
 
+    public String getUserVote() {
+        return userVote;
+    }
+
+    public void setUserVote(String userVote) {
+        this.userVote = userVote;
+    }
     // Getters
+    public long getLikes() { return likes; }
+    public void setLikes(long likes) { this.likes = likes; }
+
+    public long getDislikes() { return dislikes; }
+    public void setDislikes(long dislikes) { this.dislikes = dislikes;}
     public String getUserId() {
         return userId;
     }
