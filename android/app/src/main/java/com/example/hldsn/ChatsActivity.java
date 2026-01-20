@@ -7,7 +7,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 public class ChatsActivity extends AppCompatActivity {
     TextView communitybtn;
 
@@ -40,8 +39,5 @@ public class ChatsActivity extends AppCompatActivity {
             startActivity(intent);
         });
     }
-
-
-
 
 }
