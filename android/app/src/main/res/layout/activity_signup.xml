@@ -19,7 +19,7 @@
             android:layout_height="23dp"
             android:src="@android:drawable/ic_menu_revert"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/statusBar"
+            app:layout_constraintTop_toTopOf="parent"
             app:tint="#FFFFFF"
             tools:ignore="NotSibling" />
 

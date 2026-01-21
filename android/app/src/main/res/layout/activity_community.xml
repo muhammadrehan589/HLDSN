@@ -11,22 +11,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Status Bar -->
-        <ImageView
-            android:id="@+id/statusBar"
-            android:layout_width="match_parent"
-            android:layout_height="36dp"
-            android:src="@drawable/login_status_bar"
-            android:scaleType="fitXY"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <!-- Header -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="88dp"
             android:background="@drawable/header_gradient"
-            app:layout_constraintTop_toBottomOf="@id/statusBar">
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/backIcon"

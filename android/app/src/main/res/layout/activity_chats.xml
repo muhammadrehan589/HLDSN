@@ -14,16 +14,6 @@
         android:layout_height="wrap_content"
         android:paddingBottom="32dp">
 
-        <ImageView
-            android:id="@+id/chatStatusBar"
-            android:layout_width="0dp"
-            android:layout_height="36dp"
-            android:scaleType="fitXY"
-            android:src="@drawable/login_status_bar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/chatToolbar"
             android:layout_width="0dp"
@@ -34,7 +24,7 @@
             android:paddingBottom="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/chatStatusBar">
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/chatBackIcon"
