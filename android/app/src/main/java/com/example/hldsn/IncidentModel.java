@@ -19,6 +19,7 @@ public class IncidentModel {
     private long likes = 0;
     private long dislikes = 0;
     private  String userVote;
+    private long commentCount = 0;
 
 
     public IncidentModel() {
@@ -60,6 +61,9 @@ public class IncidentModel {
 
     public long getDislikes() { return dislikes; }
     public void setDislikes(long dislikes) { this.dislikes = dislikes;}
+
+    public long getCommentCount() { return commentCount; }
+    public void setCommentCount(long commentCount) { this.commentCount = commentCount; }
     public String getUserId() {
         return userId;
     }

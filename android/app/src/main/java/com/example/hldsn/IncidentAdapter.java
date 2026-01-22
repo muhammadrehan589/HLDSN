@@ -72,9 +72,9 @@ public class IncidentAdapter extends RecyclerView.Adapter<IncidentAdapter.Incide
 //            notifyItemChanged(adapterPosition);
 //        });
 
-        // ===== LIKE / DISLIKE (NEW) =====
         holder.likeCount.setText(String.valueOf(incident.getLikes()));
         holder.dislikeCount.setText(String.valueOf(incident.getDislikes()));
+        holder.commentCount.setText(String.valueOf(incident.getCommentCount()));
 
         holder.likeIcon.setOnClickListener(v -> {
             int adapterPosition = holder.getBindingAdapterPosition();
@@ -95,6 +95,19 @@ public class IncidentAdapter extends RecyclerView.Adapter<IncidentAdapter.Incide
                 );
             }
         });
+
+        View.OnClickListener openComments = v -> {
+            int adapterPosition = holder.getBindingAdapterPosition();
+            if (adapterPosition != RecyclerView.NO_POSITION && reactionListener != null) {
+                reactionListener.onCommentsClicked(
+                        incidentList.get(adapterPosition),
+                        adapterPosition
+                );
+            }
+        };
+
+        holder.commentIcon.setOnClickListener(openComments);
+        holder.commentContainer.setOnClickListener(openComments);
     }
 
     @Override
@@ -116,7 +129,7 @@ public class IncidentAdapter extends RecyclerView.Adapter<IncidentAdapter.Incide
         ImageView likeIcon, dislikeIcon, commentIcon;
         TextView likeCount, dislikeCount, commentCount;
         NestedScrollView commentPreviewContainer;
-//        View commentContainer;
+        View commentContainer;
 
         public IncidentViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -127,16 +140,16 @@ public class IncidentAdapter extends RecyclerView.Adapter<IncidentAdapter.Incide
             incidentLocation = itemView.findViewById(R.id.incidentLocation);
             reporterSafety = itemView.findViewById(R.id.reporterSafety);
 
-//            commentContainer = itemView.findViewById(R.id.commentContainer);
+            commentContainer = itemView.findViewById(R.id.commentContainer);
             commentPreviewContainer = itemView.findViewById(R.id.commentPreviewContainer);
 
             likeIcon = itemView.findViewById(R.id.likeIcon);
             dislikeIcon = itemView.findViewById(R.id.dislikeIcon);
-//            commentIcon = itemView.findViewById(R.id.commentIcon);
+            commentIcon = itemView.findViewById(R.id.commentIcon);
 
             likeCount = itemView.findViewById(R.id.likeCount);
             dislikeCount = itemView.findViewById(R.id.dislikeCount);
-//            commentCount = itemView.findViewById(R.id.commentCount);
+            commentCount = itemView.findViewById(R.id.commentCount);
         }
     }
 }

@@ -1,10 +1,8 @@
 package com.example.hldsn;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -12,248 +10,349 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.Priority;
-import com.google.android.gms.tasks.CancellationTokenSource;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class DisplayReportActivity extends AppCompatActivity {
+public class DisplayReportActivity extends AppCompatActivity implements OnIncidentReactionListener {
 
-    private static final int LOCATION_PERMISSION_REQUEST = 1001;
-    private static final double MAX_DISTANCE_KM = 10.0;
+    private static final String TAG = "DisplayReportDebug";
 
-    // Views
     private RecyclerView communityRecyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ShimmerFrameLayout shimmerLayout;
     private TextView emptyStateText;
     private FloatingActionButton addReportBtn;
 
-    // Adapter & Data
     private IncidentAdapter adapter;
-    private ArrayList<IncidentModel> allIncidents = new ArrayList<>();
-    private ArrayList<IncidentModel> nearbyIncidents = new ArrayList<>();
+    private final ArrayList<IncidentModel> allIncidents = new ArrayList<>();
 
-    // Firebase
     private FirebaseFirestore firestore;
+    private FirebaseAuth auth;
 
-    // Location
-    private FusedLocationProviderClient fusedLocationClient;
-    private Location currentUserLocation;
     private boolean isFirstLoad = true;
-    private boolean locationPermissionGranted = false;
+    private final Map<String, ListenerRegistration> incidentListeners = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate started");
         setContentView(R.layout.activity_community_messages);
 
-        initViews();
-        initFirebase();
-        initLocationClient();
-        setupRecyclerView();
-        setupSwipeRefresh();
-        initListeners();
+        try {
+            initViews();
+            initFirebase();
+            setupRecyclerView();
+            setupSwipeRefresh();
+            initListeners();
 
-        requestLocationPermissionAndLoad();
+            Log.d(TAG, "onCreate finished → loading all incidents");
+            loadIncidents();
+        } catch (Exception e) {
+            Log.e(TAG, "CRASH in onCreate!", e);
+            showToast("Startup error - please restart app");
+        }
     }
 
     private void initViews() {
-        communityRecyclerView = findViewById(R.id.communityRecyclerView);
-        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
-        shimmerLayout = findViewById(R.id.shimmerLayout);
-        addReportBtn = findViewById(R.id.addCommunityPostFab);
-
-        // Optional: Add a TextView in XML for empty state
-        emptyStateText = findViewById(R.id.emptyStateText); // Add this in XML if you want
-        if (emptyStateText == null) emptyStateText = new TextView(this); // fallback
-
-        findViewById(R.id.backIcon).setOnClickListener(v -> finish());
+        try {
+            communityRecyclerView = findViewById(R.id.communityRecyclerView);
+            swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+            shimmerLayout = findViewById(R.id.shimmerLayout);
+            emptyStateText = findViewById(R.id.emptyStateText);
+            addReportBtn = findViewById(R.id.addCommunityPostFab);
+        } catch (Exception e) {
+            Log.e(TAG, "View init failed", e);
+        }
     }
 
     private void initFirebase() {
-        firestore = FirebaseFirestore.getInstance();
-    }
-
-    private void initLocationClient() {
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        try {
+            firestore = FirebaseFirestore.getInstance();
+            auth = FirebaseAuth.getInstance();
+        } catch (Exception e) {
+            Log.e(TAG, "Firebase init failed", e);
+        }
     }
 
     private void setupRecyclerView() {
-        adapter = new IncidentAdapter(this::showCommentsBottomSheet);
-        communityRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        communityRecyclerView.setAdapter(adapter);
+        try {
+            adapter = new IncidentAdapter(this);
+            if (communityRecyclerView != null) {
+                communityRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+                communityRecyclerView.setAdapter(adapter);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Recycler setup failed", e);
+        }
     }
 
     private void setupSwipeRefresh() {
-        swipeRefreshLayout.setOnRefreshListener(this::loadIncidents);
-
-        swipeRefreshLayout.setColorSchemeColors(
-                getColor(R.color.safe_green),
-                getColor(android.R.color.holo_red_light),
-                getColor(android.R.color.holo_orange_light)
-        );
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setOnRefreshListener(() -> {
+                loadIncidents();
+                swipeRefreshLayout.setRefreshing(false);
+            });
+        }
     }
 
     private void initListeners() {
-        addReportBtn.setOnClickListener(v -> {
-            startActivity(new Intent(this, ReportIncidentActivity.class));
-        });
-    }
-
-    // ================= LOCATION & PERMISSION =================
-    private void requestLocationPermissionAndLoad() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            locationPermissionGranted = true;
-            getCurrentLocationAndLoadIncidents();
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_PERMISSION_REQUEST);
+        if (addReportBtn != null) {
+            addReportBtn.setOnClickListener(v -> {
+                try {
+                    startActivity(new Intent(this, ReportIncidentActivity.class));
+                } catch (Exception e) {
+                    showToast("Cannot open report screen");
+                }
+            });
         }
     }
 
-    private void getCurrentLocationAndLoadIncidents() {
-        if (!locationPermissionGranted) {
-            loadAllIncidentsWithoutFilter(); // Fallback: show all if no permission
+    private void loadIncidents() {
+        if (firestore == null) {
+            showEmptyState("Database not ready");
             return;
         }
-
-        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, new CancellationTokenSource().getToken())
-                .addOnSuccessListener(this, location -> {
-                    if (location != null) {
-                        currentUserLocation = location;
-                        loadIncidents(); // Now filter by distance
-                    } else {
-                        // Fallback if location is null
-                        Toast.makeText(this, "Getting your location...", Toast.LENGTH_SHORT).show();
-                        loadIncidents(); // Will show all or prompt
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Location unavailable. Showing all incidents.", Toast.LENGTH_SHORT).show();
-                    loadIncidents(); // Fallback
-                });
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == LOCATION_PERMISSION_REQUEST) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                locationPermissionGranted = true;
-                getCurrentLocationAndLoadIncidents();
-            } else {
-                Toast.makeText(this, "Location permission denied. Showing all incidents.", Toast.LENGTH_LONG).show();
-                loadAllIncidentsWithoutFilter();
-            }
-        }
-    }
-
-    // ================= LOAD INCIDENTS WITH 5KM FILTER =================
-    private void loadIncidents() {
-        if (isFirstLoad) {
-            shimmerLayout.setVisibility(View.VISIBLE);
-            shimmerLayout.startShimmer();
-            communityRecyclerView.setVisibility(View.GONE);
-            emptyStateText.setVisibility(View.GONE);
-        }
-
-        swipeRefreshLayout.setRefreshing(true);
 
         firestore.collection("incidents")
                 .orderBy("createdAt", Query.Direction.DESCENDING)
-                .addSnapshotListener((snapshots, error) -> {
-                    swipeRefreshLayout.setRefreshing(false);
-
-                    if (error != null) {
-                        Toast.makeText(this, "Error loading incidents", Toast.LENGTH_SHORT).show();
-                        hideShimmerAndShowRecycler();
-                        return;
-                    }
-
-                    if (snapshots == null || snapshots.isEmpty()) {
-                        showEmptyState("No incidents reported yet.");
-                        return;
-                    }
-
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
                     allIncidents.clear();
-                    for (var doc : snapshots.getDocuments()) {
-                        IncidentModel incident = doc.toObject(IncidentModel.class);
-                        if (incident != null && incident.getReporterLat() != null && incident.getReporterLng() != null) {
-                            allIncidents.add(incident);
+                    if (querySnapshot != null) {
+                        for (DocumentSnapshot doc : querySnapshot) {
+                            try {
+                                IncidentModel incident = doc.toObject(IncidentModel.class);
+                                if (incident != null) {
+                                    incident.setId(doc.getId());
+
+                                    Long likes = doc.getLong("likes");
+                                    Long dislikes = doc.getLong("dislikes");
+                                    Long comments = doc.getLong("commentCount");
+
+                                    incident.setLikes(likes != null ? likes : incident.getLikes());
+                                    incident.setDislikes(dislikes != null ? dislikes : incident.getDislikes());
+                                    incident.setCommentCount(comments != null ? comments : incident.getCommentCount());
+
+                                    allIncidents.add(incident);
+                                    attachRealTimeListener(incident);
+                                }
+                            } catch (Exception parseError) {
+                                Log.w(TAG, "Failed to parse incident " + doc.getId(), parseError);
+                            }
                         }
                     }
-
-                    filterNearbyIncidents();
+                    updateUIWithIncidents();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to load incidents", e);
+                    showEmptyState("Failed to load reports");
+                    updateUIWithIncidents();
                 });
     }
 
-    private void filterNearbyIncidents() {
-        nearbyIncidents.clear();
+    private void attachRealTimeListener(@NonNull IncidentModel incident) {
+        if (incident.getId() == null) return;
+        String incidentId = incident.getId();
 
-        if (currentUserLocation == null || !locationPermissionGranted) {
-            // Show all if no location
-            nearbyIncidents.addAll(allIncidents);
-            updateUIWithIncidents();
-            return;
-        }
+        ListenerRegistration existing = incidentListeners.remove(incidentId);
+        if (existing != null) existing.remove();
 
-        for (IncidentModel incident : allIncidents) {
-            Location incidentLocation = new Location("");
-            incidentLocation.setLatitude(incident.getReporterLat());
-            incidentLocation.setLongitude(incident.getReporterLng());
-
-            float distanceInMeters = currentUserLocation.distanceTo(incidentLocation);
-            float distanceInKm = distanceInMeters / 1000f;
-
-            if (distanceInKm <= MAX_DISTANCE_KM) {
-                nearbyIncidents.add(incident);
+        DocumentReference ref = firestore.collection("incidents").document(incidentId);
+        ListenerRegistration listener = ref.addSnapshotListener((snapshot, error) -> {
+            if (error != null) {
+                Log.w(TAG, "Realtime listen error for " + incidentId, error);
+                return;
             }
-        }
+            if (snapshot == null || !snapshot.exists()) return;
 
-        updateUIWithIncidents();
+            try {
+                Long newLikes = snapshot.getLong("likes");
+                Long newDislikes = snapshot.getLong("dislikes");
+                Long newComments = snapshot.getLong("commentCount");
+
+                if (newLikes != null) incident.setLikes(newLikes);
+                if (newDislikes != null) incident.setDislikes(newDislikes);
+                if (newComments != null) incident.setCommentCount(newComments);
+
+                int index = allIncidents.indexOf(incident);
+                if (index >= 0) {
+                    adapter.notifyItemChanged(index);
+                }
+            } catch (Exception ex) {
+                Log.w(TAG, "Failed to update realtime counts for " + incidentId, ex);
+            }
+        });
+
+        incidentListeners.put(incidentId, listener);
     }
 
     private void updateUIWithIncidents() {
-        adapter.updateList(nearbyIncidents);
+        if (adapter != null) {
+            adapter.updateList(allIncidents);
+        }
 
         if (isFirstLoad) {
             isFirstLoad = false;
-            hideShimmerAndShowRecycler();
+            if (shimmerLayout != null) {
+                shimmerLayout.stopShimmer();
+                shimmerLayout.setVisibility(View.GONE);
+            }
+            if (communityRecyclerView != null) {
+                communityRecyclerView.setVisibility(View.VISIBLE);
+            }
         }
 
-        if (nearbyIncidents.isEmpty()) {
-            if (currentUserLocation != null) {
-                showEmptyState("No incidents within 5 km of your location.");
-            } else {
-                showEmptyState("No nearby incidents found.");
-            }
-        } else {
+        if (allIncidents.isEmpty()) {
+            showEmptyState("No reports yet");
+        } else if (emptyStateText != null) {
             emptyStateText.setVisibility(View.GONE);
         }
     }
 
-    private void loadAllIncidentsWithoutFilter() {
-        locationPermissionGranted = false;
-        currentUserLocation = null;
-        loadIncidents(); // Will skip filtering
+    // ──────────────────────────────────────────────
+    //          LIKE / DISLIKE LOGIC
+    // ──────────────────────────────────────────────
+
+    @Override
+    public void onLikeClicked(IncidentModel incident, int position) {
+        handleVote(incident, position, "like");
+    }
+
+    @Override
+    public void onDislikeClicked(IncidentModel incident, int position) {
+        handleVote(incident, position, "dislike");
+    }
+
+    @Override
+    public void onCommentsClicked(IncidentModel incident, int position) {
+        showCommentsBottomSheet(incident);
+    }
+
+    private void handleVote(IncidentModel incident, int position, String voteType) {
+        if (incident == null || incident.getId() == null) {
+            showToast("Invalid report");
+            return;
+        }
+
+        FirebaseUser user = auth != null ? auth.getCurrentUser() : null;
+        if (user == null) {
+            showToast("Please login to vote");
+            return;
+        }
+
+        String userId = user.getUid();
+        String incidentId = incident.getId();
+
+        DocumentReference incidentRef = firestore.collection("incidents").document(incidentId);
+        DocumentReference voteRef = incidentRef.collection("votes").document(userId);
+
+        // Optimistic UI update
+        long oldLikes = incident.getLikes() !=0? incident.getLikes() : 0;
+        long oldDislikes = incident.getDislikes() != 0 ? incident.getDislikes() : 0;
+
+        if ("like".equals(voteType)) {
+            if ("like".equals(incident.getUserVote())) {
+                incident.setLikes(Math.max(0, oldLikes - 1));
+                incident.setUserVote(null);
+            } else if ("dislike".equals(incident.getUserVote())) {
+                incident.setLikes(oldLikes + 1);
+                incident.setDislikes(Math.max(0, oldDislikes - 1));
+                incident.setUserVote("like");
+            } else {
+                incident.setLikes(oldLikes + 1);
+                incident.setUserVote("like");
+            }
+        } else { // dislike
+            if ("dislike".equals(incident.getUserVote())) {
+                incident.setDislikes(Math.max(0, oldDislikes - 1));
+                incident.setUserVote(null);
+            } else if ("like".equals(incident.getUserVote())) {
+                incident.setDislikes(oldDislikes + 1);
+                incident.setLikes(Math.max(0, oldLikes - 1));
+                incident.setUserVote("dislike");
+            } else {
+                incident.setDislikes(oldDislikes + 1);
+                incident.setUserVote("dislike");
+            }
+        }
+
+        adapter.notifyItemChanged(position);
+
+        // Server transaction
+        firestore.runTransaction(transaction -> {
+            DocumentSnapshot voteSnap = transaction.get(voteRef);
+            DocumentSnapshot incSnap = transaction.get(incidentRef);
+
+            String currentVote = voteSnap.exists() ? voteSnap.getString("type") : null;
+            long likes = incSnap.getLong("likes") != null ? incSnap.getLong("likes") : 0;
+            long dislikes = incSnap.getLong("dislikes") != null ? incSnap.getLong("dislikes") : 0;
+
+            if ("like".equals(voteType)) {
+                if ("like".equals(currentVote)) {
+                    transaction.delete(voteRef);
+                    transaction.update(incidentRef, "likes", likes - 1);
+                } else if ("dislike".equals(currentVote)) {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("type", "like");
+                    transaction.set(voteRef, data);
+                    transaction.update(incidentRef, "likes", likes + 1);
+                    transaction.update(incidentRef, "dislikes", dislikes - 1);
+                } else {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("type", "like");
+                    transaction.set(voteRef, data);
+                    transaction.update(incidentRef, "likes", likes + 1);
+                }
+            } else {
+                if ("dislike".equals(currentVote)) {
+                    transaction.delete(voteRef);
+                    transaction.update(incidentRef, "dislikes", dislikes - 1);
+                } else if ("like".equals(currentVote)) {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("type", "dislike");
+                    transaction.set(voteRef, data);
+                    transaction.update(incidentRef, "dislikes", dislikes + 1);
+                    transaction.update(incidentRef, "likes", likes - 1);
+                } else {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("type", "dislike");
+                    transaction.set(voteRef, data);
+                    transaction.update(incidentRef, "dislikes", dislikes + 1);
+                }
+            }
+            return null;
+        }).addOnFailureListener(e -> {
+            Log.e(TAG, "Vote transaction failed for " + incidentId + ": " + e.getMessage(), e);
+            showToast("Vote failed - try again");
+            loadIncidents(); // sync again
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        for (ListenerRegistration reg : incidentListeners.values()) {
+            if (reg != null) reg.remove();
+        }
+        incidentListeners.clear();
     }
 
     private void showCommentsBottomSheet(IncidentModel incident) {
@@ -269,7 +368,22 @@ public class DisplayReportActivity extends AppCompatActivity {
         subtitle.setText("Discussion on " + incident.getIncidentType());
 
         commentsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        CommentAdapter commentAdapter = new CommentAdapter();
+        CommentAdapter commentAdapter = new CommentAdapter(new CommentAdapter.CommentActionListener() {
+            @Override
+            public void onLike(CommentModel comment) {
+                showToast("Like coming soon");
+            }
+
+            @Override
+            public void onDislike(CommentModel comment) {
+                showToast("Dislike coming soon");
+            }
+
+            @Override
+            public void onReply(CommentModel comment) {
+                showToast("Reply coming soon");
+            }
+        });
         commentsRecyclerView.setAdapter(commentAdapter);
         commentAdapter.updateList(buildPlaceholderComments(incident));
 
@@ -289,25 +403,84 @@ public class DisplayReportActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private List<CommentModel> buildPlaceholderComments(IncidentModel incident) {
+        private List<CommentModel> buildPlaceholderComments(IncidentModel incident) {
         List<CommentModel> comments = new ArrayList<>();
-        comments.add(new CommentModel("Operations Desk", "Incident type: " + incident.getIncidentType() + " acknowledged. Dispatch alerted.", "2m ago"));
-        comments.add(new CommentModel("Community Lead", "Verified location at " + incident.getLocation() + ". Crowd control volunteers en route.", "5m ago"));
-        comments.add(new CommentModel("Logistics", "Water and blankets staged near the perimeter entrance.", "9m ago"));
-        comments.add(new CommentModel("Medical", "EMS triage point set at the north exit. ETA 3 minutes.", "11m ago"));
-        comments.add(new CommentModel("Safety", "Please keep a 50m radius clear for responders.", "15m ago"));
+        long now = System.currentTimeMillis();
+
+        comments.add(new CommentModel(
+            null,
+            null,
+            "Operations Desk",
+            "Incident type: " + incident.getIncidentType() + " acknowledged. Dispatch alerted.",
+            null,
+            new java.util.Date(now - 2 * 60_000L)
+        ));
+
+        comments.add(new CommentModel(
+            null,
+            null,
+            "Community Lead",
+            "Verified location at " + incident.getLocation() + ". Crowd control volunteers en route.",
+            null,
+            new java.util.Date(now - 5 * 60_000L)
+        ));
+
+        comments.add(new CommentModel(
+            null,
+            null,
+            "Logistics",
+            "Water and blankets staged near the perimeter entrance.",
+            null,
+            new java.util.Date(now - 9 * 60_000L)
+        ));
+
+        comments.add(new CommentModel(
+            null,
+            null,
+            "Medical",
+            "EMS triage point set at the north exit. ETA 3 minutes.",
+            null,
+            new java.util.Date(now - 11 * 60_000L)
+        ));
+
+        comments.add(new CommentModel(
+            null,
+            null,
+            "Safety",
+            "Please keep a 50m radius clear for responders.",
+            null,
+            new java.util.Date(now - 15 * 60_000L)
+        ));
+
         return comments;
-    }
+        }
 
     private void hideShimmerAndShowRecycler() {
-        shimmerLayout.stopShimmer();
-        shimmerLayout.setVisibility(View.GONE);
-        communityRecyclerView.setVisibility(View.VISIBLE);
+        try {
+            if (shimmerLayout != null) {
+                shimmerLayout.stopShimmer();
+                shimmerLayout.setVisibility(View.GONE);
+            }
+            if (communityRecyclerView != null) {
+                communityRecyclerView.setVisibility(View.VISIBLE);
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "hideShimmer failed", e);
+        }
     }
 
     private void showEmptyState(String message) {
+        Log.d(TAG, "showEmptyState: " + message);
         hideShimmerAndShowRecycler();
-        emptyStateText.setText(message);
-        emptyStateText.setVisibility(View.VISIBLE);
+        if (emptyStateText != null) {
+            emptyStateText.setText(message);
+            emptyStateText.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void showToast(String msg) {
+        try {
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        } catch (Exception ignored) {}
     }
 }
