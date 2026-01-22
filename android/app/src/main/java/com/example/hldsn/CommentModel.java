@@ -10,6 +10,7 @@ public class CommentModel {
     private java.util.Date createdAt;
     private long likes;
     private long dislikes;
+    private String userVote; // "like", "dislike", or null
 
     public CommentModel() {
         // Firestore deserialization
@@ -88,5 +89,13 @@ public class CommentModel {
 
     public void setDislikes(long dislikes) {
         this.dislikes = dislikes;
+    }
+
+    public String getUserVote() {
+        return userVote;
+    }
+
+    public void setUserVote(String userVote) {
+        this.userVote = userVote;
     }
 }

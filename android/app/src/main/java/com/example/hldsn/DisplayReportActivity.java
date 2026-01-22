@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
@@ -49,6 +52,7 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
 
     private boolean isFirstLoad = true;
     private final Map<String, ListenerRegistration> incidentListeners = new HashMap<>();
+    private ListenerRegistration commentsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -353,6 +357,7 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
             if (reg != null) reg.remove();
         }
         incidentListeners.clear();
+        if (commentsListener != null) commentsListener.remove();
     }
 
     private void showCommentsBottomSheet(IncidentModel incident) {
@@ -361,31 +366,66 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
 
         TextView title = sheetView.findViewById(R.id.commentsTitle);
         TextView subtitle = sheetView.findViewById(R.id.commentsSubtitle);
+        TextView commentsCount = sheetView.findViewById(R.id.commentsCount);
         RecyclerView commentsRecyclerView = sheetView.findViewById(R.id.commentsRecyclerView);
+        EditText commentInput = sheetView.findViewById(R.id.commentInput);
+        ImageButton sendButton = sheetView.findViewById(R.id.commentSendButton);
         View closeSheet = sheetView.findViewById(R.id.closeSheet);
 
         title.setText("Comments");
         subtitle.setText("Discussion on " + incident.getIncidentType());
+        if (commentsCount != null) {
+            long initialCount = incident.getCommentCount();
+            commentsCount.setText(initialCount + (initialCount == 1 ? " comment" : " comments"));
+        }
 
         commentsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        final CommentAdapter[] adapterHolder = new CommentAdapter[1];
         CommentAdapter commentAdapter = new CommentAdapter(new CommentAdapter.CommentActionListener() {
             @Override
             public void onLike(CommentModel comment) {
-                showToast("Like coming soon");
+                handleCommentVote(incident.getId(), comment, "like", adapterHolder[0]);
             }
 
             @Override
             public void onDislike(CommentModel comment) {
-                showToast("Dislike coming soon");
+                handleCommentVote(incident.getId(), comment, "dislike", adapterHolder[0]);
             }
 
             @Override
             public void onReply(CommentModel comment) {
-                showToast("Reply coming soon");
+                if (commentInput != null) {
+                    commentInput.requestFocus();
+                    commentInput.setText("@");
+                    commentInput.setSelection(commentInput.getText().length());
+                }
             }
         });
+        adapterHolder[0] = commentAdapter;
         commentsRecyclerView.setAdapter(commentAdapter);
-        commentAdapter.updateList(buildPlaceholderComments(incident));
+        attachCommentsListener(incident.getId(), commentAdapter, commentsCount);
+
+        sendButton.setOnClickListener(v -> {
+            FirebaseUser user = auth != null ? auth.getCurrentUser() : null;
+            if (user == null) {
+                showToast("Please login to comment");
+                return;
+            }
+
+            String body = commentInput.getText() != null ? commentInput.getText().toString().trim() : "";
+            if (body.isEmpty()) {
+                showToast("Comment cannot be empty");
+                return;
+            }
+
+            DocumentReference incidentRef = firestore.collection("incidents").document(incident.getId());
+            incidentRef.collection("comments")
+                    .add(buildCommentPayload(user, body))
+                    .addOnSuccessListener(ref -> incidentRef.update("commentCount", FieldValue.increment(1)))
+                    .addOnFailureListener(e -> Log.e(TAG, "Failed to add comment", e));
+
+            commentInput.setText("");
+        });
 
         closeSheet.setOnClickListener(v -> dialog.dismiss());
 
@@ -400,60 +440,159 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
             }
         });
 
+        dialog.setOnDismissListener(d -> {
+            if (commentsListener != null) {
+                commentsListener.remove();
+                commentsListener = null;
+            }
+        });
+
         dialog.show();
     }
 
-        private List<CommentModel> buildPlaceholderComments(IncidentModel incident) {
-        List<CommentModel> comments = new ArrayList<>();
-        long now = System.currentTimeMillis();
-
-        comments.add(new CommentModel(
-            null,
-            null,
-            "Operations Desk",
-            "Incident type: " + incident.getIncidentType() + " acknowledged. Dispatch alerted.",
-            null,
-            new java.util.Date(now - 2 * 60_000L)
-        ));
-
-        comments.add(new CommentModel(
-            null,
-            null,
-            "Community Lead",
-            "Verified location at " + incident.getLocation() + ". Crowd control volunteers en route.",
-            null,
-            new java.util.Date(now - 5 * 60_000L)
-        ));
-
-        comments.add(new CommentModel(
-            null,
-            null,
-            "Logistics",
-            "Water and blankets staged near the perimeter entrance.",
-            null,
-            new java.util.Date(now - 9 * 60_000L)
-        ));
-
-        comments.add(new CommentModel(
-            null,
-            null,
-            "Medical",
-            "EMS triage point set at the north exit. ETA 3 minutes.",
-            null,
-            new java.util.Date(now - 11 * 60_000L)
-        ));
-
-        comments.add(new CommentModel(
-            null,
-            null,
-            "Safety",
-            "Please keep a 50m radius clear for responders.",
-            null,
-            new java.util.Date(now - 15 * 60_000L)
-        ));
-
-        return comments;
+    private void handleCommentVote(String incidentId, CommentModel comment, String voteType, CommentAdapter adapter) {
+        if (firestore == null || incidentId == null || comment == null || comment.getId() == null) {
+            showToast("Invalid comment");
+            return;
         }
+
+        FirebaseUser user = auth != null ? auth.getCurrentUser() : null;
+        if (user == null) {
+            showToast("Please login to vote");
+            return;
+        }
+
+        String userId = user.getUid();
+        DocumentReference commentRef = firestore.collection("incidents")
+                .document(incidentId)
+                .collection("comments")
+                .document(comment.getId());
+        DocumentReference voteRef = commentRef.collection("votes").document(userId);
+
+        long oldLikes = comment.getLikes();
+        long oldDislikes = comment.getDislikes();
+
+        if ("like".equals(voteType)) {
+            if ("like".equals(comment.getUserVote())) {
+                comment.setLikes(Math.max(0, oldLikes - 1));
+                comment.setUserVote(null);
+            } else if ("dislike".equals(comment.getUserVote())) {
+                comment.setLikes(oldLikes + 1);
+                comment.setDislikes(Math.max(0, oldDislikes - 1));
+                comment.setUserVote("like");
+            } else {
+                comment.setLikes(oldLikes + 1);
+                comment.setUserVote("like");
+            }
+        } else {
+            if ("dislike".equals(comment.getUserVote())) {
+                comment.setDislikes(Math.max(0, oldDislikes - 1));
+                comment.setUserVote(null);
+            } else if ("like".equals(comment.getUserVote())) {
+                comment.setDislikes(oldDislikes + 1);
+                comment.setLikes(Math.max(0, oldLikes - 1));
+                comment.setUserVote("dislike");
+            } else {
+                comment.setDislikes(oldDislikes + 1);
+                comment.setUserVote("dislike");
+            }
+        }
+
+        adapter.notifyDataSetChanged();
+
+        firestore.runTransaction(transaction -> {
+            DocumentSnapshot voteSnap = transaction.get(voteRef);
+            DocumentSnapshot commentSnap = transaction.get(commentRef);
+
+            String currentVote = voteSnap.exists() ? voteSnap.getString("type") : null;
+            long likes = commentSnap.getLong("likes") != null ? commentSnap.getLong("likes") : 0;
+            long dislikes = commentSnap.getLong("dislikes") != null ? commentSnap.getLong("dislikes") : 0;
+
+            if ("like".equals(voteType)) {
+                if ("like".equals(currentVote)) {
+                    transaction.delete(voteRef);
+                    transaction.update(commentRef, "likes", likes - 1);
+                } else if ("dislike".equals(currentVote)) {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("type", "like");
+                    transaction.set(voteRef, data);
+                    transaction.update(commentRef, "likes", likes + 1);
+                    transaction.update(commentRef, "dislikes", dislikes - 1);
+                } else {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("type", "like");
+                    transaction.set(voteRef, data);
+                    transaction.update(commentRef, "likes", likes + 1);
+                }
+            } else {
+                if ("dislike".equals(currentVote)) {
+                    transaction.delete(voteRef);
+                    transaction.update(commentRef, "dislikes", dislikes - 1);
+                } else if ("like".equals(currentVote)) {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("type", "dislike");
+                    transaction.set(voteRef, data);
+                    transaction.update(commentRef, "dislikes", dislikes + 1);
+                    transaction.update(commentRef, "likes", likes - 1);
+                } else {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("type", "dislike");
+                    transaction.set(voteRef, data);
+                    transaction.update(commentRef, "dislikes", dislikes + 1);
+                }
+            }
+            return null;
+        }).addOnFailureListener(e -> Log.e(TAG, "Comment vote failed for " + comment.getId(), e));
+    }
+
+    private Map<String, Object> buildCommentPayload(FirebaseUser user, String body) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("authorId", user.getUid());
+        data.put("authorName", user.getDisplayName() != null ? user.getDisplayName() : "User");
+        data.put("body", body);
+        data.put("parentId", null);
+        data.put("createdAt", FieldValue.serverTimestamp());
+        data.put("likes", 0L);
+        data.put("dislikes", 0L);
+        return data;
+    }
+
+    private void attachCommentsListener(String incidentId, CommentAdapter adapter, TextView commentsCount) {
+        if (firestore == null) return;
+        if (commentsListener != null) commentsListener.remove();
+
+        commentsListener = firestore.collection("incidents")
+                .document(incidentId)
+                .collection("comments")
+                .orderBy("createdAt", Query.Direction.ASCENDING)
+                .addSnapshotListener((snap, error) -> {
+                    if (error != null) {
+                        Log.w(TAG, "Comments listen failed", error);
+                        return;
+                    }
+                    if (snap == null) return;
+
+                    List<CommentModel> list = new ArrayList<>();
+                    for (DocumentSnapshot doc : snap.getDocuments()) {
+                        try {
+                            CommentModel c = doc.toObject(CommentModel.class);
+                            if (c != null) {
+                                c.setId(doc.getId());
+                                // User vote is not stored in comment doc; clear to avoid stale state
+                                c.setUserVote(null);
+                                list.add(c);
+                            }
+                        } catch (Exception e) {
+                            Log.w(TAG, "Failed to parse comment " + doc.getId(), e);
+                        }
+                    }
+
+                    adapter.updateList(list);
+                    if (commentsCount != null) {
+                        commentsCount.setText(list.size() + (list.size() == 1 ? " comment" : " comments"));
+                    }
+                });
+    }
 
     private void hideShimmerAndShowRecycler() {
         try {
