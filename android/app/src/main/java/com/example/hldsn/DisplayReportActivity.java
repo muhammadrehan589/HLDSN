@@ -30,11 +30,13 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DisplayReportActivity extends AppCompatActivity implements OnIncidentReactionListener {
+
 
     private static final String TAG = "DisplayReportDebug";
 
@@ -73,6 +75,7 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
             Log.e(TAG, "CRASH in onCreate!", e);
             showToast("Startup error - please restart app");
         }
+
     }
 
     private void initViews() {
@@ -372,6 +375,7 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
         ImageButton sendButton = sheetView.findViewById(R.id.commentSendButton);
         View closeSheet = sheetView.findViewById(R.id.closeSheet);
 
+
         title.setText("Comments");
         subtitle.setText("Discussion on " + incident.getIncidentType());
         if (commentsCount != null) {
@@ -393,10 +397,10 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
             }
 
             @Override
-            public void onReply(CommentModel comment) {
+            public void onReply(CommentModel comment,String name) {
                 if (commentInput != null) {
                     commentInput.requestFocus();
-                    commentInput.setText("@");
+                    commentInput.setText("@" +name +"");
                     commentInput.setSelection(commentInput.getText().length());
                 }
             }
@@ -544,6 +548,8 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
             return null;
         }).addOnFailureListener(e -> Log.e(TAG, "Comment vote failed for " + comment.getId(), e));
     }
+
+
 
     private Map<String, Object> buildCommentPayload(FirebaseUser user, String body) {
         Map<String, Object> data = new HashMap<>();

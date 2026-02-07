@@ -1,5 +1,6 @@
 package com.example.hldsn;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,12 +13,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
 public class IncidentAdapter extends RecyclerView.Adapter<IncidentAdapter.IncidentViewHolder> {
     private final List<IncidentModel> incidentList = new ArrayList<>();
     private final OnIncidentReactionListener reactionListener;
+
 
     public IncidentAdapter(OnIncidentReactionListener reactionListener) {
         this.reactionListener = reactionListener;
@@ -27,8 +31,12 @@ public class IncidentAdapter extends RecyclerView.Adapter<IncidentAdapter.Incide
     public IncidentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_incident_report_recyclerview, parent, false);
+
         return new IncidentViewHolder(view);
+
     }
+
+
 
     @Override
     public void onBindViewHolder(@NonNull IncidentViewHolder holder, int position) {
