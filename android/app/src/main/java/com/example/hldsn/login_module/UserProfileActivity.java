@@ -1,6 +1,5 @@
-package com.example.hldsn;
+package com.example.hldsn.login_module;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,9 +14,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
+import com.example.hldsn.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -97,7 +96,7 @@ private static String TAG = "UserProfileActivity";
        contactField3=findViewById(R.id.contactField3);
 
         editProfile.setOnClickListener(v->{
-            Intent intent=new Intent(this,SaveUserProfileActivity.class);
+            Intent intent=new Intent(this, SaveUserProfileActivity.class);
             startActivity(intent);
             finish();
 

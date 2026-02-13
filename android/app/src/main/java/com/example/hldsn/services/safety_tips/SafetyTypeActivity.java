@@ -1,8 +1,10 @@
-package com.example.hldsn;
+package com.example.hldsn.services.safety_tips;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.hldsn.R;
 
 public class SafetyTypeActivity extends AppCompatActivity {
     String incidenttype;

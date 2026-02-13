@@ -1,10 +1,11 @@
-package com.example.hldsn;
+package com.example.hldsn.login_module;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.*;
 import android.content.Intent;
 
+import com.example.hldsn.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 

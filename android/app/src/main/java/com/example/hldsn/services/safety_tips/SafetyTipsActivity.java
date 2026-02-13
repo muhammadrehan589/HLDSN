@@ -1,10 +1,12 @@
-package com.example.hldsn;
+package com.example.hldsn.services.safety_tips;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.hldsn.R;
 
 public class SafetyTipsActivity extends AppCompatActivity {
 
