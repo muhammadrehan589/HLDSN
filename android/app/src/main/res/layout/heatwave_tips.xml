@@ -7,58 +7,76 @@
     android:background="@drawable/bg_landslide_screen"
    >
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
         android:id="@+id/appBar"
         android:layout_width="0dp"
-        android:layout_height="140dp"
-        android:background="@drawable/bg_landslide_appbar"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
+        android:layout_height="88dp"
+        android:background="@drawable/header_gradient"
+        android:elevation="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-
-
-
-
         <ImageView
-            android:id="@+id/menuIcon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="34dp"
-            android:contentDescription="Open drawer"
+            android:id="@+id/menu_icon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="20dp"
             android:padding="6dp"
-            android:src="@drawable/ic_menu_landslide"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:src="@drawable/ic_menu"
+            android:contentDescription="Menu" />
 
         <TextView
-            android:id="@+id/appBarTitle"
+            android:id="@+id/app_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:fontFamily="serif"
+            android:layout_centerInParent="true"
             android:text="Heatwave Tips"
-            android:textColor="@android:color/white"
-            android:textSize="28sp"
+            android:textColor="#FFFFFF"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/menuIcon"
-            app:layout_constraintStart_toEndOf="@id/menuIcon"
-            app:layout_constraintTop_toTopOf="@id/menuIcon" />
+            android:textSize="24sp"
+            android:fontFamily="serif"
+            android:letterSpacing="0.05"
+            android:shadowColor="#33000000"
+            android:shadowDx="0"
+            android:shadowDy="2"
+            android:shadowRadius="2" />
 
-        <ImageView
-            android:id="@+id/bellIcon"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:layout_marginTop="34dp"
-            android:contentDescription="Notifications"
-            android:padding="2dp"
-            android:src="@drawable/ic_notification"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/menuIcon" />
+        <FrameLayout
+            android:id="@+id/notification_badge_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="20dp">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageView
+                android:id="@+id/notification_icon"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_notification"
+                android:contentDescription="Notifications" />
+
+            <TextView
+                android:id="@+id/tv_notification_count"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="top|end"
+                android:background="@drawable/circle_red_badge"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:includeFontPadding="false"
+                tools:text="5"
+                tools:visibility="visible" />
+
+        </FrameLayout>
+
+    </RelativeLayout>
 
     <ImageView
         android:id="@+id/backArrow"
