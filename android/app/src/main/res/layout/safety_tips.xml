@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_landslide_screen"
-    tools:context=".SafetyTipsActivity">
+    tools:context=".services.safety_tips.SafetyTipsActivity">
 
     <RelativeLayout
         android:id="@+id/appBar"

@@ -1,4 +1,4 @@
-package com.example.hldsn;
+package com.example.hldsn.notification_module;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +10,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.hldsn.R;
+import com.example.hldsn.incident_report_module.DisplayReportActivity;
+import com.example.hldsn.incident_report_module.IncidentModel;
 
 import java.util.ArrayList;
 import java.util.List;

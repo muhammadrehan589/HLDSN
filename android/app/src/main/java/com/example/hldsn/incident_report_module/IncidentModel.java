@@ -1,4 +1,4 @@
-package com.example.hldsn;
+package com.example.hldsn.incident_report_module;
 
 import java.util.Date;
 

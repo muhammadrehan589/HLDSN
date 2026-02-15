@@ -7,7 +7,7 @@
     android:background="@drawable/login_gradient"
     android:fillViewport="true"
     android:overScrollMode="never"
-    tools:context=".ChatsActivity">
+    tools:context=".incident_report_module.ChatsActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

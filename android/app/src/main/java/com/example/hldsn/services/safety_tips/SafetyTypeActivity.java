@@ -1,4 +1,4 @@
-package com.example.hldsn;
+package com.example.hldsn.services.safety_tips;
 
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.core.widget.NestedScrollView;
+
+import com.example.hldsn.R;
 
 public class SafetyTypeActivity extends AppCompatActivity {
     String incidenttype;
