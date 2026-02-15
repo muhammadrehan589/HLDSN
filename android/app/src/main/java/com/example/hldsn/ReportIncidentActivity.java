@@ -14,6 +14,7 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -128,6 +129,13 @@ public class ReportIncidentActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 com.google.android.material.R.layout.m3_auto_complete_simple_item, incidentTypes);
         typeField.setAdapter(adapter);
+
+        typeField.setOnItemClickListener((parent, view, position, id) -> {
+            String selected = adapter.getItem(position);
+            if (selected != null) {
+                typeField.setText(selected, false);
+            }
+        });
 
         typeField.setOnClickListener(v -> typeField.showDropDown());
     }
