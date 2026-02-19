@@ -76,7 +76,7 @@
                     android:textStyle="bold"
                     android:visibility="gone"
                     android:includeFontPadding="false"
-                    tools:text="5"
+                    tools:text=""
                     tools:visibility="visible" />
 
             </FrameLayout>
