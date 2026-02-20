@@ -22,6 +22,9 @@
     <!-- Media Images (Android 13+) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
+    <!-- External Storage (for Android versions below 13) -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+
     <!-- Camera -->
     <uses-permission android:name="android.permission.CAMERA" />
 

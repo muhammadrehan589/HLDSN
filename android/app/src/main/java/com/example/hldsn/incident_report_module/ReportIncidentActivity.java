@@ -334,7 +334,7 @@ public class ReportIncidentActivity extends AppCompatActivity {
 
     private void uploadMediaAndSave(String type, String locationText, String description) {
         Request request = new Request.Builder()
-                .url("https://springbootapi-production-cda6.up.railway.app/api/imagekit/auth")
+                .url("https://save-image.up.railway.app/api/imagekit/auth")
                 .build();
 
         new OkHttpClient().newCall(request).enqueue(new Callback() {
