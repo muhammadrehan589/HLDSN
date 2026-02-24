@@ -22,6 +22,9 @@
     <!-- Media Images (Android 13+) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
+    <!-- External Storage (for Android versions below 13) -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+
     <!-- Camera -->
     <uses-permission android:name="android.permission.CAMERA" />
 
@@ -67,7 +70,7 @@
 
         <!-- Launcher Activity -->
         <activity
-            android:name=".LaunchActivity"
+            android:name=".home.LaunchActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -76,17 +79,19 @@
         </activity>
 
         <!-- Other Activities -->
-        <activity android:name=".LoginActivity" android:exported="false" />
-        <activity android:name=".SignupActivity" android:exported="false" />
-        <activity android:name=".Main" android:exported="false" />
+        <activity android:name=".login_module.LoginActivity" android:exported="false" />
+        <activity android:name=".login_module.SignupActivity" android:exported="false" />
+        <activity android:name=".home.Main" android:exported="false" />
         <activity android:name=".OtpVerificationActivity" android:exported="false" />
-        <activity android:name=".HomePageActivity" android:exported="false" />
-        <activity android:name=".ChatsActivity" android:exported="false" />
-        <activity android:name=".ReportIncidentActivity" android:exported="false" />
-        <activity android:name=".ReportDetailsActivity" android:exported="false" />
-        <activity android:name=".SaveUserProfileActivity" android:exported="false" />
-        <activity android:name=".UserProfileActivity" android:exported="false" />
-        <activity android:name=".DisplayReportActivity" android:exported="false"/>
+        <activity android:name=".home.HomePageActivity" android:exported="false" />
+        <activity android:name=".incident_report_module.ChatsActivity" android:exported="false" />
+        <activity android:name=".incident_report_module.ReportIncidentActivity" android:exported="false" />
+        <activity android:name=".services.safety_tips.SafetyTipsActivity" android:exported="false" />
+        <activity android:name=".login_module.SaveUserProfileActivity" android:exported="false" />
+        <activity android:name=".login_module.UserProfileActivity" android:exported="false" />
+        <activity android:name=".incident_report_module.DisplayReportActivity" android:exported="false"/>
+        <activity android:name=".services.safety_tips.SafetyTypeActivity" android:exported="false"/>
+
 
     </application>
 

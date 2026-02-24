@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    app:cardBackgroundColor="#0F1F1D"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Incident Image -->
+        <ImageView
+            android:id="@+id/incidentImage"
+            android:layout_width="80dp"
+            android:layout_height="110dp"
+            android:contentDescription="Incident image"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_fire"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Incident Type -->
+        <TextView
+            android:id="@+id/incidentType"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Fire Outbreak"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/incidentImage"
+            app:layout_constraintTop_toTopOf="@id/incidentImage"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Description -->
+        <TextView
+            android:id="@+id/incidentDescription"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginStart="16dp"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:text="A major fire has broken out in the downtown area, affecting multiple buildings."
+            android:textColor="#D9F3F0"
+            android:textSize="14sp"
+            app:layout_constraintStart_toEndOf="@id/incidentImage"
+            app:layout_constraintTop_toBottomOf="@id/incidentType"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Location -->
+        <TextView
+            android:id="@+id/incidentLocation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginStart="16dp"
+            android:text="Location: Downtown District, City Center"
+            android:textColor="#E6FFFFFF"
+            android:textSize="14sp"
+            app:layout_constraintStart_toEndOf="@id/incidentImage"
+            app:layout_constraintTop_toBottomOf="@id/incidentDescription"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Reporter Safety -->
+        <TextView
+            android:id="@+id/reporterSafety"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Reporter is safe: Yes"
+            android:textColor="#2DD09E"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/incidentLocation"
+            app:layout_constraintTop_toBottomOf="@id/incidentLocation" />
+
+        <!-- Comments Preview -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/commentPreviewContainer"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="12dp"
+            android:background="#1AFFFFFF"
+            android:padding="12dp"
+            android:visibility="gone"
+            android:overScrollMode="never"
+            app:layout_constraintStart_toStartOf="@id/reporterSafety"
+            app:layout_constraintTop_toBottomOf="@id/reporterSafety"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="6dp"
+                    android:text="Emergency services responded within minutes."
+                    android:textColor="#E6FFFFFF"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="6dp"
+                    android:text="Evacuation assisted by nearby residents."
+                    android:textColor="#E6FFFFFF"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Reaction Bar -->
+        <LinearLayout
+            android:id="@+id/reactionBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="@id/reporterSafety"
+            app:layout_constraintTop_toBottomOf="@id/commentPreviewContainer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <!-- Like -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/likeIcon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_thumb_up"
+                    app:tint="#4DA3FF" />
+
+                <TextView
+                    android:id="@+id/likeCount"
+                    android:layout_marginStart="6dp"
+                    android:text="113"
+                    android:textColor="#E6FFFFFF"
+                    android:textSize="14sp"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"/>
+            </LinearLayout>
+
+            <!-- Dislike -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/dislikeIcon"
+
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_thumb_down"
+                    app:tint="#F06A6A" />
+
+                <TextView
+                    android:id="@+id/dislikeCount"
+                    android:layout_marginStart="6dp"
+                    android:text="8"
+                    android:textColor="#E6FFFFFF"
+                    android:textSize="14sp"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"/>
+            </LinearLayout>
+
+            <!-- Comment -->
+            <LinearLayout
+                android:id="@+id/commentContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/commentIcon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_comment"
+                    app:tint="#E6FFFFFF" />
+
+                <TextView
+                    android:id="@+id/commentCount"
+                    android:layout_marginStart="6dp"
+                    android:text="0"
+                    android:textColor="#E6FFFFFF"
+                    android:textSize="14sp"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>
