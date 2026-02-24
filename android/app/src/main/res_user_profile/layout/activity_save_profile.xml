@@ -72,19 +72,29 @@
             app:layout_constraintTop_toBottomOf="@id/header" />
 
         <!-- Profile Image -->
-        <ImageView
-            android:id="@+id/profileImage"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/profileImageCard"
             android:layout_width="140dp"
             android:layout_height="140dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="32dp"
-            android:background="@drawable/profile_avatar_background"
-            android:contentDescription="Profile Picture"
-            android:padding="4dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_profile_avatar"
+            app:cardCornerRadius="70dp"
+            app:cardElevation="8dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/header" />
+            app:layout_constraintTop_toBottomOf="@id/header">
+
+            <ImageView
+                android:id="@+id/profileImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="Profile Picture"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_profile_avatar"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground" />
+
+        </androidx.cardview.widget.CardView>
 
         <!-- Name, Address, Phone Card -->
         <androidx.cardview.widget.CardView
@@ -97,8 +107,8 @@
             app:cardCornerRadius="32dp"
             app:cardElevation="12dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/profileImage"
-            app:layout_constraintTop_toTopOf="@id/profileImage">
+            app:layout_constraintStart_toEndOf="@id/profileImageCard"
+            app:layout_constraintTop_toTopOf="@id/profileImageCard">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -213,7 +223,7 @@
             app:cardElevation="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/profileImage">
+            app:layout_constraintTop_toBottomOf="@id/profileImageCard">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
