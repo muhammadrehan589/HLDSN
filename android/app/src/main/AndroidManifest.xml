@@ -85,6 +85,7 @@
         <activity android:name=".OtpVerificationActivity" android:exported="false" />
         <activity android:name=".home.HomePageActivity" android:exported="false" />
         <activity android:name=".incident_report_module.ChatsActivity" android:exported="false" />
+        <activity android:name=".incident_report_module.ConversationActivity" android:exported="false" />
         <activity android:name=".incident_report_module.ReportIncidentActivity" android:exported="false" />
         <activity android:name=".services.safety_tips.SafetyTipsActivity" android:exported="false" />
         <activity android:name=".login_module.SaveUserProfileActivity" android:exported="false" />
