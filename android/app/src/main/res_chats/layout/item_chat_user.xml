@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp"
+    android:foreground="?attr/selectableItemBackground">
+
+    <!-- Avatar circle -->
+    <FrameLayout
+        android:id="@+id/avatarFrame"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:background="@drawable/profile_avatar_background"
+        android:clipToOutline="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+            android:id="@+id/avatarImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/avatarInitial"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </FrameLayout>
+
+    <!-- Name -->
+    <TextView
+        android:id="@+id/userName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="8dp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/avatarFrame"
+        app:layout_constraintEnd_toStartOf="@id/messageTime"
+        app:layout_constraintTop_toTopOf="@id/avatarFrame" />
+
+    <!-- Time -->
+    <TextView
+        android:id="@+id/messageTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#80FFFFFF"
+        android:textSize="11sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/userName"
+        app:layout_constraintBaseline_toBaselineOf="@id/userName" />
+
+    <!-- Last message -->
+    <TextView
+        android:id="@+id/lastMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:textColor="#99FFFFFF"
+        android:textSize="13sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/avatarFrame"
+        app:layout_constraintEnd_toStartOf="@id/unreadBadge"
+        app:layout_constraintTop_toBottomOf="@id/userName" />
+
+    <!-- Unread badge -->
+    <TextView
+        android:id="@+id/unreadBadge"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@drawable/bg_unread_badge"
+        android:gravity="center"
+        android:textColor="#FFFFFF"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:includeFontPadding="false"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/messageTime" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
