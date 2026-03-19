@@ -56,6 +56,7 @@ public class SaveUserProfileActivity extends AppCompatActivity {
     private EditText contactField1, contactField2, contactField3;
     private EditText injuryField1, injuryField2, injuryField3;
     private ImageView profileImg;
+    private ImageView backButton;
     private Button saveButton;
 
     private FirebaseAuth auth;
@@ -103,10 +104,19 @@ public class SaveUserProfileActivity extends AppCompatActivity {
        contactField3=findViewById(R.id.contactField3);
 
         profileImg = findViewById(R.id.profileImage);
+        backButton = findViewById(R.id.backButton);
         saveButton = findViewById(R.id.saveButton);
 
         // Set click listener for profile image
         profileImg.setOnClickListener(v -> showImageDialog());
+
+        if (backButton != null) {
+            backButton.setOnClickListener(v -> {
+                Intent intent = new Intent(this, UserProfileActivity.class);
+                startActivity(intent);
+                finish();
+            });
+        }
     }
 
     private void initLaunchers() {

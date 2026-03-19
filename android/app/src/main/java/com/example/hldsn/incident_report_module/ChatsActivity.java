@@ -43,7 +43,7 @@ public class ChatsActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         // ── Header buttons ───────────────────────────────────────────────────
-        ImageView backIcon = findViewById(R.id.chatBackIcon);
+        ImageView backIcon = findViewById(R.id.backButton);
         if (backIcon != null) backIcon.setOnClickListener(v -> finish());
 
         // communityTab → ReportIncidentActivity

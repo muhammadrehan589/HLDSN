@@ -30,6 +30,7 @@ private static String TAG = "UserProfileActivity";
     private TextView injuryField1, injuryField2, injuryField3;
     TextView contactField1, contactField2, contactField3;
     private ImageView profileImage;
+    private ImageView backButton;
     Button editProfile ;
 
 
@@ -70,6 +71,7 @@ private static String TAG = "UserProfileActivity";
 
 
     private void initViews() {
+        backButton = findViewById(R.id.backButton);
         profileImage = findViewById(R.id.profileImage);
 
         nameField = findViewById(R.id.nameField);
@@ -102,6 +104,10 @@ private static String TAG = "UserProfileActivity";
 
 
         });
+
+        if (backButton != null) {
+            backButton.setOnClickListener(v -> finish());
+        }
 
     }
 

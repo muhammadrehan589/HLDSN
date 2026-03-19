@@ -20,7 +20,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/backIcon"
+                android:id="@+id/backButton"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginStart="16dp"
@@ -39,7 +39,7 @@
                 android:textSize="32sp"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@id/backIcon"
+                app:layout_constraintStart_toEndOf="@id/backButton"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
