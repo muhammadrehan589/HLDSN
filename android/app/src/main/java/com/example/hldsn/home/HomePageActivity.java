@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +31,8 @@ import com.example.hldsn.login_module.SaveUserProfileActivity;
 import com.example.hldsn.login_module.UserProfileActivity;
 import com.example.hldsn.notification_module.NotificationAdapter;
 import com.example.hldsn.services.safety_tips.SafetyTipsActivity;
+import com.example.hldsn.sos.SosListenerService;
+import com.example.hldsn.sos.SosManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -50,6 +53,7 @@ public class HomePageActivity extends AppCompatActivity {
     private ImageView menuIcon, notificationIcon;
     private TextView tvNotificationCount;
     private MaterialButton chatBtn, tipsBtn;
+    private Button sosBtn;
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -114,15 +118,20 @@ public class HomePageActivity extends AppCompatActivity {
         loadSeenIncidentIds();
 
         checkAndRequestPermissions();
+
+        // Start background SOS listener (BLE scan + WiFi Direct discovery)
+        ContextCompat.startForegroundService(
+                this, new Intent(this, SosListenerService.class));
     }
 
     private void initViews() {
-        drawerLayout = findViewById(R.id.drawer_layout);
-        menuIcon = findViewById(R.id.menu_icon);
-        notificationIcon = findViewById(R.id.notification_icon);
-        tvNotificationCount = findViewById(R.id.tv_notification_count);
-        chatBtn = findViewById(R.id.btn_service_chats);
-        tipsBtn = findViewById(R.id.btn_info_safety);
+        drawerLayout         = findViewById(R.id.drawer_layout);
+        menuIcon             = findViewById(R.id.menu_icon);
+        notificationIcon     = findViewById(R.id.notification_icon);
+        tvNotificationCount  = findViewById(R.id.tv_notification_count);
+        chatBtn              = findViewById(R.id.btn_service_chats);
+        tipsBtn              = findViewById(R.id.btn_info_safety);
+        sosBtn               = findViewById(R.id.btn_emergency);
     }
 
     private void initNotificationDrawer() {
@@ -160,6 +169,11 @@ public class HomePageActivity extends AppCompatActivity {
 
         chatBtn.setOnClickListener(v -> startActivity(new Intent(this, ChatsActivity.class)));
         tipsBtn.setOnClickListener(v -> startActivity(new Intent(this, SafetyTipsActivity.class)));
+
+        // SOS button
+        if (sosBtn != null) {
+            sosBtn.setOnClickListener(v -> showSosConfirmDialog());
+        }
 
         // Profile menu example
         findViewById(R.id.profileMenuItem).setOnClickListener(v -> {
@@ -326,6 +340,56 @@ public class HomePageActivity extends AppCompatActivity {
         });
 
         dialog.show();
+    }
+
+    // ── SOS ───────────────────────────────────────────────────────────────────
+
+    private void showSosConfirmDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("🊘 Send SOS Alert?")
+                .setMessage("This will IMMEDIATELY alert all your contacts with your "
+                        + "current location.\n\nOnly use in a real emergency.")
+                .setPositiveButton("YES, SEND SOS", (dialog, which) -> triggerSos())
+                .setNegativeButton("Cancel", null)
+                .setCancelable(true)
+                .show();
+    }
+
+    private void triggerSos() {
+        SosManager sosManager = new SosManager(this);
+        sosManager.triggerSos(new SosManager.SosTriggerCallback() {
+            @Override
+            public void onStarted() {
+                runOnUiThread(() ->
+                        Toast.makeText(HomePageActivity.this,
+                                "🊘 SOS sent! Alerting your contacts...",
+                                Toast.LENGTH_LONG).show());
+            }
+
+            @Override
+            public void onOnlineBroadcastComplete(int contactsReached) {
+                runOnUiThread(() ->
+                        Toast.makeText(HomePageActivity.this,
+                                "✅ SOS alert delivered to " + contactsReached + " contact(s)",
+                                Toast.LENGTH_LONG).show());
+            }
+
+            @Override
+            public void onOfflineStarted() {
+                runOnUiThread(() ->
+                        Toast.makeText(HomePageActivity.this,
+                                "📲 No internet — broadcasting SOS via Bluetooth & Wi-Fi Direct",
+                                Toast.LENGTH_LONG).show());
+            }
+
+            @Override
+            public void onError(String reason) {
+                runOnUiThread(() ->
+                        Toast.makeText(HomePageActivity.this,
+                                "⚠️ SOS error: " + reason,
+                                Toast.LENGTH_LONG).show());
+            }
+        });
     }
 
     private void requestNearbyGroupIfNeeded() {
