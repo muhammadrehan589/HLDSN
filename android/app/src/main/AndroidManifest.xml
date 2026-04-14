@@ -16,6 +16,7 @@
 
     <!-- Wi-Fi is optional -->
     <uses-feature android:name="android.hardware.wifi" android:required="false" />
+    <uses-feature android:name="android.hardware.wifi.direct" android:required="false" />
 
     <!-- ==================== PERMISSIONS ==================== -->
 
@@ -55,6 +56,10 @@
 
     <!-- Internet (required for Firebase, ImageKit, etc.) -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- Foreground service (required for SosListenerService) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -71,6 +76,7 @@
 
     <!-- ==================== APPLICATION ==================== -->
     <application
+        android:name=".HldsnApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -105,6 +111,13 @@
         <activity android:name=".login_module.UserProfileActivity" android:exported="false" />
         <activity android:name=".incident_report_module.DisplayReportActivity" android:exported="false"/>
         <activity android:name=".services.safety_tips.SafetyTypeActivity" android:exported="false"/>
+        <activity android:name=".sos.SosDetailActivity" android:exported="false"/>
+
+        <service
+            android:name=".sos.SosForegroundService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice|location" />
 
         <!-- SOS background listener service -->
         <service

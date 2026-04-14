@@ -1,84 +1,86 @@
 package com.example.hldsn.sos;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.util.Locale;
 
-/**
- * Lightweight data carrier for an SOS alert.
- *
- * BLE payload layout (max ~20 usable bytes of service data):
- *   [0]      – 0xAA  (SOS identifier)
- *   [1..4]   – latitude  as int32  (lat * 1_000_000)
- *   [5..8]   – longitude as int32  (lng * 1_000_000)
- *   [9..N]   – sender name, UTF-8, up to 11 bytes
- *
- * Wi-Fi Direct / socket: send as JSON string (see WifiDirectSosManager).
- */
-public class SosPacket {
+public final class SosPacket {
 
-    public static final byte SOS_IDENTIFIER = (byte) 0xAA;
+    static final int TYPE_SOS = 1;
+    static final int TYPE_ACK = 2;
+    static final int DEFAULT_TTL = 5;
 
-    private static final int MAX_NAME_BYTES = 11;   // keeps total payload ≤ 20 bytes
-    private static final int MIN_DECODE_LEN = 9;    // id(1) + lat(4) + lng(4)
+    final int type;
+    final long messageId;
+    final int latMilli;
+    final int lonMilli;
+    final int epochSeconds;
+    final int ttl;
+    final int hop;
+    final String senderName;
 
-    public final String senderName;
-    public final double latitude;
-    public final double longitude;
-
-    public SosPacket(String senderName, double latitude, double longitude) {
-        this.senderName = senderName != null ? senderName : "Unknown";
-        this.latitude   = latitude;
-        this.longitude  = longitude;
+    SosPacket(int type, long messageId, int latMilli, int lonMilli, int epochSeconds, int ttl, int hop, String senderName) {
+        this.type = type;
+        this.messageId = messageId;
+        this.latMilli = latMilli;
+        this.lonMilli = lonMilli;
+        this.epochSeconds = epochSeconds;
+        this.ttl = ttl;
+        this.hop = hop;
+        this.senderName = sanitizeSenderName(senderName);
     }
 
-    // ── Encode ────────────────────────────────────────────────────────────────
-
-    /** Encode to compact byte array suitable for BLE service-data payload. */
-    public byte[] encode() {
-        byte[] raw  = senderName.getBytes(StandardCharsets.UTF_8);
-        // Safely truncate to MAX_NAME_BYTES without splitting a multi-byte codepoint
-        int    len  = Math.min(raw.length, MAX_NAME_BYTES);
-
-        ByteBuffer buf = ByteBuffer.allocate(MIN_DECODE_LEN + len);
-        buf.put(SOS_IDENTIFIER);
-        buf.putInt((int) (latitude  * 1_000_000));
-        buf.putInt((int) (longitude * 1_000_000));
-        buf.put(raw, 0, len);
-        return buf.array();
+    static SosPacket createSos(double lat, double lon, int epochSeconds, String senderName) {
+        SecureRandom random = new SecureRandom();
+        long id = random.nextLong() & 0x0000FFFFFFFFFFFFL;
+        int latMilli = (int) Math.max(-90000, Math.min(90000, Math.round(lat * 1000d)));
+        int lonMilli = (int) Math.max(-180000, Math.min(180000, Math.round(lon * 1000d)));
+        return new SosPacket(TYPE_SOS, id, latMilli, lonMilli, epochSeconds, DEFAULT_TTL, 0, senderName);
     }
 
-    // ── Decode ────────────────────────────────────────────────────────────────
-
-    /**
-     * Decode from BLE service-data bytes.
-     * Returns {@code null} if the data is not a valid SOS packet.
-     */
-    public static SosPacket decode(byte[] data) {
-        if (data == null || data.length < MIN_DECODE_LEN) return null;
-        if (data[0] != SOS_IDENTIFIER)                    return null;
-
-        ByteBuffer buf = ByteBuffer.wrap(data);
-        buf.get();                                   // skip identifier
-        double lat  = buf.getInt() / 1_000_000.0;
-        double lng  = buf.getInt() / 1_000_000.0;
-
-        byte[] nameBytes = new byte[buf.remaining()];
-        buf.get(nameBytes);
-        String name = new String(nameBytes, StandardCharsets.UTF_8);
-
-        return new SosPacket(name, lat, lng);
+    static SosPacket createAck(long messageId) {
+        return new SosPacket(TYPE_ACK, messageId & 0x0000FFFFFFFFFFFFL, 0, 0, 0, 0, 0, null);
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
-    /** Google Maps deep-link for the SOS location. */
-    public String getMapsUrl() {
-        if (latitude == 0 && longitude == 0) return "(location unavailable)";
-        return "https://maps.google.com/?q=" + latitude + "," + longitude;
+    SosPacket asRelay() {
+        int nextHop = Math.min(15, hop + 1);
+        int nextTtl = Math.max(0, ttl - 1);
+        return new SosPacket(TYPE_SOS, messageId, latMilli, lonMilli, epochSeconds, nextTtl, nextHop, senderName);
     }
 
-    @Override
-    public String toString() {
-        return "SosPacket{name='" + senderName + "', lat=" + latitude + ", lng=" + longitude + "}";
+    boolean canRelay() {
+        return type == TYPE_SOS && ttl > 0;
+    }
+
+    public String shortId() {
+        return String.format(Locale.US, "%012X", messageId);
+    }
+
+    public int getLatMilli() {
+        return latMilli;
+    }
+
+    public int getLonMilli() {
+        return lonMilli;
+    }
+
+    public int getEpochSeconds() {
+        return epochSeconds;
+    }
+
+    public String getSenderName() {
+        return senderName;
+    }
+
+    private static String sanitizeSenderName(String raw) {
+        if (raw == null) {
+            return "";
+        }
+        String trimmed = raw.trim();
+        if (trimmed.isEmpty()) {
+            return "";
+        }
+        return trimmed.length() > 32 ? trimmed.substring(0, 32) : trimmed;
     }
 }
+
+
