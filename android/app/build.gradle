@@ -25,13 +25,15 @@ android {
     }
     sourceSets {
         main {
-            res.srcDirs += [
+            res.srcDirs = [
+                    'src/main/res',
                     'src/main/res_chats',
                     'src/main/res_community_reports',
                     'src/main/res_main_screens',
                     'src/main/res_notification',
                     'src/main/res_others',
                     'src/main/res_safety_tips',
+                    'src/main/res_volunteer',
                     'src/main/res_user_profile'
             ]
         }
