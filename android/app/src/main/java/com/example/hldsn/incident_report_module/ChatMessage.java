@@ -9,6 +9,8 @@ public class ChatMessage {
     private String text;
     private Timestamp timestamp;
     private boolean read;
+    /** "normal" for regular messages, "sos" for SOS alerts. */
+    private String messageType;
 
     // Required empty constructor for Firestore deserialization
     public ChatMessage() {}
@@ -30,10 +32,14 @@ public class ChatMessage {
     public Timestamp getTimestamp(){ return timestamp; }
     public boolean isRead()       { return read;       }
 
-    public void setMessageId(String v)  { messageId  = v; }
-    public void setSenderId(String v)   { senderId   = v; }
-    public void setSenderName(String v) { senderName = v; }
-    public void setText(String v)       { text       = v; }
-    public void setTimestamp(Timestamp v){ timestamp = v; }
-    public void setRead(boolean v)      { read       = v; }
+    public void setMessageId(String v)   { messageId   = v; }
+    public void setSenderId(String v)    { senderId    = v; }
+    public void setSenderName(String v)  { senderName  = v; }
+    public void setText(String v)        { text        = v; }
+    public void setTimestamp(Timestamp v){ timestamp   = v; }
+    public void setRead(boolean v)       { read        = v; }
+    public void setMessageType(String v) { messageType = v; }
+
+    public String  getMessageType() { return messageType; }
+    public boolean isSosMessage()   { return "sos".equals(messageType); }
 }

@@ -15,6 +15,25 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- SOS urgency badge (only visible for SOS alerts) -->
+        <TextView
+            android:id="@+id/tvSosUrgencyBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="#33FF474C"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.08"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:text="🚨 SOS EMERGENCY"
+            android:textColor="#FF474C"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
         <!-- Incident Type -->
         <TextView
             android:id="@+id/tvIncidentType"

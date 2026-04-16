@@ -96,7 +96,7 @@ public class ConversationActivity extends AppCompatActivity {
     // ── Setup ─────────────────────────────────────────────────────────────────
 
     private void bindViews() {
-        backIcon             = findViewById(R.id.convBackIcon);
+        backIcon             = findViewById(R.id.backButton);
         convAvatarInitial    = findViewById(R.id.convAvatarInitial);
         convUserName         = findViewById(R.id.convUserName);
         convOnlineStatus     = findViewById(R.id.convOnlineStatus);

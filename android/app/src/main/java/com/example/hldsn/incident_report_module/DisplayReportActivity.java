@@ -10,7 +10,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -55,6 +54,10 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
     private boolean isFirstLoad = true;
     private final Map<String, ListenerRegistration> incidentListeners = new HashMap<>();
     private ListenerRegistration commentsListener;
+    /** Persistent real-time listener for the incidents collection (offline-capable). */
+    private ListenerRegistration incidentsCollectionListener;
+    /** Prevents the "showing cached data" toast from repeating within one session. */
+    private boolean hasShownCacheBanner = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,11 +141,27 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
             return;
         }
 
-        firestore.collection("incidents")
+        // Re-registering replaces any previous listener (e.g. on swipe-refresh).
+        if (incidentsCollectionListener != null) {
+            incidentsCollectionListener.remove();
+        }
+
+        incidentsCollectionListener = firestore.collection("incidents")
                 .orderBy("createdAt", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
+                .addSnapshotListener((querySnapshot, error) -> {
+                    if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
+
+                    if (error != null) {
+                        Log.e(TAG, "Failed to load incidents", error);
+                        showEmptyState("Failed to load reports");
+                        updateUIWithIncidents();
+                        return;
+                    }
+
                     allIncidents.clear();
+                    // The collection listener replaces per-document listeners.
+                    removeAllIncidentListeners();
+
                     if (querySnapshot != null) {
                         for (DocumentSnapshot doc : querySnapshot) {
                             try {
@@ -150,65 +169,42 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
                                 if (incident != null) {
                                     incident.setId(doc.getId());
 
-                                    Long likes = doc.getLong("likes");
+                                    Long likes    = doc.getLong("likes");
                                     Long dislikes = doc.getLong("dislikes");
                                     Long comments = doc.getLong("commentCount");
 
-                                    incident.setLikes(likes != null ? likes : incident.getLikes());
-                                    incident.setDislikes(dislikes != null ? dislikes : incident.getDislikes());
-                                    incident.setCommentCount(comments != null ? comments : incident.getCommentCount());
+                                    incident.setLikes(likes        != null ? likes        : incident.getLikes());
+                                    incident.setDislikes(dislikes  != null ? dislikes     : incident.getDislikes());
+                                    incident.setCommentCount(comments != null ? comments  : incident.getCommentCount());
 
                                     allIncidents.add(incident);
-                                    attachRealTimeListener(incident);
                                 }
                             } catch (Exception parseError) {
                                 Log.w(TAG, "Failed to parse incident " + doc.getId(), parseError);
                             }
                         }
                     }
-                    updateUIWithIncidents();
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Failed to load incidents", e);
-                    showEmptyState("Failed to load reports");
+
+                    // Offline: data served from local cache.
+                    boolean fromCache = querySnapshot != null
+                            && querySnapshot.getMetadata().isFromCache();
+                    if (fromCache && !hasShownCacheBanner) {
+                        hasShownCacheBanner = true;
+                        showToast("You're offline — showing cached reports");
+                    } else if (!fromCache) {
+                        hasShownCacheBanner = false; // reset for the next offline session
+                    }
+
                     updateUIWithIncidents();
                 });
     }
 
-    private void attachRealTimeListener(@NonNull IncidentModel incident) {
-        if (incident.getId() == null) return;
-        String incidentId = incident.getId();
-
-        ListenerRegistration existing = incidentListeners.remove(incidentId);
-        if (existing != null) existing.remove();
-
-        DocumentReference ref = firestore.collection("incidents").document(incidentId);
-        ListenerRegistration listener = ref.addSnapshotListener((snapshot, error) -> {
-            if (error != null) {
-                Log.w(TAG, "Realtime listen error for " + incidentId, error);
-                return;
-            }
-            if (snapshot == null || !snapshot.exists()) return;
-
-            try {
-                Long newLikes = snapshot.getLong("likes");
-                Long newDislikes = snapshot.getLong("dislikes");
-                Long newComments = snapshot.getLong("commentCount");
-
-                if (newLikes != null) incident.setLikes(newLikes);
-                if (newDislikes != null) incident.setDislikes(newDislikes);
-                if (newComments != null) incident.setCommentCount(newComments);
-
-                int index = allIncidents.indexOf(incident);
-                if (index >= 0) {
-                    adapter.notifyItemChanged(index);
-                }
-            } catch (Exception ex) {
-                Log.w(TAG, "Failed to update realtime counts for " + incidentId, ex);
-            }
-        });
-
-        incidentListeners.put(incidentId, listener);
+    /** Cancel every per-document real-time listener. */
+    private void removeAllIncidentListeners() {
+        for (ListenerRegistration reg : incidentListeners.values()) {
+            if (reg != null) reg.remove();
+        }
+        incidentListeners.clear();
     }
 
     private void updateUIWithIncidents() {
@@ -309,8 +305,10 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
             DocumentSnapshot incSnap = transaction.get(incidentRef);
 
             String currentVote = voteSnap.exists() ? voteSnap.getString("type") : null;
-            long likes = incSnap.getLong("likes") != null ? incSnap.getLong("likes") : 0;
-            long dislikes = incSnap.getLong("dislikes") != null ? incSnap.getLong("dislikes") : 0;
+            Long rawLikes    = incSnap.getLong("likes");
+            Long rawDislikes = incSnap.getLong("dislikes");
+            long likes    = rawLikes    != null ? rawLikes    : 0;
+            long dislikes = rawDislikes != null ? rawDislikes : 0;
 
             if ("like".equals(voteType)) {
                 if ("like".equals(currentVote)) {
@@ -356,10 +354,8 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        for (ListenerRegistration reg : incidentListeners.values()) {
-            if (reg != null) reg.remove();
-        }
-        incidentListeners.clear();
+        if (incidentsCollectionListener != null) incidentsCollectionListener.remove();
+        removeAllIncidentListeners();
         if (commentsListener != null) commentsListener.remove();
     }
 
@@ -505,12 +501,14 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
         adapter.notifyDataSetChanged();
 
         firestore.runTransaction(transaction -> {
-            DocumentSnapshot voteSnap = transaction.get(voteRef);
+            DocumentSnapshot voteSnap    = transaction.get(voteRef);
             DocumentSnapshot commentSnap = transaction.get(commentRef);
 
             String currentVote = voteSnap.exists() ? voteSnap.getString("type") : null;
-            long likes = commentSnap.getLong("likes") != null ? commentSnap.getLong("likes") : 0;
-            long dislikes = commentSnap.getLong("dislikes") != null ? commentSnap.getLong("dislikes") : 0;
+            Long rawCLikes    = commentSnap.getLong("likes");
+            Long rawCDislikes = commentSnap.getLong("dislikes");
+            long likes    = rawCLikes    != null ? rawCLikes    : 0;
+            long dislikes = rawCDislikes != null ? rawCDislikes : 0;
 
             if ("like".equals(voteType)) {
                 if ("like".equals(currentVote)) {

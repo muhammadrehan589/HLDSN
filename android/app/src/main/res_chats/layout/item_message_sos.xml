@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    SOS message bubble — used in ConversationActivity's RecyclerView.
+    Displayed full-width regardless of sender/receiver (it's an emergency alert).
+    Rendered by ChatMessageAdapter when messageType == "sos".
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="12dp"
+    android:paddingVertical="6dp">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="#B71C1C"
+        app:cardCornerRadius="14dp"
+        app:cardElevation="6dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <!-- ── Top row: badge + timestamp ── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="6dp">
+
+                <!-- Flashing alert emoji + label -->
+                <TextView
+                    android:id="@+id/sosBadge"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="🆘  SOS ALERT"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:letterSpacing="0.05" />
+
+                <TextView
+                    android:id="@+id/sosTimeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFCDD2"
+                    android:textSize="10sp" />
+
+            </LinearLayout>
+
+            <!-- ── Divider ── -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#EF9A9A"
+                android:layout_marginBottom="8dp" />
+
+            <!-- ── Sender name ── -->
+            <TextView
+                android:id="@+id/sosSenderName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFEBEE"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:layout_marginBottom="6dp" />
+
+            <!-- ── SOS message text (contains location URL) ── -->
+            <TextView
+                android:id="@+id/sosMessageText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFCDD2"
+                android:textSize="12sp"
+                android:lineSpacingExtra="2dp"
+                android:autoLink="web"
+                android:linksClickable="true" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>

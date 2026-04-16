@@ -14,7 +14,6 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,6 +28,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.hldsn.NetworkUtils;
 import com.example.hldsn.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -42,6 +42,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
@@ -128,7 +129,7 @@ public class ReportIncidentActivity extends AppCompatActivity {
     private void setupDropdown() {
         String[] incidentTypes = getResources().getStringArray(R.array.incident_types);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                com.google.android.material.R.layout.m3_auto_complete_simple_item, incidentTypes);
+                android.R.layout.simple_dropdown_item_1line, incidentTypes);
         typeField.setAdapter(adapter);
 
         typeField.setOnItemClickListener((parent, view, position, id) -> {
@@ -168,8 +169,8 @@ public class ReportIncidentActivity extends AppCompatActivity {
 
     private void initListeners() {
 
-        safeColor = getResources().getColor(R.color.safe_green);
-        unsafeColor = getResources().getColor(R.color.lightred);
+        safeColor = ContextCompat.getColor(this, R.color.safe_green);
+        unsafeColor = ContextCompat.getColor(this, R.color.lightred);
 
         // INITIAL UI STATE
         setupSafeButtonUI();
@@ -194,10 +195,27 @@ public class ReportIncidentActivity extends AppCompatActivity {
 
     // ================= PERMISSIONS =================
     private void checkPermissions() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+        java.util.ArrayList<String> permissions = new java.util.ArrayList<>();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.CAMERA);
+        }
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
+                    != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.READ_MEDIA_IMAGES);
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+        }
+
+        if (!permissions.isEmpty()) {
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_MEDIA_IMAGES},
+                    permissions.toArray(new String[0]),
                     PERMISSION_REQUEST);
         }
     }
@@ -325,9 +343,17 @@ public class ReportIncidentActivity extends AppCompatActivity {
 
         uploadProgress.setVisibility(View.VISIBLE);
 
-        if (selectedMediaUri != null) {
+        if (selectedMediaUri != null && NetworkUtils.isOnline(this)) {
+            // Online with media → full upload flow.
             uploadMediaAndSave(type, locationText, description);
         } else {
+            if (selectedMediaUri != null) {
+                // Offline but user attached a photo – skip the upload and warn them.
+                Toast.makeText(this,
+                        "No internet — photo skipped. Report saved and will sync when online.",
+                        Toast.LENGTH_LONG).show();
+            }
+            // Firestore queues writes offline and syncs automatically.
             saveToFirestore(null, type, locationText, description);
         }
     }
@@ -347,8 +373,11 @@ public class ReportIncidentActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws java.io.IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) {
                 try {
+                    if (response.body() == null) {
+                        throw new IOException("Empty auth response body");
+                    }
                     JSONObject json = new JSONObject(response.body().string());
                     String token = json.getString("token");
                     String signature = json.getString("signature");
@@ -395,9 +424,12 @@ public class ReportIncidentActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onResponse(@NonNull Call call, @NonNull Response response) throws java.io.IOException {
+                    public void onResponse(@NonNull Call call, @NonNull Response response) {
                     try {
-                        JSONObject json = new JSONObject(response.body().string());
+                            if (response.body() == null) {
+                                throw new IOException("Empty upload response body");
+                            }
+                            JSONObject json = new JSONObject(response.body().string());
                         String mediaUrl = json.getString("url");
                         saveToFirestore(mediaUrl, type, locationText, description);
                     } catch (Exception e) {
@@ -446,6 +478,9 @@ public class ReportIncidentActivity extends AppCompatActivity {
 
     private byte[] readBytes(Uri uri) throws Exception {
         InputStream inputStream = getContentResolver().openInputStream(uri);
+        if (inputStream == null) {
+            throw new IOException("Unable to open media stream");
+        }
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         byte[] data = new byte[4096];
         int bytesRead;

@@ -38,7 +38,7 @@ public class SafetyTipsActivity extends AppCompatActivity {
         menuIcon = findViewById(R.id.menu_icon);
         notificationIcon = findViewById(R.id.notification_icon);
         notificationCount = findViewById(R.id.tv_notification_count);
-        backArrow = findViewById(R.id.backArrow);
+        backArrow = findViewById(R.id.backButton);
 
         if (notificationCount != null) {
             notificationCount.setVisibility(View.GONE);

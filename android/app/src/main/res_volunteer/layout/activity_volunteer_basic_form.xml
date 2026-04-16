@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/notification_gradient_bg">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerBar"
+        android:layout_width="0dp"
+        android:layout_height="86dp"
+        android:background="@drawable/homepage_appbar_background"
+        android:elevation="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/menuButton"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginStart="18dp"
+            android:contentDescription="Menu"
+            android:src="@drawable/ic_menu_landslide"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/headerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="serif"
+            android:text="Volunteer Form"
+            android:textColor="#FFFFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/notificationButton"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="18dp"
+            android:contentDescription="Notifications"
+            android:src="@drawable/ic_bell_outline"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/formScroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/nextButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerBar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="20dp">
+
+            <ImageView
+                android:id="@+id/backButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="Back"
+                android:src="@drawable/ic_back" />
+
+            <TextView
+                android:id="@+id/formTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="48dp"
+                android:layout_gravity="center_horizontal"
+                android:text="Volunteer Basic Form"
+                android:textColor="#FFFFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/formSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:text="Personal Details"
+                android:textColor="#E5FFFFFF"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/firstNameField"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/volunteer_input_field_bg"
+                    android:gravity="center_vertical"
+                    android:hint="First Name"
+                    android:inputType="textPersonName"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:textColor="#1F1F1F"
+                    android:textColorHint="#575757"
+                    android:textSize="16sp" />
+
+                <Space
+                    android:layout_width="14dp"
+                    android:layout_height="1dp" />
+
+                <EditText
+                    android:id="@+id/surnameField"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/volunteer_input_field_bg"
+                    android:gravity="center_vertical"
+                    android:hint="Surname"
+                    android:inputType="textPersonName"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:textColor="#1F1F1F"
+                    android:textColorHint="#575757"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/fullAddressField"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="2"
+                    android:background="@drawable/volunteer_input_field_bg"
+                    android:gravity="center_vertical"
+                    android:hint="Full Address"
+                    android:inputType="textPostalAddress"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:textColor="#1F1F1F"
+                    android:textColorHint="#575757"
+                    android:textSize="16sp" />
+
+                <Space
+                    android:layout_width="14dp"
+                    android:layout_height="1dp" />
+
+                <EditText
+                    android:id="@+id/ageField"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/volunteer_input_field_bg"
+                    android:gravity="center_vertical"
+                    android:hint="Age"
+                    android:inputType="number"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:textColor="#1F1F1F"
+                    android:textColorHint="#575757"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/phoneNumberField"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/volunteer_input_field_bg"
+                android:gravity="center_vertical"
+                android:hint="Phone Number"
+                android:inputType="phone"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textColor="#1F1F1F"
+                android:textColorHint="#575757"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/emergencyContactField"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="2"
+                    android:background="@drawable/volunteer_input_field_bg"
+                    android:gravity="center_vertical"
+                    android:hint="Emergency Contact"
+                    android:inputType="phone"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:textColor="#1F1F1F"
+                    android:textColorHint="#575757"
+                    android:textSize="16sp" />
+
+                <Space
+                    android:layout_width="14dp"
+                    android:layout_height="1dp" />
+
+                <EditText
+                    android:id="@+id/genderField"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/volunteer_input_field_bg"
+                    android:gravity="center_vertical"
+                    android:hint="Gender"
+                    android:inputType="text"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:textColor="#1F1F1F"
+                    android:textColorHint="#575757"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/emailField"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/volunteer_input_field_bg"
+                android:gravity="center_vertical"
+                android:hint="Email"
+                android:inputType="textEmailAddress"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textColor="#1F1F1F"
+                android:textColorHint="#575757"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/passwordField"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/volunteer_input_field_bg"
+                android:gravity="center_vertical"
+                android:hint="Password (Don't put a real one)"
+                android:inputType="textPassword"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textColor="#1F1F1F"
+                android:textColorHint="#575757"
+                android:textSize="16sp" />
+
+            <Space
+                android:layout_width="1dp"
+                android:layout_height="16dp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/nextButton"
+        android:layout_width="0dp"
+        android:layout_height="58dp"
+        android:layout_marginStart="34dp"
+        android:layout_marginEnd="34dp"
+        android:layout_marginBottom="34dp"
+        android:background="@drawable/volunteer_primary_button_bg"
+        android:backgroundTint="@null"
+        android:elevation="10dp"
+        android:text="Next"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFFFF"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

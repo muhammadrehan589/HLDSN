@@ -59,9 +59,15 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="Community"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textColor="#FFFFFF"
-            android:backgroundTint="@android:color/transparent"/>
+            android:backgroundTint="@android:color/transparent"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            app:minWidth="0dp"
+            app:minHeight="0dp"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/tabRecommended"
@@ -70,9 +76,15 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="Recommended"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textColor="#9EDCC6"
-            android:backgroundTint="@android:color/transparent"/>
+            android:backgroundTint="@android:color/transparent"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            app:minWidth="0dp"
+            app:minHeight="0dp"/>
     </LinearLayout>
 
     <!-- Tab Indicator -->

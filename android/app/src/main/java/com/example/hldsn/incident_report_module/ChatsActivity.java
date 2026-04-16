@@ -17,6 +17,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Source;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +45,7 @@ public class ChatsActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         // ── Header buttons ───────────────────────────────────────────────────
-        ImageView backIcon = findViewById(R.id.chatBackIcon);
+        ImageView backIcon = findViewById(R.id.backButton);
         if (backIcon != null) backIcon.setOnClickListener(v -> finish());
 
         // communityTab → ReportIncidentActivity
@@ -92,39 +94,47 @@ public class ChatsActivity extends AppCompatActivity {
 
     private void loadUsers() {
         db.collection("users")
-                .get()
-                .addOnSuccessListener(querySnap -> {
-                    List<DocumentSnapshot> docs = querySnap.getDocuments();
-                    // Filter out self
-                    List<DocumentSnapshot> others = new ArrayList<>();
-                    for (DocumentSnapshot doc : docs) {
-                        if (!doc.getId().equals(currentUid)) others.add(doc);
-                    }
+                .get()                              // tries server first
+                .addOnSuccessListener(this::processUserSnapshot)
+                .addOnFailureListener(e -> {
+                    // Server unavailable (offline) – fall back to local Firestore cache.
+                    db.collection("users")
+                            .get(Source.CACHE)
+                            .addOnSuccessListener(this::processUserSnapshot)
+                            .addOnFailureListener(e2 -> adapter.updateList(new ArrayList<>()));
+                });
+    }
 
-                    if (others.isEmpty()) {
-                        adapter.updateList(new ArrayList<>());
-                        return;
-                    }
+    private void processUserSnapshot(QuerySnapshot querySnap) {
+        List<DocumentSnapshot> docs = querySnap.getDocuments();
+        // Filter out self
+        List<DocumentSnapshot> others = new ArrayList<>();
+        for (DocumentSnapshot doc : docs) {
+            if (!doc.getId().equals(currentUid)) others.add(doc);
+        }
 
-                    List<ChatUser> result = new ArrayList<>();
-                    AtomicInteger pending = new AtomicInteger(others.size());
+        if (others.isEmpty()) {
+            adapter.updateList(new ArrayList<>());
+            return;
+        }
 
-                    for (DocumentSnapshot userDoc : others) {
-                        String uid  = userDoc.getId();
-                        String name = userDoc.getString("name");
-                        if (name == null || name.isEmpty()) name = userDoc.getString("email");
-                        if (name == null) name = "Unknown";
+        List<ChatUser> result = new ArrayList<>();
+        AtomicInteger pending = new AtomicInteger(others.size());
 
-                        ChatUser chatUser = new ChatUser(uid, name,
-                                userDoc.getString("photoUrl"),
-                                null, null, 0);
-                        result.add(chatUser);
+        for (DocumentSnapshot userDoc : others) {
+            String uid  = userDoc.getId();
+            String name = userDoc.getString("name");
+            if (name == null || name.isEmpty()) name = userDoc.getString("email");
+            if (name == null) name = "Unknown";
 
-                        // Fetch chat metadata for this user
-                        fetchChatMeta(chatUser, pending, result);
-                    }
-                })
-                .addOnFailureListener(e -> adapter.updateList(new ArrayList<>()));
+            ChatUser chatUser = new ChatUser(uid, name,
+                    userDoc.getString("photoUrl"),
+                    null, null, 0);
+            result.add(chatUser);
+
+            // Fetch chat metadata for this user
+            fetchChatMeta(chatUser, pending, result);
+        }
     }
 
     private void fetchChatMeta(ChatUser chatUser, AtomicInteger pending,
@@ -135,33 +145,45 @@ public class ChatsActivity extends AppCompatActivity {
 
         db.collection("chats").document(chatId)
                 .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null
-                            && task.getResult().exists()) {
-                        DocumentSnapshot chatDoc = task.getResult();
-                        chatUser.setLastMessage(chatDoc.getString("lastMessage"));
-                        Timestamp ts = chatDoc.getTimestamp("lastMessageTime");
-                        chatUser.setLastMessageTime(ts);
+                .addOnSuccessListener(chatDoc -> {
+                    bindChatMeta(chatUser, chatDoc);
+                    onChatMetaLoaded(pending, result);
+                })
+                .addOnFailureListener(e -> db.collection("chats").document(chatId)
+                        .get(Source.CACHE)
+                        .addOnSuccessListener(chatDoc -> {
+                            bindChatMeta(chatUser, chatDoc);
+                            onChatMetaLoaded(pending, result);
+                        })
+                        .addOnFailureListener(cacheError -> onChatMetaLoaded(pending, result)));
+    }
 
-                        // Unread count for current user
-                        Long unread = chatDoc.getLong("unreadCounts." + currentUid);
-                        chatUser.setUnreadCount(unread != null ? unread.intValue() : 0);
-                    }
+    private void bindChatMeta(ChatUser chatUser, DocumentSnapshot chatDoc) {
+        if (chatDoc == null || !chatDoc.exists()) {
+            return;
+        }
+        chatUser.setLastMessage(chatDoc.getString("lastMessage"));
+        Timestamp ts = chatDoc.getTimestamp("lastMessageTime");
+        chatUser.setLastMessageTime(ts);
 
-                    // Once all fetches done, push to adapter
-                    if (pending.decrementAndGet() == 0) {
-                        // Sort: conversations with messages first, by time desc
-                        result.sort((a, b) -> {
-                            Timestamp ta = a.getLastMessageTime();
-                            Timestamp tb = b.getLastMessageTime();
-                            if (ta == null && tb == null) return 0;
-                            if (ta == null) return 1;
-                            if (tb == null) return -1;
-                            return tb.compareTo(ta);
-                        });
-                        runOnUiThread(() -> adapter.updateList(result));
-                    }
-                });
+        Long unread = chatDoc.getLong("unreadCounts." + currentUid);
+        chatUser.setUnreadCount(unread != null ? unread.intValue() : 0);
+    }
+
+    private void onChatMetaLoaded(AtomicInteger pending, List<ChatUser> result) {
+        // Once all fetches done, push to adapter
+        if (pending.decrementAndGet() == 0) {
+            // Sort: conversations with messages first, by time desc
+            result.sort((a, b) -> {
+                Timestamp ta = a.getLastMessageTime();
+                Timestamp tb = b.getLastMessageTime();
+                if (ta == null && tb == null) return 0;
+                if (ta == null) return 1;
+                if (tb == null) return -1;
+                return tb.compareTo(ta);
+            });
+            runOnUiThread(() -> adapter.updateList(result));
+        }
     }
 }
 
