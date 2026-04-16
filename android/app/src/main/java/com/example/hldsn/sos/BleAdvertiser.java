@@ -68,7 +68,7 @@ public class BleAdvertiser {
 
         AdvertiseData data = new AdvertiseData.Builder()
                 .addServiceUuid(new ParcelUuid(SOS_SERVICE_UUID))
-                .addServiceData(new ParcelUuid(SOS_SERVICE_UUID), packet.encode())
+            .addServiceData(new ParcelUuid(SOS_SERVICE_UUID), SosCodec.encodeBleBeacon(packet))
                 .setIncludeDeviceName(false)
                 .build();
 

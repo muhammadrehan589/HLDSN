@@ -81,8 +81,8 @@ public class WifiDirectSosManager {
 
         // Build DNS-SD TXT record — receivers get lat/lng immediately without a socket
         Map<String, String> record = new HashMap<>();
-        record.put("lat",  String.valueOf(packet.latitude));
-        record.put("lng",  String.valueOf(packet.longitude));
+        record.put("lat", String.valueOf(packet.getLatMilli() / 1000d));
+        record.put("lng", String.valueOf(packet.getLonMilli() / 1000d));
         record.put("name", truncate(packet.senderName, 40));
 
         WifiP2pDnsSdServiceInfo serviceInfo =
@@ -179,7 +179,10 @@ public class WifiDirectSosManager {
                     double lng  = Double.parseDouble(record.get("lng"));
                     String name = record.getOrDefault("name", "Unknown");
                     Log.d(TAG, "SOS TXT record received from: " + name);
-                    if (sosListener != null) sosListener.onSosReceived(new SosPacket(name, lat, lng));
+                    if (sosListener != null) {
+                        int nowEpoch = (int) (System.currentTimeMillis() / 1000L);
+                        sosListener.onSosReceived(SosPacket.createSos(lat, lng, nowEpoch, name));
+                    }
                 } catch (Exception e) {
                     Log.e(TAG, "Error parsing TXT record", e);
                 }
@@ -307,8 +310,8 @@ public class WifiDirectSosManager {
             JSONObject obj = new JSONObject();
             obj.put("type", "SOS");
             obj.put("name", packet.senderName);
-            obj.put("lat",  packet.latitude);
-            obj.put("lng",  packet.longitude);
+            obj.put("lat", packet.getLatMilli() / 1000d);
+            obj.put("lng", packet.getLonMilli() / 1000d);
             return obj.toString();
         } catch (Exception e) {
             return "{}";
@@ -318,10 +321,12 @@ public class WifiDirectSosManager {
     private SosPacket fromJson(String json) {
         try {
             JSONObject obj = new JSONObject(json);
-            return new SosPacket(
-                    obj.getString("name"),
+            int nowEpoch = (int) (System.currentTimeMillis() / 1000L);
+            return SosPacket.createSos(
                     obj.getDouble("lat"),
-                    obj.getDouble("lng"));
+                    obj.getDouble("lng"),
+                    nowEpoch,
+                    obj.getString("name"));
         } catch (Exception e) {
             return null;
         }

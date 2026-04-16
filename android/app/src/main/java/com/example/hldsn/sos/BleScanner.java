@@ -80,7 +80,7 @@ public class BleScanner {
                         new ParcelUuid(BleAdvertiser.SOS_SERVICE_UUID));
                 if (data == null) return;
 
-                SosPacket packet = SosPacket.decode(data);
+                SosPacket packet = SosCodec.decodeBleBeacon(data);
                 if (packet != null && listener != null) {
                     Log.d(TAG, "SOS detected via BLE: " + packet.senderName);
                     listener.onSosReceived(packet);

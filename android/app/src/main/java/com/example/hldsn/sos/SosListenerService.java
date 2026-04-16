@@ -168,8 +168,14 @@ public class SosListenerService extends Service {
     }
 
     private void showSosNotification(SosPacket packet) {
-        String mapUrl  = packet.getMapsUrl();
-        String bigText = "⚠️ " + packet.senderName + " needs immediate help!\n📍 " + mapUrl;
+        double lat = packet.getLatMilli() / 1000d;
+        double lng = packet.getLonMilli() / 1000d;
+        boolean hasLocation = packet.getLatMilli() != 0 || packet.getLonMilli() != 0;
+        String mapUrl = hasLocation
+            ? "https://maps.google.com/?q=" + lat + "," + lng
+            : "https://maps.google.com/";
+        String bigText = "⚠️ " + packet.senderName + " needs immediate help!\n📍 "
+            + (hasLocation ? mapUrl : "Location unavailable");
 
         // Make the map URL tappable
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mapUrl));

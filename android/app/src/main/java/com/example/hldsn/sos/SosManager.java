@@ -210,7 +210,8 @@ public class SosManager {
         FirebaseUser me   = FirebaseAuth.getInstance().getCurrentUser();
         String senderName = (me != null) ? resolveName(me) : "Unknown";
 
-        SosPacket packet = new SosPacket(senderName, lat, lng);
+        int nowEpoch = (int) (System.currentTimeMillis() / 1000L);
+        SosPacket packet = SosPacket.createSos(lat, lng, nowEpoch, senderName);
 
         // Start BLE advertising
         bleAdvertiser.startAdvertising(context, packet);

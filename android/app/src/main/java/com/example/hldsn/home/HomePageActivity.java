@@ -43,7 +43,6 @@ import com.example.hldsn.notification_module.SosAlertRecord;
 import com.example.hldsn.notification_module.SosAlertStore;
 import com.example.hldsn.services.safety_tips.SafetyTipsActivity;
 import com.example.hldsn.sos.SosListenerService;
-import com.example.hldsn.sos.SosManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -248,11 +247,10 @@ public class HomePageActivity extends AppCompatActivity {
 
         chatBtn.setOnClickListener(v -> startActivity(new Intent(this, ChatsActivity.class)));
         tipsBtn.setOnClickListener(v -> startActivity(new Intent(this, SafetyTipsActivity.class)));
-        emergencyBtn.setOnClickListener(v -> triggerSos());
 
         // SOS button
-        if (sosBtn != null) {
-            sosBtn.setOnClickListener(v -> showSosConfirmDialog());
+        if (emergencyBtn != null) {
+            emergencyBtn.setOnClickListener(v -> showSosConfirmDialog());
         }
 
         // Profile menu example
@@ -553,43 +551,6 @@ public class HomePageActivity extends AppCompatActivity {
                 .setNegativeButton("Cancel", null)
                 .setCancelable(true)
                 .show();
-    }
-
-    private void triggerSos() {
-        SosManager sosManager = new SosManager(this);
-        sosManager.triggerSos(new SosManager.SosTriggerCallback() {
-            @Override
-            public void onStarted() {
-                runOnUiThread(() ->
-                        Toast.makeText(HomePageActivity.this,
-                                "🊘 SOS sent! Alerting your contacts...",
-                                Toast.LENGTH_LONG).show());
-            }
-
-            @Override
-            public void onOnlineBroadcastComplete(int contactsReached) {
-                runOnUiThread(() ->
-                        Toast.makeText(HomePageActivity.this,
-                                "✅ SOS alert delivered to " + contactsReached + " contact(s)",
-                                Toast.LENGTH_LONG).show());
-            }
-
-            @Override
-            public void onOfflineStarted() {
-                runOnUiThread(() ->
-                        Toast.makeText(HomePageActivity.this,
-                                "📲 No internet — broadcasting SOS via Bluetooth & Wi-Fi Direct",
-                                Toast.LENGTH_LONG).show());
-            }
-
-            @Override
-            public void onError(String reason) {
-                runOnUiThread(() ->
-                        Toast.makeText(HomePageActivity.this,
-                                "⚠️ SOS error: " + reason,
-                                Toast.LENGTH_LONG).show());
-            }
-        });
     }
 
     private void requestNearbyGroupIfNeeded() {
