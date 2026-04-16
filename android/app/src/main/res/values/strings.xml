@@ -13,4 +13,5 @@
     <string name="edhi_icon_desc">Edhi Icon</string>
     <string name="hospital_icon_desc">Hospital Icon</string>
     <string name="police_icon_desc">Police Icon</string>
+    <string name="volunteer_click_here_underlined"><u>Click Here</u></string>
 </resources>
