@@ -39,10 +39,14 @@ import androidx.core.content.ContextCompat;
 
 import com.example.hldsn.R;
 import com.example.hldsn.home.HomePageActivity;
+import com.example.hldsn.incident_report_module.ChatIdUtil;
+import com.example.hldsn.incident_report_module.ChatMessage;
+import com.example.hldsn.incident_report_module.OfflineChatStore;
 import com.example.hldsn.notification_module.SosAlertRecord;
 import com.example.hldsn.notification_module.SosAlertStore;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.Timestamp;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -52,22 +56,37 @@ import com.google.android.gms.tasks.CancellationTokenSource;
 
 import java.time.Instant;
 import java.util.ArrayDeque;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 public class SosForegroundService extends Service {
 
     public static final String ACTION_START_MESH = "com.example.hldsn.sos.ACTION_START_MESH";
     public static final String ACTION_TRIGGER_SOS = "com.example.hldsn.sos.ACTION_TRIGGER_SOS";
+    public static final String ACTION_SEND_OFFLINE_CHAT = "com.example.hldsn.sos.ACTION_SEND_OFFLINE_CHAT";
     public static final String ACTION_SOS_STATUS = "com.example.hldsn.sos.ACTION_SOS_STATUS";
     public static final String ACTION_SOS_ALERTS_UPDATED = "com.example.hldsn.sos.ACTION_SOS_ALERTS_UPDATED";
     public static final String ACTION_OPEN_NOTIFICATIONS = "com.example.hldsn.sos.ACTION_OPEN_NOTIFICATIONS";
+    public static final String ACTION_OFFLINE_CHAT_STATUS = "com.example.hldsn.sos.ACTION_OFFLINE_CHAT_STATUS";
+    public static final String ACTION_OFFLINE_CHAT_RECEIVED = "com.example.hldsn.sos.ACTION_OFFLINE_CHAT_RECEIVED";
     public static final String EXTRA_STATUS = "extra_status";
+    public static final String EXTRA_CHAT_MESSAGE_ID = "extra_chat_message_id";
+    public static final String EXTRA_CHAT_TARGET_UID = "extra_chat_target_uid";
+    public static final String EXTRA_CHAT_SOURCE_UID = "extra_chat_source_uid";
+    public static final String EXTRA_CHAT_TEXT = "extra_chat_text";
+    public static final String EXTRA_CHAT_QUICK_TYPE = "extra_chat_quick_type";
+    public static final String EXTRA_CHAT_STATUS = "extra_chat_status";
+    public static final String EXTRA_CHAT_ID = "extra_chat_id";
+    public static final String EXTRA_CHAT_SENDER_NAME = "extra_chat_sender_name";
+    public static final String EXTRA_CHAT_TIMESTAMP_MS = "extra_chat_timestamp_ms";
 
     private static final String TAG = "SosFgService";
     private static final String CHANNEL_ID = "sos_mesh_channel";
     private static final String ALERT_CHANNEL_ID = "sos_received_alerts";
+    private static final String CHAT_ALERT_CHANNEL_ID = "offline_chat_alerts";
     private static final int NOTIFICATION_ID = 3101;
 
     private static final long TICK_MS = 800L;
@@ -75,6 +94,9 @@ public class SosForegroundService extends Service {
     private static final long MAX_SEEN_AGE_MS = 2 * 60_000L;
     private static final long BLE_RETRY_COOLDOWN_MS = 10_000L;
     private static final long BLE_REINIT_MIN_INTERVAL_MS = 1_500L;
+    private static final long CHAT_FAIL_TIMEOUT_MS = 35_000L;
+    private static final long CHAT_RETRY_INTERVAL_MS = 5_000L;
+    private static final long CHAT_MAX_LIFETIME_MS = 12 * 60 * 60_000L;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Object lock = new Object();
@@ -82,6 +104,8 @@ public class SosForegroundService extends Service {
     private final Map<Long, Long> seenSosAt = new HashMap<>();
     private final Map<Long, OriginState> originStates = new HashMap<>();
     private final Map<Long, Long> relayedFullAt = new HashMap<>();
+    private final Map<Long, PendingChatState> pendingChats = new HashMap<>();
+    private final Map<String, Long> seenChatAcksAt = new HashMap<>();
 
     private final TransportSelector transportSelector = new TransportSelector();
 
@@ -101,6 +125,7 @@ public class SosForegroundService extends Service {
         @Override
         public void run() {
             try {
+                tickPendingChats();
                 dispatchNextFrame();
                 pruneCaches();
             } finally {
@@ -182,6 +207,9 @@ public class SosForegroundService extends Service {
         if (ACTION_TRIGGER_SOS.equals(action)) {
             startMesh();
             triggerSos();
+        } else if (ACTION_SEND_OFFLINE_CHAT.equals(action)) {
+            startMesh();
+            handleOfflineChatSend(intent);
         } else {
             startMesh();
         }
@@ -502,9 +530,252 @@ public class SosForegroundService extends Service {
         sendStatus("SOS broadcast started");
     }
 
+    private void handleOfflineChatSend(Intent intent) {
+        if (intent == null) {
+            return;
+        }
+
+        String sourceUid = resolveCurrentUid();
+        String targetUid = intent.getStringExtra(EXTRA_CHAT_TARGET_UID);
+        String quickType = safe(intent.getStringExtra(EXTRA_CHAT_QUICK_TYPE));
+        String text = safe(intent.getStringExtra(EXTRA_CHAT_TEXT));
+
+        if (sourceUid.isEmpty() || targetUid == null || targetUid.isEmpty()) {
+            return;
+        }
+
+        if (text.isEmpty() && quickType.isEmpty()) {
+            return;
+        }
+
+        long requestedMessageId = intent.getLongExtra(EXTRA_CHAT_MESSAGE_ID, 0L);
+        int nowEpoch = (int) Instant.now().getEpochSecond();
+        String senderName = resolveSenderName();
+        SosPacket packet = SosPacket.createChat(
+                requestedMessageId,
+                sourceUid,
+                targetUid,
+                text,
+                quickType,
+                nowEpoch,
+                senderName
+        );
+
+        String chatId = ChatIdUtil.buildChatId(sourceUid, targetUid);
+        long now = SystemClock.elapsedRealtime();
+
+        synchronized (lock) {
+            pendingChats.put(packet.messageId, new PendingChatState(packet, chatId, targetUid, now));
+        }
+
+        persistOutgoingOfflineChat(packet, chatId, "pending");
+        broadcastOfflineChatStatus(packet.messageId, chatId, targetUid, "pending");
+
+        if (wifiDirectTransport != null) {
+            wifiDirectTransport.sendFrame(SosCodec.encodeFullFrame(packet));
+        }
+    }
+
+    private void tickPendingChats() {
+        if (pendingChats.isEmpty()) {
+            return;
+        }
+
+        long now = SystemClock.elapsedRealtime();
+        Map<Long, PendingChatState> snapshot;
+
+        synchronized (lock) {
+            Iterator<Map.Entry<Long, PendingChatState>> iterator = pendingChats.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<Long, PendingChatState> entry = iterator.next();
+                PendingChatState state = entry.getValue();
+                if (now - state.createdAtMs > CHAT_MAX_LIFETIME_MS) {
+                    iterator.remove();
+                }
+            }
+            snapshot = new HashMap<>(pendingChats);
+        }
+
+        for (PendingChatState state : snapshot.values()) {
+            if (!state.failedBroadcasted && now - state.createdAtMs >= CHAT_FAIL_TIMEOUT_MS) {
+                state.failedBroadcasted = true;
+                persistOutgoingOfflineChat(state.packet, state.chatId, "failed");
+                broadcastOfflineChatStatus(state.packet.messageId, state.chatId, state.targetUid, "failed");
+            }
+
+            if (now >= state.nextRetryAtMs) {
+                state.nextRetryAtMs = now + CHAT_RETRY_INTERVAL_MS;
+                if (wifiDirectTransport != null) {
+                    wifiDirectTransport.sendFrame(SosCodec.encodeFullFrame(state.packet));
+                }
+            }
+        }
+    }
+
+    private void markPendingChatDelivered(long messageId) {
+        PendingChatState state;
+        synchronized (lock) {
+            state = pendingChats.remove(messageId);
+        }
+        if (state == null) {
+            return;
+        }
+
+        persistOutgoingOfflineChat(state.packet, state.chatId, "sent");
+        broadcastOfflineChatStatus(state.packet.messageId, state.chatId, state.targetUid, "sent");
+    }
+
+    private void persistOutgoingOfflineChat(SosPacket packet, String chatId, String deliveryStatus) {
+        ChatMessage msg = new ChatMessage();
+        msg.setMessageId(toMessageId(packet.messageId));
+        msg.setSenderId(packet.getSourceUid());
+        msg.setSenderName(packet.getSenderName());
+        msg.setText(resolveChatBody(packet));
+        msg.setMessageType(packet.getQuickType().isEmpty() ? "normal" : "quick");
+        msg.setQuickType(packet.getQuickType());
+        msg.setTimestamp(new Timestamp(new Date(packet.getEpochSeconds() * 1000L)));
+        msg.setRead(false);
+        msg.setTransportType("offline");
+        msg.setDeliveryStatus(deliveryStatus);
+        OfflineChatStore.upsertMessage(this, chatId, msg);
+    }
+
+    private void persistIncomingOfflineChat(SosPacket packet) {
+        String chatId = ChatIdUtil.buildChatId(packet.getSourceUid(), packet.getTargetUid());
+
+        ChatMessage msg = new ChatMessage();
+        msg.setMessageId(toMessageId(packet.messageId));
+        msg.setSenderId(packet.getSourceUid());
+        msg.setSenderName(packet.getSenderName());
+        msg.setText(resolveChatBody(packet));
+        msg.setMessageType(packet.getQuickType().isEmpty() ? "normal" : "quick");
+        msg.setQuickType(packet.getQuickType());
+        long timestampMs = packet.getEpochSeconds() > 0
+                ? packet.getEpochSeconds() * 1000L
+                : System.currentTimeMillis();
+        msg.setTimestamp(new Timestamp(new Date(timestampMs)));
+        msg.setRead(false);
+        msg.setTransportType("offline");
+        msg.setDeliveryStatus("sent");
+        OfflineChatStore.upsertMessage(this, chatId, msg);
+    }
+
+    private void sendOfflineChatReceivedBroadcast(SosPacket packet) {
+        Intent intent = new Intent(ACTION_OFFLINE_CHAT_RECEIVED);
+        intent.setPackage(getPackageName());
+        intent.putExtra(EXTRA_CHAT_MESSAGE_ID, packet.messageId);
+        intent.putExtra(EXTRA_CHAT_SOURCE_UID, packet.getSourceUid());
+        intent.putExtra(EXTRA_CHAT_TARGET_UID, packet.getTargetUid());
+        intent.putExtra(EXTRA_CHAT_SENDER_NAME, packet.getSenderName());
+        intent.putExtra(EXTRA_CHAT_TEXT, packet.getChatText());
+        intent.putExtra(EXTRA_CHAT_QUICK_TYPE, packet.getQuickType());
+        intent.putExtra(EXTRA_CHAT_TIMESTAMP_MS, packet.getEpochSeconds() * 1000L);
+        sendBroadcast(intent);
+    }
+
+    private void broadcastOfflineChatStatus(long messageId, String chatId, String targetUid, String status) {
+        Intent intent = new Intent(ACTION_OFFLINE_CHAT_STATUS);
+        intent.setPackage(getPackageName());
+        intent.putExtra(EXTRA_CHAT_MESSAGE_ID, messageId);
+        intent.putExtra(EXTRA_CHAT_ID, chatId);
+        intent.putExtra(EXTRA_CHAT_TARGET_UID, targetUid);
+        intent.putExtra(EXTRA_CHAT_STATUS, status);
+        sendBroadcast(intent);
+    }
+
+    private void showReceivedOfflineChatNotification(SosPacket packet) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        String sender = packet.getSenderName().isEmpty() ? "HLDSN User" : packet.getSenderName();
+        String text = resolveChatBody(packet);
+
+        Intent openIntent = new Intent(this, com.example.hldsn.incident_report_module.ConversationActivity.class);
+        openIntent.putExtra(com.example.hldsn.incident_report_module.ConversationActivity.EXTRA_USER_ID, packet.getSourceUid());
+        openIntent.putExtra(com.example.hldsn.incident_report_module.ConversationActivity.EXTRA_USER_NAME, sender);
+        openIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                this,
+                (int) (packet.messageId & 0x7FFFFFFF),
+                openIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        Notification notification = new NotificationCompat.Builder(this, CHAT_ALERT_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle("Offline message from " + sender)
+                .setContentText(text)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .build();
+
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (manager != null) {
+            manager.notify(7000 + Math.abs((int) (packet.messageId % 1000)), notification);
+        }
+    }
+
+    private String resolveChatBody(SosPacket packet) {
+        String body = safe(packet.getChatText());
+        if (!body.isEmpty()) {
+            return body;
+        }
+        String quickType = packet.getQuickType();
+        if (quickType == null || quickType.isEmpty()) {
+            return "(empty message)";
+        }
+        switch (quickType) {
+            case "need_rescue":
+                return "Need rescue";
+            case "need_medical":
+                return "Need medical";
+            case "fire_seen":
+                return "Fire seen";
+            case "road_blocked":
+                return "Road blocked";
+            case "i_am_safe":
+                return "I am safe";
+            case "found_shelter":
+                return "Found shelter";
+            default:
+                return "Quick emergency message";
+        }
+    }
+
+    private String resolveCurrentUid() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        return user != null && user.getUid() != null ? user.getUid() : "";
+    }
+
+    private String toMessageId(long messageId) {
+        return String.format(Locale.US, "%012X", messageId & 0x0000FFFFFFFFFFFFL);
+    }
+
+    private String safe(String value) {
+        return value != null ? value : "";
+    }
+
     private void onPacketReceived(SosPacket packet, boolean fullFrameReceived) {
         Log.i(TAG, "Packet received transport=" + (fullFrameReceived ? "WIFI_DIRECT" : "BLE_BEACON")
                 + " data=" + (fullFrameReceived ? packetSummary(packet) : beaconSummary(packet)));
+
+        if (packet.type == SosPacket.TYPE_CHAT_ACK) {
+            handleChatAckPacket(packet, fullFrameReceived);
+            return;
+        }
+
+        if (packet.type == SosPacket.TYPE_CHAT) {
+            handleChatPacket(packet, fullFrameReceived);
+            return;
+        }
+
         if (packet.type == SosPacket.TYPE_ACK) {
             if (fullFrameReceived) {
                 onAckReceived(packet.messageId);
@@ -560,6 +831,79 @@ public class SosForegroundService extends Service {
         }
     }
 
+    private void handleChatPacket(SosPacket packet, boolean fullFrameReceived) {
+        if (!fullFrameReceived) {
+            // Chat payload is only available in full Wi-Fi Direct frames.
+            return;
+        }
+
+        String currentUid = resolveCurrentUid();
+        if (currentUid == null || currentUid.isEmpty()) {
+            return;
+        }
+
+        boolean isNew;
+        synchronized (lock) {
+            Long seenAt = seenSosAt.get(packet.messageId);
+            isNew = seenAt == null;
+            seenSosAt.put(packet.messageId, SystemClock.elapsedRealtime());
+        }
+
+        if (!isNew) {
+            return;
+        }
+
+        if (packet.isTargetFor(currentUid)) {
+            persistIncomingOfflineChat(packet);
+            sendOfflineChatReceivedBroadcast(packet);
+            showReceivedOfflineChatNotification(packet);
+            queueChatAck(packet.messageId, currentUid, packet.getSourceUid());
+            sendStatus("Offline message received");
+            return;
+        }
+
+        if (!packet.canRelay()) {
+            return;
+        }
+
+        if (wifiDirectTransport != null) {
+            wifiDirectTransport.sendFrame(SosCodec.encodeFullFrame(packet.asRelay()));
+        }
+    }
+
+    private void handleChatAckPacket(SosPacket packet, boolean fullFrameReceived) {
+        if (!fullFrameReceived) {
+            return;
+        }
+
+        String dedupeKey = packet.type + ":" + packet.messageId + ":"
+                + packet.getSourceUid() + ":" + packet.getTargetUid();
+        synchronized (lock) {
+            if (seenChatAcksAt.containsKey(dedupeKey)) {
+                return;
+            }
+            seenChatAcksAt.put(dedupeKey, SystemClock.elapsedRealtime());
+        }
+
+        String currentUid = resolveCurrentUid();
+        if (currentUid == null || currentUid.isEmpty()) {
+            return;
+        }
+
+        if (packet.isTargetFor(currentUid)) {
+            markPendingChatDelivered(packet.messageId);
+            return;
+        }
+
+        if (!packet.canRelay()) {
+            return;
+        }
+
+        if (wifiDirectTransport != null) {
+            wifiDirectTransport.sendFrame(SosCodec.encodeFullFrame(packet.asRelay()));
+        }
+    }
+
     private void onAckReceived(long messageId) {
         synchronized (lock) {
             OriginState state = originStates.get(messageId);
@@ -582,6 +926,17 @@ public class SosForegroundService extends Service {
             outbound.addFirst(new QueuedPacket(ack, SystemClock.elapsedRealtime() + 6_000L, 4, true));
         }
         Log.i(TAG, "Queued ACK for id=" + String.format(java.util.Locale.US, "%012X", messageId));
+    }
+
+    private void queueChatAck(long messageId, String sourceUid, String targetUid) {
+        if (targetUid == null || targetUid.isEmpty()) {
+            return;
+        }
+        if (wifiDirectTransport == null) {
+            return;
+        }
+        SosPacket ack = SosPacket.createChatAck(messageId, sourceUid, targetUid);
+        wifiDirectTransport.sendFrame(SosCodec.encodeFullFrame(ack));
     }
 
     private QueuedPacket pickNextPacketLocked() {
@@ -810,6 +1165,14 @@ public class SosForegroundService extends Service {
                     relayedFullIt.remove();
                 }
             }
+
+            Iterator<Map.Entry<String, Long>> chatAckIt = seenChatAcksAt.entrySet().iterator();
+            while (chatAckIt.hasNext()) {
+                Map.Entry<String, Long> entry = chatAckIt.next();
+                if (now - entry.getValue() > MAX_SEEN_AGE_MS) {
+                    chatAckIt.remove();
+                }
+            }
         }
     }
 
@@ -872,6 +1235,14 @@ public class SosForegroundService extends Service {
         );
         alertChannel.setDescription("Popup alerts for nearby SOS detections");
         manager.createNotificationChannel(alertChannel);
+
+        NotificationChannel chatAlertChannel = new NotificationChannel(
+            CHAT_ALERT_CHANNEL_ID,
+            "Offline Chat Alerts",
+            NotificationManager.IMPORTANCE_HIGH
+        );
+        chatAlertChannel.setDescription("Delivered offline mesh chat messages");
+        manager.createNotificationChannel(chatAlertChannel);
     }
 
     private void sendStatus(String status) {
@@ -948,20 +1319,49 @@ public class SosForegroundService extends Service {
         if (packet == null) {
             return "null";
         }
-        String type = packet.type == SosPacket.TYPE_ACK ? "ACK" : "SOS";
+        String type;
+        switch (packet.type) {
+            case SosPacket.TYPE_ACK:
+                type = "ACK";
+                break;
+            case SosPacket.TYPE_CHAT:
+                type = "CHAT";
+                break;
+            case SosPacket.TYPE_CHAT_ACK:
+                type = "CHAT_ACK";
+                break;
+            default:
+                type = "SOS";
+                break;
+        }
         String sender = packet.getSenderName().isEmpty() ? "unknown" : packet.getSenderName();
         String coords = (packet.getLatMilli() == 0 && packet.getLonMilli() == 0)
                 ? ""
                 : " lat=" + (packet.getLatMilli() / 1000.0d) + " lon=" + (packet.getLonMilli() / 1000.0d);
+        String route = " src=" + packet.getSourceUid() + " dst=" + packet.getTargetUid();
         return type + "#" + packet.shortId() + " hop=" + packet.hop + " ttl=" + packet.ttl
-                + " sender=" + sender + coords;
+                + " sender=" + sender + coords + route;
     }
 
     private String beaconSummary(SosPacket packet) {
         if (packet == null) {
             return "null";
         }
-        String type = packet.type == SosPacket.TYPE_ACK ? "ACK_BEACON" : "SOS_BEACON";
+        String type;
+        switch (packet.type) {
+            case SosPacket.TYPE_ACK:
+                type = "ACK_BEACON";
+                break;
+            case SosPacket.TYPE_CHAT:
+                type = "CHAT_BEACON";
+                break;
+            case SosPacket.TYPE_CHAT_ACK:
+                type = "CHAT_ACK_BEACON";
+                break;
+            default:
+                type = "SOS_BEACON";
+                break;
+        }
         return type + "#" + packet.shortId() + " hop=" + packet.hop + " ttl=" + packet.ttl;
     }
 
@@ -1020,6 +1420,24 @@ public class SosForegroundService extends Service {
 
         OriginState(long startedAtMs) {
             this.startedAtMs = startedAtMs;
+        }
+    }
+
+    private static final class PendingChatState {
+        final SosPacket packet;
+        final String chatId;
+        final String targetUid;
+        final long createdAtMs;
+        long nextRetryAtMs;
+        boolean failedBroadcasted;
+
+        PendingChatState(SosPacket packet, String chatId, String targetUid, long createdAtMs) {
+            this.packet = packet;
+            this.chatId = chatId;
+            this.targetUid = targetUid;
+            this.createdAtMs = createdAtMs;
+            this.nextRetryAtMs = createdAtMs;
+            this.failedBroadcasted = false;
         }
     }
 }

@@ -73,6 +73,7 @@
 
     <!-- Wake lock (keep CPU alive during offline SOS broadcast) -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- ==================== APPLICATION ==================== -->
     <application
@@ -128,6 +129,16 @@
             android:name=".sos.SosListenerService"
             android:exported="false"
             android:foregroundServiceType="connectedDevice|location" />
+
+        <receiver
+            android:name=".sos.MeshBootstrapReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
 
 
     </application>
