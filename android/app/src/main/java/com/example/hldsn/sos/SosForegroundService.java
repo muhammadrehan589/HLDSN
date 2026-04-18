@@ -47,6 +47,8 @@ import com.example.hldsn.notification_module.SosAlertStore;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -72,6 +74,7 @@ public class SosForegroundService extends Service {
     public static final String ACTION_OPEN_NOTIFICATIONS = "com.example.hldsn.sos.ACTION_OPEN_NOTIFICATIONS";
     public static final String ACTION_OFFLINE_CHAT_STATUS = "com.example.hldsn.sos.ACTION_OFFLINE_CHAT_STATUS";
     public static final String ACTION_OFFLINE_CHAT_RECEIVED = "com.example.hldsn.sos.ACTION_OFFLINE_CHAT_RECEIVED";
+    public static final String EXTRA_SENDER_NAME = "extra_sender_name";
     public static final String EXTRA_STATUS = "extra_status";
     public static final String EXTRA_CHAT_MESSAGE_ID = "extra_chat_message_id";
     public static final String EXTRA_CHAT_TARGET_UID = "extra_chat_target_uid";
@@ -97,6 +100,8 @@ public class SosForegroundService extends Service {
     private static final long CHAT_FAIL_TIMEOUT_MS = 35_000L;
     private static final long CHAT_RETRY_INTERVAL_MS = 5_000L;
     private static final long CHAT_MAX_LIFETIME_MS = 12 * 60 * 60_000L;
+    private static final String SOS_PREFS = "sos_sender_profile";
+    private static final String KEY_CACHED_SENDER_NAME = "cached_sender_name";
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Object lock = new Object();
@@ -355,8 +360,10 @@ public class SosForegroundService extends Service {
         bleScanRunning = false;
     }
 
-    private void triggerSos() {
+    private void triggerSos(@Nullable Intent triggerIntent) {
         Log.i(TAG, "SOS trigger requested.");
+        final String senderHint = triggerIntent != null ? triggerIntent.getStringExtra(EXTRA_SENDER_NAME) : null;
+        Log.d(TAG, "SOS trigger senderHint=" + (senderHint == null || senderHint.trim().isEmpty() ? "none" : senderHint));
         if (!hasLocationPermission()) {
             Log.w(TAG, "SOS blocked: no location permission.");
             sendStatus("Location permission required for SOS");
@@ -365,7 +372,7 @@ public class SosForegroundService extends Service {
 
         if (forceLocationManagerFallback) {
             Log.i(TAG, "Using forced LocationManager fallback (FLP disabled for session).");
-            fetchLocationManagerFallback();
+            fetchLocationManagerFallback(senderHint);
             return;
         }
 
@@ -373,7 +380,7 @@ public class SosForegroundService extends Service {
             Log.w(TAG, "Google Play services unavailable. Using LocationManager fallback.");
             sendStatus("Using device GPS fallback");
             forceLocationManagerFallback = true;
-            fetchLocationManagerFallback();
+            fetchLocationManagerFallback(senderHint);
             return;
         }
 
@@ -387,10 +394,10 @@ public class SosForegroundService extends Service {
             task.addOnSuccessListener(location -> {
                 if (location != null) {
                     Log.i(TAG, "FLP current location success lat=" + location.getLatitude() + " lon=" + location.getLongitude());
-                    queueOriginSos(location.getLatitude(), location.getLongitude());
+                    queueOriginSos(location.getLatitude(), location.getLongitude(), senderHint);
                 } else {
                     Log.w(TAG, "FLP current location returned null. Trying fallback chain.");
-                    fetchLastLocationFallback();
+                    fetchLastLocationFallback(senderHint);
                 }
             }).addOnFailureListener(e -> {
                 Log.w(TAG, "getCurrentLocation failed", e);
@@ -399,14 +406,14 @@ public class SosForegroundService extends Service {
                     sendStatus("Google location service unstable, using device GPS fallback");
                     Log.w(TAG, "Detected broker package failure. Forcing LocationManager fallback for this session.");
                 }
-                fetchLastLocationFallback();
+                fetchLastLocationFallback(senderHint);
             });
         } catch (SecurityException sec) {
             if (isBrokerPackageFailure(sec)) {
                 forceLocationManagerFallback = true;
                 sendStatus("Google location service unstable, using device GPS fallback");
                 Log.w(TAG, "SecurityException from FLP broker. Switching to LocationManager fallback.", sec);
-                fetchLocationManagerFallback();
+                fetchLocationManagerFallback(senderHint);
                 return;
             }
             Log.w(TAG, "SecurityException while requesting FLP location.", sec);
@@ -414,30 +421,30 @@ public class SosForegroundService extends Service {
         } catch (RuntimeException runtimeException) {
             Log.w(TAG, "FLP runtime failure. Falling back to LocationManager.", runtimeException);
             forceLocationManagerFallback = true;
-            fetchLocationManagerFallback();
+            fetchLocationManagerFallback(senderHint);
         }
     }
 
     @SuppressLint("MissingPermission")
-    private void fetchLastLocationFallback() {
+    private void fetchLastLocationFallback(@Nullable String senderHint) {
         if (!hasLocationPermission()) {
             Log.w(TAG, "No location permission during fallback. Sending SOS with 0,0.");
-            queueOriginSos(0d, 0d);
+            queueOriginSos(0d, 0d, senderHint);
             return;
         }
         if (forceLocationManagerFallback) {
             Log.i(TAG, "Skipping FLP lastLocation due to forced fallback flag.");
-            fetchLocationManagerFallback();
+            fetchLocationManagerFallback(senderHint);
             return;
         }
         locationClient.getLastLocation()
                 .addOnSuccessListener(location -> {
                     if (location != null) {
                         Log.i(TAG, "FLP lastLocation success lat=" + location.getLatitude() + " lon=" + location.getLongitude());
-                        queueOriginSos(location.getLatitude(), location.getLongitude());
+                        queueOriginSos(location.getLatitude(), location.getLongitude(), senderHint);
                     } else {
                         Log.w(TAG, "FLP lastLocation returned null. Using LocationManager fallback.");
-                        fetchLocationManagerFallback();
+                        fetchLocationManagerFallback(senderHint);
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -446,7 +453,7 @@ public class SosForegroundService extends Service {
                         forceLocationManagerFallback = true;
                         Log.w(TAG, "Broker failure confirmed during lastLocation. Keeping forced fallback enabled.");
                     }
-                    fetchLocationManagerFallback();
+                    fetchLocationManagerFallback(senderHint);
                 });
     }
 
@@ -458,10 +465,10 @@ public class SosForegroundService extends Service {
         return message != null && message.contains("Unknown calling package name 'com.google.android.gms'");
     }
 
-    private void fetchLocationManagerFallback() {
+    private void fetchLocationManagerFallback(@Nullable String senderHint) {
         if (!hasLocationPermission()) {
             Log.w(TAG, "LocationManager fallback blocked: no location permission. Sending 0,0.");
-            queueOriginSos(0d, 0d);
+            queueOriginSos(0d, 0d, senderHint);
             return;
         }
 
@@ -469,7 +476,7 @@ public class SosForegroundService extends Service {
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             if (locationManager == null) {
                 Log.w(TAG, "LocationManager unavailable. Sending SOS with 0,0.");
-                queueOriginSos(0d, 0d);
+                queueOriginSos(0d, 0d, senderHint);
                 return;
             }
 
@@ -487,14 +494,14 @@ public class SosForegroundService extends Service {
             Location best = chooseBetterLocation(gps, network);
             if (best != null) {
                 Log.i(TAG, "LocationManager fallback selected lat=" + best.getLatitude() + " lon=" + best.getLongitude());
-                queueOriginSos(best.getLatitude(), best.getLongitude());
+                queueOriginSos(best.getLatitude(), best.getLongitude(), senderHint);
             } else {
                 Log.w(TAG, "No last known location from providers. Sending SOS with 0,0.");
-                queueOriginSos(0d, 0d);
+                queueOriginSos(0d, 0d, senderHint);
             }
         } catch (SecurityException e) {
             Log.w(TAG, "LocationManager fallback permission error", e);
-            queueOriginSos(0d, 0d);
+            queueOriginSos(0d, 0d, senderHint);
         }
     }
 
@@ -516,9 +523,9 @@ public class SosForegroundService extends Service {
         return status == ConnectionResult.SUCCESS;
     }
 
-    private void queueOriginSos(double lat, double lon) {
+    private void queueOriginSos(double lat, double lon, @Nullable String senderHint) {
         int nowEpoch = (int) Instant.now().getEpochSecond();
-        String senderName = resolveSenderName();
+        String senderName = resolveSenderName(senderHint);
         SosPacket packet = SosPacket.createSos(lat, lon, nowEpoch, senderName);
         synchronized (lock) {
             seenSosAt.put(packet.messageId, SystemClock.elapsedRealtime());
@@ -1176,22 +1183,85 @@ public class SosForegroundService extends Service {
         }
     }
 
-    private String resolveSenderName() {
+    private String resolveSenderName(@Nullable String senderHint) {
+        if (senderHint != null) {
+            String trimmed = senderHint.trim();
+            if (!trimmed.isEmpty()) {
+                cacheSenderName(trimmed);
+                return trimmed;
+            }
+        }
+
         try {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user == null) {
-                return "HLDSN User";
+                String cached = readCachedSenderName();
+                return cached.isEmpty() ? "HLDSN User" : cached;
             }
             if (user.getDisplayName() != null && !user.getDisplayName().trim().isEmpty()) {
-                return user.getDisplayName().trim();
+                String displayName = user.getDisplayName().trim();
+                cacheSenderName(displayName);
+                return displayName;
             }
             if (user.getEmail() != null && !user.getEmail().trim().isEmpty()) {
-                return user.getEmail().trim();
+                String email = user.getEmail().trim();
+                String fallbackName = email.contains("@") ? email.substring(0, email.indexOf('@')) : email;
+                if (!fallbackName.isEmpty()) {
+                    cacheSenderName(fallbackName);
+                    return fallbackName;
+                }
             }
+
+            FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(user.getUid())
+                    .get()
+                    .addOnSuccessListener(this::cacheSenderNameFromUserDoc)
+                    .addOnFailureListener(e -> Log.d(TAG, "Sender profile fetch failed", e));
         } catch (Exception ignored) {
             // Keep SOS send path resilient even if auth lookup fails.
         }
-        return "HLDSN User";
+
+        String cached = readCachedSenderName();
+        return cached.isEmpty() ? "HLDSN User" : cached;
+    }
+
+    private void cacheSenderNameFromUserDoc(DocumentSnapshot documentSnapshot) {
+        if (documentSnapshot == null || !documentSnapshot.exists()) {
+            return;
+        }
+        String single = safeTrim(documentSnapshot.getString("name"));
+        if (!single.isEmpty()) {
+            cacheSenderName(single);
+            return;
+        }
+
+        String first = safeTrim(documentSnapshot.getString("firstName"));
+        String last = safeTrim(documentSnapshot.getString("lastName"));
+        String full = (first + " " + last).trim();
+        if (!full.isEmpty()) {
+            cacheSenderName(full);
+        }
+    }
+
+    private void cacheSenderName(String name) {
+        String clean = safeTrim(name);
+        if (clean.isEmpty()) {
+            return;
+        }
+        getSharedPreferences(SOS_PREFS, MODE_PRIVATE)
+                .edit()
+                .putString(KEY_CACHED_SENDER_NAME, clean)
+                .apply();
+    }
+
+    private String readCachedSenderName() {
+        return safeTrim(getSharedPreferences(SOS_PREFS, MODE_PRIVATE)
+                .getString(KEY_CACHED_SENDER_NAME, ""));
+    }
+
+    private String safeTrim(@Nullable String value) {
+        return value == null ? "" : value.trim();
     }
 
     private void updateNotification(String text) {

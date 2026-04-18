@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hldsn.R;
 import com.example.hldsn.login_module.LoginActivity;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class LaunchActivity extends AppCompatActivity {
 
@@ -35,7 +36,13 @@ public class LaunchActivity extends AppCompatActivity {
 
         // Navigate to LoginActivity after delay
         new Handler().postDelayed(() -> {
-            startActivity(new Intent(LaunchActivity.this, LoginActivity.class));
+            Class<?> destination = FirebaseAuth.getInstance().getCurrentUser() != null
+                    ? HomePageActivity.class
+                    : LoginActivity.class;
+
+            Intent intent = new Intent(LaunchActivity.this, destination);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
             finish();
         }, SPLASH_DELAY);
     }
