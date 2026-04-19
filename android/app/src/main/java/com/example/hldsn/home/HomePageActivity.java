@@ -45,6 +45,7 @@ import com.example.hldsn.services.safety_tips.SafetyTipsActivity;
 import com.example.hldsn.sos.SosListenerService;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -65,6 +66,7 @@ public class HomePageActivity extends AppCompatActivity {
     private static final String ACTION_SOS_STATUS = "com.example.hldsn.sos.ACTION_SOS_STATUS";
     private static final String ACTION_SOS_ALERTS_UPDATED = "com.example.hldsn.sos.ACTION_SOS_ALERTS_UPDATED";
     private static final String ACTION_OPEN_NOTIFICATIONS = "com.example.hldsn.sos.ACTION_OPEN_NOTIFICATIONS";
+    private static final String EXTRA_SENDER_NAME = "extra_sender_name";
     private static final String EXTRA_SOS_STATUS = "extra_status";
     private static final String PREFS_PERMISSION_GATE = "home_permission_gate";
     private static final String PREF_KEY_ALL_PERMISSIONS_PREFIX = "all_permissions_prompted_";
@@ -616,7 +618,28 @@ public class HomePageActivity extends AppCompatActivity {
         Intent intent = new Intent();
         intent.setClassName(getPackageName(), SOS_SERVICE_CLASS);
         intent.setAction(ACTION_TRIGGER_SOS);
+        String senderHint = resolveSenderHint();
+        if (!senderHint.isEmpty()) {
+            intent.putExtra(EXTRA_SENDER_NAME, senderHint);
+        }
+        Log.d(TAG, "Triggering SOS with senderHint=" + (senderHint.isEmpty() ? "none" : senderHint));
         startForegroundService(intent);
+    }
+
+    private String resolveSenderHint() {
+        FirebaseUser user = auth != null ? auth.getCurrentUser() : null;
+        if (user == null) {
+            return "";
+        }
+        if (user.getDisplayName() != null && !user.getDisplayName().trim().isEmpty()) {
+            return user.getDisplayName().trim();
+        }
+        if (user.getEmail() != null && !user.getEmail().trim().isEmpty()) {
+            String email = user.getEmail().trim();
+            int at = email.indexOf('@');
+            return at > 0 ? email.substring(0, at) : email;
+        }
+        return "";
     }
 
     private boolean ensureRadiosEnabled(boolean sosRequested) {
