@@ -11,12 +11,6 @@ public class ChatMessage {
     private boolean read;
     /** "normal" for regular messages, "sos" for SOS alerts. */
     private String messageType;
-    /** Quick-action code such as "need_rescue". Empty for plain text. */
-    private String quickType;
-    /** Delivery state for offline mesh messages: pending/failed/sent. */
-    private String deliveryStatus;
-    /** Transport label: online or offline. */
-    private String transportType;
 
     // Required empty constructor for Firestore deserialization
     public ChatMessage() {}
@@ -48,21 +42,4 @@ public class ChatMessage {
 
     public String  getMessageType() { return messageType; }
     public boolean isSosMessage()   { return "sos".equals(messageType); }
-
-    public String getQuickType() { return quickType; }
-    public void setQuickType(String quickType) { this.quickType = quickType; }
-
-    public String getDeliveryStatus() { return deliveryStatus; }
-    public void setDeliveryStatus(String deliveryStatus) { this.deliveryStatus = deliveryStatus; }
-
-    public String getTransportType() { return transportType; }
-    public void setTransportType(String transportType) { this.transportType = transportType; }
-
-    public boolean isQuickMessage() {
-        return quickType != null && !quickType.isEmpty();
-    }
-
-    public boolean isOfflineMessage() {
-        return "offline".equals(transportType);
-    }
 }

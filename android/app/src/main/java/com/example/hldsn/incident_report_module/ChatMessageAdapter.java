@@ -65,22 +65,20 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ChatMessage msg = messages.get(position);
         String timeStr = formatTime(msg.getTimestamp());
-        String bodyText = formatBodyText(msg);
 
         if (holder instanceof SosViewHolder) {
             SosViewHolder h = (SosViewHolder) holder;
             // Strip the raw text — sender name is already in the header
             h.senderNameLabel.setText(msg.getSenderName() != null ? msg.getSenderName() : "");
-            h.messageText.setText(bodyText);
+            h.messageText.setText(msg.getText());
             h.timeText.setText(timeStr);
         } else if (holder instanceof SentViewHolder) {
             SentViewHolder h = (SentViewHolder) holder;
-            h.messageText.setText(bodyText);
+            h.messageText.setText(msg.getText());
             h.timeText.setText(timeStr);
-            bindDeliveryStatus(h, msg.getDeliveryStatus());
         } else {
             ReceivedViewHolder h = (ReceivedViewHolder) holder;
-            h.messageText.setText(bodyText);
+            h.messageText.setText(msg.getText());
             h.timeText.setText(timeStr);
 
             String senderName = msg.getSenderName();
@@ -101,65 +99,6 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return DateFormat.format("hh:mm a", date).toString();
     }
 
-    private String formatBodyText(ChatMessage msg) {
-        String raw = msg.getText() != null ? msg.getText() : "";
-        if (!msg.isQuickMessage()) {
-            return raw;
-        }
-        String label = quickTypeLabel(msg.getQuickType());
-        if (raw.isEmpty() || raw.equalsIgnoreCase(label)) {
-            return "Emergency: " + label;
-        }
-        return "Emergency: " + label + "\n" + raw;
-    }
-
-    private String quickTypeLabel(String quickType) {
-        if (quickType == null) return "Quick message";
-        switch (quickType) {
-            case "need_rescue":
-                return "Need rescue";
-            case "need_medical":
-                return "Need medical";
-            case "fire_seen":
-                return "Fire seen";
-            case "road_blocked":
-                return "Road blocked";
-            case "i_am_safe":
-                return "I am safe";
-            case "found_shelter":
-                return "Found shelter";
-            default:
-                return "Quick message";
-        }
-    }
-
-    private void bindDeliveryStatus(SentViewHolder holder, String status) {
-        if (status == null || status.isEmpty()) {
-            holder.deliveryStatusText.setVisibility(View.GONE);
-            return;
-        }
-
-        holder.deliveryStatusText.setVisibility(View.VISIBLE);
-        switch (status) {
-            case "pending":
-                holder.deliveryStatusText.setText("Sending via mesh...");
-                holder.deliveryStatusText.setTextColor(0x80FFFFFF);
-                break;
-            case "failed":
-                holder.deliveryStatusText.setText("Failed - retrying");
-                holder.deliveryStatusText.setTextColor(0xFFFFB4A9);
-                break;
-            case "sent":
-                holder.deliveryStatusText.setText("Delivered via mesh");
-                holder.deliveryStatusText.setTextColor(0xFF8EF0C1);
-                break;
-            default:
-                holder.deliveryStatusText.setText(status);
-                holder.deliveryStatusText.setTextColor(0x80FFFFFF);
-                break;
-        }
-    }
-
     // ── ViewHolders ────────────────────────────────────────────────────────────
 
     static class SosViewHolder extends RecyclerView.ViewHolder {
@@ -178,13 +117,11 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     static class SentViewHolder extends RecyclerView.ViewHolder {
         final TextView messageText;
         final TextView timeText;
-        final TextView deliveryStatusText;
 
         SentViewHolder(@NonNull View itemView) {
             super(itemView);
             messageText = itemView.findViewById(R.id.messageTextSent);
             timeText    = itemView.findViewById(R.id.timeTextSent);
-            deliveryStatusText = itemView.findViewById(R.id.deliveryStatusSent);
         }
     }
 
