@@ -43,6 +43,7 @@ import com.example.hldsn.notification_module.SosAlertRecord;
 import com.example.hldsn.notification_module.SosAlertStore;
 import com.example.hldsn.services.safety_tips.SafetyTipsActivity;
 import com.example.hldsn.sos.SosListenerService;
+import com.example.hldsn.volunteer_module.VolunteerNetworkMapActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -74,7 +75,7 @@ public class HomePageActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ImageView menuIcon, notificationIcon;
     private TextView tvNotificationCount;
-    private MaterialButton chatBtn, tipsBtn;
+    private MaterialButton chatBtn, tipsBtn, volunteerBtn;
     private View emergencyBtn;
 
     private FirebaseAuth auth;
@@ -210,6 +211,7 @@ public class HomePageActivity extends AppCompatActivity {
         tvNotificationCount = findViewById(R.id.tv_notification_count);
         chatBtn = findViewById(R.id.btn_service_chats);
         tipsBtn = findViewById(R.id.btn_info_safety);
+        volunteerBtn = findViewById(R.id.btn_service_volunteer);
         emergencyBtn = findViewById(R.id.btn_emergency);
     }
 
@@ -249,6 +251,10 @@ public class HomePageActivity extends AppCompatActivity {
 
         chatBtn.setOnClickListener(v -> startActivity(new Intent(this, ChatsActivity.class)));
         tipsBtn.setOnClickListener(v -> startActivity(new Intent(this, SafetyTipsActivity.class)));
+        if (volunteerBtn != null) {
+            volunteerBtn.setOnClickListener(v ->
+                startActivity(new Intent(this, VolunteerNetworkMapActivity.class)));
+        }
 
         // SOS button
         if (emergencyBtn != null) {

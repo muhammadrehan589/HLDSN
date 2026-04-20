@@ -145,7 +145,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="#7B6DFF"
-                        android:checked="true" />
+                        android:checked="false" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -172,7 +172,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="#7B6DFF"
-                        android:checked="true" />
+                        android:checked="false" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -202,7 +202,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="#7B6DFF"
-                        android:checked="true" />
+                        android:checked="false" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -229,7 +229,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="#7B6DFF"
-                        android:checked="true" />
+                        android:checked="false" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -253,7 +253,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:buttonTint="#7B6DFF"
-                    android:checked="true" />
+                    android:checked="false" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -333,6 +333,33 @@
                         android:textColor="#111111"
                         android:textSize="15sp" />
                 </LinearLayout>
+
+                <Space
+                    android:layout_width="8dp"
+                    android:layout_height="1dp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/section_chip_bg"
+                    android:gravity="center_vertical"
+                    android:paddingEnd="8dp">
+
+                    <RadioButton
+                        android:id="@+id/rbExpert"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="#FFFFFF"
+                        android:checked="false" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Expert"
+                        android:textColor="#111111"
+                        android:textSize="15sp" />
+                </LinearLayout>
             </LinearLayout>
 
             <TextView
@@ -369,7 +396,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="#7B6DFF"
-                        android:checked="true" />
+                        android:checked="false" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -396,7 +423,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="#7B6DFF"
-                        android:checked="true" />
+                        android:checked="false" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -426,7 +453,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="#7B6DFF"
-                        android:checked="true" />
+                        android:checked="false" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -453,7 +480,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="#7B6DFF"
-                        android:checked="true" />
+                        android:checked="false" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -483,7 +510,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="#7B6DFF"
-                        android:checked="true" />
+                        android:checked="false" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -510,7 +537,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="#7B6DFF"
-                        android:checked="true" />
+                        android:checked="false" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -555,7 +582,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="#7B6DFF"
-                        android:checked="true" />
+                        android:checked="false" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -582,7 +609,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="#7B6DFF"
-                        android:checked="true" />
+                        android:checked="false" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -609,7 +636,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="#7B6DFF"
-                        android:checked="true" />
+                        android:checked="false" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -639,7 +666,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="#7B6DFF"
-                        android:checked="true" />
+                        android:checked="false" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -666,7 +693,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="#7B6DFF"
-                        android:checked="true" />
+                        android:checked="false" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -693,7 +720,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="#7B6DFF"
-                        android:checked="true" />
+                        android:checked="false" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -725,3 +752,4 @@
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
