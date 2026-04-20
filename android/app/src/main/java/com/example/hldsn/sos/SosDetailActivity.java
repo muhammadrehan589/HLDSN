@@ -3,6 +3,7 @@ package com.example.hldsn.sos;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +28,7 @@ import java.util.Locale;
 public class SosDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_ALERT_JSON = "sos_alert_json";
+    private static final String SOS_UI_TRACE_TAG = "SOS_UI_TRACE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,11 +73,18 @@ public class SosDetailActivity extends AppCompatActivity {
             double lat = alert.getLatMilli() / 1000.0;
             double lon = alert.getLonMilli() / 1000.0;
             locationSection.setVisibility(View.VISIBLE);
-            tvCoords.setText(String.format(Locale.US, "%.4f°,  %.4f°", lat, lon));
+            tvCoords.setText(String.format(Locale.US, "%.6f°,  %.6f°", lat, lon));
+            Log.d(SOS_UI_TRACE_TAG, "DETAIL_RENDER id=" + alert.getMessageId()
+                    + " sender=" + alert.getSenderName()
+                    + " lat=" + lat
+                    + " lon=" + lon);
 
             btnOpenMaps.setOnClickListener(v -> openInMaps(lat, lon));
         } else {
             locationSection.setVisibility(View.GONE);
+            Log.d(SOS_UI_TRACE_TAG, "DETAIL_RENDER id=" + alert.getMessageId()
+                    + " sender=" + alert.getSenderName()
+                    + " hasLocation=false subtitle=" + alert.getSubtitle());
         }
 
         btnBack.setOnClickListener(v -> finish());

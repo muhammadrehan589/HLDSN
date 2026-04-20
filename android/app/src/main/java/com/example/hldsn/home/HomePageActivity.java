@@ -58,14 +58,17 @@ import java.util.Set;
 public class HomePageActivity extends AppCompatActivity {
 
     private static final String TAG = "HomePageActivity";
+    private static final String SOS_UI_TRACE_TAG = "SOS_UI_TRACE";
     private static final String SOS_SERVICE_CLASS = "com.example.hldsn.sos.SosForegroundService";
     private static final String ACTION_START_MESH = "com.example.hldsn.sos.ACTION_START_MESH";
     private static final String ACTION_TRIGGER_SOS = "com.example.hldsn.sos.ACTION_TRIGGER_SOS";
     private static final String ACTION_SOS_STATUS = "com.example.hldsn.sos.ACTION_SOS_STATUS";
     private static final String ACTION_SOS_ALERTS_UPDATED = "com.example.hldsn.sos.ACTION_SOS_ALERTS_UPDATED";
     private static final String ACTION_OPEN_NOTIFICATIONS = "com.example.hldsn.sos.ACTION_OPEN_NOTIFICATIONS";
+    private static final String ACTION_MESH_MESSAGE_RECEIVED = "com.example.hldsn.sos.ACTION_MESH_MESSAGE_RECEIVED";
     private static final String EXTRA_SENDER_NAME = "extra_sender_name";
     private static final String EXTRA_SOS_STATUS = "extra_status";
+    private static final String EXTRA_MESH_TEXT = "extra_mesh_text";
     private static final String PREFS_PERMISSION_GATE = "home_permission_gate";
     private static final String PREF_KEY_ALL_PERMISSIONS_PREFIX = "all_permissions_prompted_";
 
@@ -171,6 +174,11 @@ public class HomePageActivity extends AppCompatActivity {
             } else if (ACTION_SOS_ALERTS_UPDATED.equals(intent.getAction())) {
                 loadSosAlerts();
                 refreshNotificationContent();
+            } else if (ACTION_MESH_MESSAGE_RECEIVED.equals(intent.getAction())) {
+                String text = intent.getStringExtra(EXTRA_MESH_TEXT);
+                if (text != null && !text.trim().isEmpty()) {
+                    Toast.makeText(HomePageActivity.this, "Offline message: " + text, Toast.LENGTH_SHORT).show();
+                }
             }
         }
     };
@@ -279,11 +287,21 @@ public class HomePageActivity extends AppCompatActivity {
     private void loadSosAlerts() {
         sosAlerts.clear();
         sosAlerts.addAll(SosAlertStore.getAlerts(this));
+        for (SosAlertRecord alert : sosAlerts) {
+            Log.d(SOS_UI_TRACE_TAG, "LOAD_ALERT id=" + alert.getMessageId()
+                    + " sender=" + alert.getSenderName()
+                    + " latMilli=" + alert.getLatMilli()
+                    + " lonMilli=" + alert.getLonMilli()
+                    + " hasLocation=" + alert.hasLocation());
+        }
     }
 
     private List<NotificationItem> buildNotificationItems() {
         List<NotificationItem> items = new ArrayList<>();
         for (SosAlertRecord alert : sosAlerts) {
+            Log.d(SOS_UI_TRACE_TAG, "BUILD_ITEM id=" + alert.getMessageId()
+                    + " title=" + alert.getTitle()
+                    + " subtitle=" + alert.getSubtitle());
             items.add(NotificationItem.fromSosAlert(alert));
         }
         for (IncidentModel incident : unreadIncidents) {
@@ -720,6 +738,7 @@ public class HomePageActivity extends AppCompatActivity {
     private IntentFilter buildNotificationIntentFilter() {
         IntentFilter filter = new IntentFilter(ACTION_SOS_STATUS);
         filter.addAction(ACTION_SOS_ALERTS_UPDATED);
+        filter.addAction(ACTION_MESH_MESSAGE_RECEIVED);
         return filter;
     }
 

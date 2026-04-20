@@ -1,8 +1,10 @@
 package com.example.hldsn.incident_report_module;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,8 +32,18 @@ import java.util.Map;
 
 public class ConversationActivity extends AppCompatActivity {
 
+    private static final String MESH_TAG = "MeshMessaging";
     public static final String EXTRA_USER_ID   = "extra_user_id";
     public static final String EXTRA_USER_NAME = "extra_user_name";
+    public static final String EXTRA_MESH_USER_ID = "extra_mesh_user_id";
+    public static final String EXTRA_MESH_PUBLIC_KEY = "extra_mesh_public_key";
+    public static final String EXTRA_MESH_DEVICE_NAME = "extra_mesh_device_name";
+    private static final String SOS_SERVICE_CLASS = "com.example.hldsn.sos.SosForegroundService";
+    private static final String ACTION_SEND_MESH_MESSAGE = "com.example.hldsn.sos.ACTION_SEND_MESH_MESSAGE";
+    private static final String EXTRA_MESH_DESTINATION_ID = "extra_mesh_destination_id";
+    private static final String EXTRA_MESH_TEXT = "extra_mesh_text";
+    private static final String EXTRA_MESH_TTL = "extra_mesh_ttl";
+    private static final String EXTRA_MESH_DISPLAY_NAME = "extra_mesh_display_name";
 
     // ── Views ──────────────────────────────────────────────────────────────────
     private ImageView   backIcon;
@@ -48,6 +60,9 @@ public class ConversationActivity extends AppCompatActivity {
     private String currentUid;
     private String currentName;
     private String chatId;
+    private String destinationMeshUserId;
+    private String destinationMeshPublicKey;
+    private String destinationMeshDeviceName;
 
     private final List<ChatMessage>  messageList = new ArrayList<>();
     private ChatMessageAdapter       adapter;
@@ -72,6 +87,12 @@ public class ConversationActivity extends AppCompatActivity {
         otherUid  = getIntent().getStringExtra(EXTRA_USER_ID);
         otherName = getIntent().getStringExtra(EXTRA_USER_NAME);
         if (otherUid == null || otherUid.isEmpty()) { finish(); return; }
+        destinationMeshUserId = safeTrim(getIntent().getStringExtra(EXTRA_MESH_USER_ID));
+        destinationMeshPublicKey = safeTrim(getIntent().getStringExtra(EXTRA_MESH_PUBLIC_KEY));
+        destinationMeshDeviceName = safeTrim(getIntent().getStringExtra(EXTRA_MESH_DEVICE_NAME));
+        if (destinationMeshUserId.isEmpty()) {
+            destinationMeshUserId = otherUid;
+        }
 
         // Deterministic chatId: sorted UIDs joined by "_"
         String[] uids = {currentUid, otherUid};
@@ -172,6 +193,7 @@ public class ConversationActivity extends AppCompatActivity {
         String text = messageInput.getText().toString().trim();
         if (text.isEmpty()) return;
         messageInput.setText("");
+        sendMeshMessageIfPossible(text);
 
         Timestamp now = Timestamp.now();
 
@@ -191,6 +213,77 @@ public class ConversationActivity extends AppCompatActivity {
                 .addOnFailureListener(e ->
                         Toast.makeText(this, "Failed to send message",
                                 Toast.LENGTH_SHORT).show());
+    }
+
+    private void sendMeshMessageIfPossible(String text) {
+        if (!destinationMeshUserId.isEmpty()) {
+            Log.d(MESH_TAG, "sendMeshMessageIfPossible: using peer metadata dest=" + destinationMeshUserId
+                    + " has_pubkey=" + !destinationMeshPublicKey.isEmpty());
+
+            Intent meshIntent = new Intent();
+            meshIntent.setClassName(getPackageName(), SOS_SERVICE_CLASS);
+            meshIntent.setAction(ACTION_SEND_MESH_MESSAGE);
+            meshIntent.putExtra(EXTRA_MESH_DESTINATION_ID, destinationMeshUserId);
+            meshIntent.putExtra(EXTRA_MESH_TEXT, text);
+            meshIntent.putExtra(EXTRA_MESH_TTL, 5);
+            if (!destinationMeshPublicKey.isEmpty()) {
+                meshIntent.putExtra(EXTRA_MESH_PUBLIC_KEY, destinationMeshPublicKey);
+            }
+            meshIntent.putExtra(EXTRA_MESH_DISPLAY_NAME,
+                    otherName != null && !otherName.trim().isEmpty() ? otherName.trim() : "Peer");
+            if (!destinationMeshDeviceName.isEmpty()) {
+                meshIntent.putExtra(EXTRA_MESH_DEVICE_NAME, destinationMeshDeviceName);
+            }
+
+            Log.d(MESH_TAG, "sendMeshMessageIfPossible: starting mesh send service");
+            startForegroundService(meshIntent);
+            return;
+        }
+
+        Log.d(MESH_TAG, "sendMeshMessageIfPossible: no peer metadata, querying firestore for dest=" + otherUid);
+        db.collection("users")
+                .document(otherUid)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    String destinationMeshId = doc != null ? doc.getString("user_id") : null;
+                    if (destinationMeshId == null || destinationMeshId.trim().isEmpty()) {
+                        Log.w(MESH_TAG, "sendMeshMessageIfPossible: user has no mesh id");
+                        return;
+                    }
+                    String destinationPublicKey = doc.getString("public_key");
+                    String destinationDisplayName = doc.getString("display_name");
+                    String destinationDeviceName = doc.getString("device_name");
+
+                    Log.d(MESH_TAG, "sendMeshMessageIfPossible: firestore lookup dest=" + destinationMeshId
+                            + " has_pubkey=" + (destinationPublicKey != null && !destinationPublicKey.isEmpty()));
+
+                    Intent meshIntent = new Intent();
+                    meshIntent.setClassName(getPackageName(), SOS_SERVICE_CLASS);
+                    meshIntent.setAction(ACTION_SEND_MESH_MESSAGE);
+                    meshIntent.putExtra(EXTRA_MESH_DESTINATION_ID, destinationMeshId.trim());
+                    meshIntent.putExtra(EXTRA_MESH_TEXT, text);
+                    meshIntent.putExtra(EXTRA_MESH_TTL, 5);
+                    if (destinationPublicKey != null && !destinationPublicKey.trim().isEmpty()) {
+                        meshIntent.putExtra(EXTRA_MESH_PUBLIC_KEY, destinationPublicKey.trim());
+                    }
+                    meshIntent.putExtra(EXTRA_MESH_DISPLAY_NAME,
+                            destinationDisplayName != null && !destinationDisplayName.trim().isEmpty()
+                                    ? destinationDisplayName.trim()
+                                    : (otherName != null ? otherName : "Peer"));
+                    if (destinationDeviceName != null && !destinationDeviceName.trim().isEmpty()) {
+                        meshIntent.putExtra(EXTRA_MESH_DEVICE_NAME, destinationDeviceName.trim());
+                    }
+
+                    Log.d(MESH_TAG, "sendMeshMessageIfPossible: starting mesh send service");
+                    startForegroundService(meshIntent);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(MESH_TAG, "sendMeshMessageIfPossible: firestore lookup failed", e);
+                });
+    }
+
+    private String safeTrim(String value) {
+        return value == null ? "" : value.trim();
     }
 
     private void updateChatMeta(String lastText, Timestamp ts) {

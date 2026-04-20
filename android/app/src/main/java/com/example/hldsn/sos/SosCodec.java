@@ -6,7 +6,9 @@ import java.nio.charset.StandardCharsets;
 final class SosCodec {
 
     static final int BLE_MANUFACTURER_ID = 0x7A11;
-    static final int BLE_BEACON_SIZE = 8;
+    static final int BLE_ACK_BEACON_SIZE = 8;
+    static final int MAX_BLE_SENDER_NAME_BYTES = 8;
+    static final int BLE_BEACON_SIZE = 15 + MAX_BLE_SENDER_NAME_BYTES;
     static final int FULL_FRAME_BASE_SIZE = 19;
     static final int MAX_SENDER_NAME_BYTES = 32;
 
@@ -42,12 +44,36 @@ final class SosCodec {
     }
 
     static byte[] encodeBleBeacon(SosPacket packet) {
-        ByteBuffer buffer = ByteBuffer.allocate(BLE_BEACON_SIZE);
+        if (packet.type == SosPacket.TYPE_ACK) {
+            ByteBuffer buffer = ByteBuffer.allocate(BLE_ACK_BEACON_SIZE);
+            buffer.put((byte) (packet.type & 0xFF));
+            putUInt48(buffer, packet.messageId);
+            int ttlNibble = Math.max(0, Math.min(15, packet.ttl));
+            int hopNibble = Math.max(0, Math.min(15, packet.hop));
+            buffer.put((byte) ((ttlNibble << 4) | hopNibble));
+            return buffer.array();
+        }
+
+        byte[] senderBytes = packet.getSenderName().getBytes(StandardCharsets.UTF_8);
+        if (senderBytes.length > MAX_BLE_SENDER_NAME_BYTES) {
+            byte[] limited = new byte[MAX_BLE_SENDER_NAME_BYTES];
+            System.arraycopy(senderBytes, 0, limited, 0, MAX_BLE_SENDER_NAME_BYTES);
+            senderBytes = limited;
+        }
+
+        // SOS beacon now carries compact lat/lon and short sender to avoid losing details on BLE-only paths.
+        ByteBuffer buffer = ByteBuffer.allocate(15 + senderBytes.length);
         buffer.put((byte) (packet.type & 0xFF));
         putUInt48(buffer, packet.messageId);
         int ttlNibble = Math.max(0, Math.min(15, packet.ttl));
         int hopNibble = Math.max(0, Math.min(15, packet.hop));
         buffer.put((byte) ((ttlNibble << 4) | hopNibble));
+        putInt24(buffer, packet.latMilli);
+        putInt24(buffer, packet.lonMilli);
+        buffer.put((byte) (senderBytes.length & 0xFF));
+        if (senderBytes.length > 0) {
+            buffer.put(senderBytes);
+        }
         return buffer.array();
     }
 
@@ -88,7 +114,7 @@ final class SosCodec {
     }
 
     static SosPacket decodeBleBeacon(byte[] frame) {
-        if (frame == null || frame.length != BLE_BEACON_SIZE) {
+        if (frame == null || frame.length < BLE_ACK_BEACON_SIZE) {
             return null;
         }
         ByteBuffer buffer = ByteBuffer.wrap(frame);
@@ -103,7 +129,29 @@ final class SosCodec {
         if (type == SosPacket.TYPE_ACK) {
             return SosPacket.createAck(id);
         }
-        return new SosPacket(type, id, 0, 0, 0, ttl, hop, "");
+
+        int latMilli = 0;
+        int lonMilli = 0;
+        if (buffer.remaining() >= 6) {
+            latMilli = readInt24(buffer);
+            lonMilli = readInt24(buffer);
+        }
+
+        String senderName = "";
+        if (buffer.remaining() > 0) {
+            int declaredLen = buffer.get() & 0xFF;
+            if (declaredLen > MAX_BLE_SENDER_NAME_BYTES) {
+                declaredLen = MAX_BLE_SENDER_NAME_BYTES;
+            }
+            int readable = Math.min(declaredLen, buffer.remaining());
+            if (readable > 0) {
+                byte[] senderBytes = new byte[readable];
+                buffer.get(senderBytes);
+                senderName = new String(senderBytes, StandardCharsets.UTF_8).trim();
+            }
+        }
+
+        return new SosPacket(type, id, latMilli, lonMilli, 0, ttl, hop, senderName);
     }
 
     private static void putUInt48(ByteBuffer buffer, long value) {

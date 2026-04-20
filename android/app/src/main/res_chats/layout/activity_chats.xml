@@ -130,15 +130,30 @@
             android:textSize="14sp" />
     </FrameLayout>
 
-    <!-- ── Chat list ── -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/chatListRecyclerView"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:overScrollMode="never"
-        android:paddingBottom="16dp"
-        tools:listitem="@layout/item_chat_user" />
+        android:layout_weight="1">
+
+        <!-- ── Chat list ── -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/chatListRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingBottom="16dp"
+            tools:listitem="@layout/item_chat_user" />
+
+        <TextView
+            android:id="@+id/chatsEmptyState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="No nearby devices"
+            android:textColor="#B3FFFFFF"
+            android:textSize="14sp"
+            android:visibility="gone" />
+    </FrameLayout>
 
 </LinearLayout>
