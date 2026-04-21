@@ -10,8 +10,10 @@ import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hldsn.R;
+import com.example.hldsn.auth.RoleBasedNavigator;
 import com.example.hldsn.login_module.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LaunchActivity extends AppCompatActivity {
 
@@ -36,11 +38,13 @@ public class LaunchActivity extends AppCompatActivity {
 
         // Navigate to LoginActivity after delay
         new Handler().postDelayed(() -> {
-            Class<?> destination = FirebaseAuth.getInstance().getCurrentUser() != null
-                    ? HomePageActivity.class
-                    : LoginActivity.class;
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (currentUser != null) {
+                RoleBasedNavigator.routeAfterLogin(this, currentUser);
+                return;
+            }
 
-            Intent intent = new Intent(LaunchActivity.this, destination);
+            Intent intent = new Intent(LaunchActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();

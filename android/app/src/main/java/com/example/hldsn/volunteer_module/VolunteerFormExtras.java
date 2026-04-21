@@ -13,6 +13,8 @@ public final class VolunteerFormExtras {
     public static final String EMERGENCY_CONTACT = "volunteer.emergencyContact";
     public static final String GENDER = "volunteer.gender";
     public static final String EMAIL = "volunteer.email";
+    public static final String NGO_ID = "volunteer.ngoId";
+    public static final String NGO_NAME = "volunteer.ngoName";
 
     public static final String SKILLS = "volunteer.skills";
     public static final String RESOURCES = "volunteer.resources";

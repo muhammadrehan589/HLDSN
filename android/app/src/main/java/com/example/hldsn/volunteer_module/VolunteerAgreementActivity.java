@@ -72,6 +72,12 @@ public class VolunteerAgreementActivity extends AppCompatActivity {
             return;
         }
 
+        String selectedNgoId = getTrimmedExtra(VolunteerFormExtras.NGO_ID);
+        if (selectedNgoId.isEmpty()) {
+            Toast.makeText(this, "Please select an NGO before submitting", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         isSubmitting = true;
         if (submitButton != null) {
             submitButton.setText("Submitting...");
@@ -108,6 +114,8 @@ public class VolunteerAgreementActivity extends AppCompatActivity {
         payload.put("emergencyContact", getTrimmedExtra(VolunteerFormExtras.EMERGENCY_CONTACT));
         payload.put("gender", getTrimmedExtra(VolunteerFormExtras.GENDER));
         payload.put("email", getTrimmedExtra(VolunteerFormExtras.EMAIL));
+        payload.put("ngoId", getTrimmedExtra(VolunteerFormExtras.NGO_ID));
+        payload.put("ngoName", getTrimmedExtra(VolunteerFormExtras.NGO_NAME));
 
         payload.put("skills", getStringListExtra(VolunteerFormExtras.SKILLS));
         payload.put("resources", getStringListExtra(VolunteerFormExtras.RESOURCES));

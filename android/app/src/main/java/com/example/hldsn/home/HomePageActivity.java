@@ -37,6 +37,7 @@ import com.example.hldsn.incident_report_module.IncidentModel;
 import com.example.hldsn.login_module.LoginActivity;
 import com.example.hldsn.login_module.SaveUserProfileActivity;
 import com.example.hldsn.login_module.UserProfileActivity;
+import com.example.hldsn.ngo_module.NgoRegistrationRequestActivity;
 import com.example.hldsn.notification_module.NotificationAdapter;
 import com.example.hldsn.notification_module.NotificationItem;
 import com.example.hldsn.notification_module.SosAlertRecord;
@@ -268,6 +269,14 @@ public class HomePageActivity extends AppCompatActivity {
             startActivity(intent);
             drawerLayout.closeDrawer(GravityCompat.START);
         });
+
+        View ngoRegistrationItem = findViewById(R.id.ngoRegistrationMenuItem);
+        if (ngoRegistrationItem != null) {
+            ngoRegistrationItem.setOnClickListener(v -> {
+                startActivity(new Intent(this, NgoRegistrationRequestActivity.class));
+                drawerLayout.closeDrawer(GravityCompat.START);
+            });
+        }
 
         findViewById(R.id.logoutMenuItem).setOnClickListener(v -> {
             auth.signOut();

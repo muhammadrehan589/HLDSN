@@ -16,9 +16,15 @@ import com.example.hldsn.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class VolunteerBasicFormActivity extends AppCompatActivity {
 
@@ -29,11 +35,13 @@ public class VolunteerBasicFormActivity extends AppCompatActivity {
     private EditText phoneNumberField;
     private EditText emergencyContactField;
     private AutoCompleteTextView genderField;
+    private AutoCompleteTextView preferredNgoField;
     private EditText emailField;
     private MaterialButton nextButton;
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
+    private final Map<String, String> ngoDisplayToId = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +53,7 @@ public class VolunteerBasicFormActivity extends AppCompatActivity {
 
         bindViews();
         setupGenderDropdown();
+        setupNgoDropdown();
         setupNavigation();
         setupLiveValidation();
         prefillFromProfile();
@@ -59,6 +68,7 @@ public class VolunteerBasicFormActivity extends AppCompatActivity {
         phoneNumberField = findViewById(R.id.phoneNumberField);
         emergencyContactField = findViewById(R.id.emergencyContactField);
         genderField = findViewById(R.id.genderField);
+        preferredNgoField = findViewById(R.id.preferredNgoField);
         emailField = findViewById(R.id.emailField);
         nextButton = findViewById(R.id.nextButton);
     }
@@ -87,6 +97,55 @@ public class VolunteerBasicFormActivity extends AppCompatActivity {
         genderField.setOnItemClickListener((parent, view, position, id) -> updateNextButtonState());
     }
 
+    private void setupNgoDropdown() {
+        if (preferredNgoField == null) {
+            return;
+        }
+
+        preferredNgoField.setOnClickListener(v -> preferredNgoField.showDropDown());
+        preferredNgoField.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                preferredNgoField.showDropDown();
+            }
+        });
+        preferredNgoField.setOnItemClickListener((parent, view, position, id) -> updateNextButtonState());
+
+        db.collection("ngos")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    ngoDisplayToId.clear();
+                    List<String> displayNames = new ArrayList<>();
+
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        String status = safe(doc.getString("status")).toLowerCase(Locale.US);
+                        if (!status.isEmpty() && !"active".equals(status)) {
+                            continue;
+                        }
+
+                        String name = safe(doc.getString("name"));
+                        if (name.isEmpty() || ngoDisplayToId.containsKey(name)) {
+                            continue;
+                        }
+
+                        ngoDisplayToId.put(name, doc.getId());
+                        displayNames.add(name);
+                    }
+
+                    Collections.sort(displayNames, String.CASE_INSENSITIVE_ORDER);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                            this,
+                            android.R.layout.simple_dropdown_item_1line,
+                            displayNames
+                    );
+                    preferredNgoField.setAdapter(adapter);
+                    updateNextButtonState();
+                })
+                .addOnFailureListener(error -> {
+                    Toast.makeText(this, "Could not load NGO list", Toast.LENGTH_SHORT).show();
+                    updateNextButtonState();
+                });
+    }
+
     private void setupNavigation() {
         ImageView backButton = findViewById(R.id.backButton);
         if (backButton != null) {
@@ -102,6 +161,15 @@ public class VolunteerBasicFormActivity extends AppCompatActivity {
                 return;
             }
 
+            String selectedNgoId = selectedNgoIdFromInput();
+            String selectedNgoName = textOf(preferredNgoField);
+            if (selectedNgoId.isEmpty()) {
+                preferredNgoField.setError("Select a valid NGO");
+                preferredNgoField.requestFocus();
+                Toast.makeText(this, "Please select a valid NGO", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             Intent intent = new Intent(this, VolunteerSkillsFormActivity.class);
             intent.putExtra(VolunteerFormExtras.FIRST_NAME, textOf(firstNameField));
             intent.putExtra(VolunteerFormExtras.SURNAME, textOf(surnameField));
@@ -111,6 +179,8 @@ public class VolunteerBasicFormActivity extends AppCompatActivity {
             intent.putExtra(VolunteerFormExtras.EMERGENCY_CONTACT, textOf(emergencyContactField));
             intent.putExtra(VolunteerFormExtras.GENDER, textOf(genderField));
             intent.putExtra(VolunteerFormExtras.EMAIL, textOf(emailField));
+            intent.putExtra(VolunteerFormExtras.NGO_ID, selectedNgoId);
+            intent.putExtra(VolunteerFormExtras.NGO_NAME, selectedNgoName);
             startActivity(intent);
         });
     }
@@ -194,6 +264,11 @@ public class VolunteerBasicFormActivity extends AppCompatActivity {
                 return field;
             }
         }
+
+        if (selectedNgoIdFromInput().isEmpty()) {
+            return preferredNgoField;
+        }
+
         return null;
     }
 
@@ -206,8 +281,15 @@ public class VolunteerBasicFormActivity extends AppCompatActivity {
                 phoneNumberField,
                 emergencyContactField,
                 genderField,
-            emailField
+                preferredNgoField,
+                emailField
         };
+    }
+
+    private String selectedNgoIdFromInput() {
+        String selectedName = textOf(preferredNgoField);
+        String selectedId = ngoDisplayToId.get(selectedName);
+        return selectedId == null ? "" : selectedId.trim();
     }
 
     private boolean isBlank(EditText field) {
