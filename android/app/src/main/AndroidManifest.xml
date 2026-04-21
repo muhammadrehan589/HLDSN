@@ -103,6 +103,11 @@
         <activity android:name=".home.Main" android:exported="false" />
         <activity android:name=".OtpVerificationActivity" android:exported="false" />
         <activity android:name=".home.HomePageActivity" android:exported="false" />
+        <activity android:name=".volunteer_module.VolunteerNetworkMapActivity" android:exported="false" />
+        <activity android:name=".volunteer_module.VolunteerBasicFormActivity" android:exported="false" />
+        <activity android:name=".volunteer_module.VolunteerSkillsFormActivity" android:exported="false" />
+        <activity android:name=".volunteer_module.VolunteerAgreementActivity" android:exported="false" />
+        <activity android:name=".volunteer_module.VolunteerSuccessActivity" android:exported="false" />
         <activity android:name=".incident_report_module.ChatsActivity" android:exported="false" />
         <activity android:name=".incident_report_module.ConversationActivity" android:exported="false" />
         <activity android:name=".incident_report_module.ReportIncidentActivity" android:exported="false" />
@@ -112,6 +117,13 @@
         <activity android:name=".incident_report_module.DisplayReportActivity" android:exported="false"/>
         <activity android:name=".services.safety_tips.SafetyTypeActivity" android:exported="false"/>
         <activity android:name=".sos.SosDetailActivity" android:exported="false"/>
+        <activity android:name=".admin_module.AdminDashboardActivity" android:exported="false" />
+        <activity android:name=".admin_module.AdminNgoManagementActivity" android:exported="false" />
+        <activity android:name=".admin_module.AdminUsersManagementActivity" android:exported="false" />
+        <activity android:name=".admin_module.AdminNgoRequestsActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoDashboardActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoVolunteerApprovalsActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoRegistrationRequestActivity" android:exported="false" />
 
         <service
             android:name=".sos.SosForegroundService"
