@@ -9,15 +9,21 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +36,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.hldsn.R;
 import com.example.hldsn.incident_report_module.ChatsActivity;
@@ -54,10 +61,23 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class HomePageActivity extends AppCompatActivity {
 
@@ -72,12 +92,31 @@ public class HomePageActivity extends AppCompatActivity {
     private static final String EXTRA_SOS_STATUS = "extra_status";
     private static final String PREFS_PERMISSION_GATE = "home_permission_gate";
     private static final String PREF_KEY_ALL_PERMISSIONS_PREFIX = "all_permissions_prompted_";
+    private static final String NEWS_DEFAULT_HEADLINE = "Disaster update in Pakistan";
+        private static final String DISASTER_NEWS_API_URL =
+            "https://api.gdeltproject.org/api/v2/doc/doc?query=%28Pakistan%20AND%20%28disaster%20OR%20flood%20OR%20earthquake%20OR%20landslide%20OR%20cyclone%29%29&mode=ArtList&maxrecords=20&sort=DateDesc&format=json";
+        private static final int NEWS_HTTP_TIMEOUT_MS = 10000;
+    private static final int NEWS_FETCH_LIMIT = 12;
+    private static final long NEWS_SLIDE_INTERVAL_MS = 5000L;
+        private static final int[] NEWS_FALLBACK_IMAGES = new int[] {
+            R.drawable.flood_banner,
+            R.drawable.ic_launcher_background_flood_alltips_screen,
+            R.drawable.ic_launcher_background_earthquake_alltips_screen,
+            R.drawable.ic_launcher_background_landslide_alltips_screen
+        };
 
     private DrawerLayout drawerLayout;
     private ImageView menuIcon, notificationIcon;
     private TextView tvNotificationCount;
     private MaterialButton chatBtn, tipsBtn, volunteerBtn;
     private View emergencyBtn;
+    private ViewPager2 newsSlider;
+    private LinearLayout newsSliderDots;
+    private NewsSliderAdapter newsSliderAdapter;
+    private final Handler newsSliderHandler = new Handler(Looper.getMainLooper());
+    private final ExecutorService newsApiExecutor = Executors.newSingleThreadExecutor();
+    private Runnable newsSliderRunnable;
+    private boolean isNewsSliderCallbackRegistered;
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -98,6 +137,16 @@ public class HomePageActivity extends AppCompatActivity {
     private View emptyStateLayout;
     List<IncidentModel> unreadIncidents = new ArrayList<>();
     private final List<SosAlertRecord> sosAlerts = new ArrayList<>();
+
+    private final ViewPager2.OnPageChangeCallback newsSliderPageChangeCallback =
+            new ViewPager2.OnPageChangeCallback() {
+                @Override
+                public void onPageSelected(int position) {
+                    super.onPageSelected(position);
+                    updateNewsDots(position);
+                    restartNewsAutoSlide();
+                }
+            };
 
     /** Prevents the "no internet" toast from firing on every Firestore retry. */
     private boolean hasShownNetworkError = false;
@@ -196,6 +245,7 @@ public class HomePageActivity extends AppCompatActivity {
         currentUserId = auth.getCurrentUser().getUid();
 
         initViews();
+        initNewsSlider();
         initNotificationDrawer();
         initListeners();
         loadSeenIncidentIds();
@@ -214,6 +264,264 @@ public class HomePageActivity extends AppCompatActivity {
         tipsBtn = findViewById(R.id.btn_info_safety);
         volunteerBtn = findViewById(R.id.btn_service_volunteer);
         emergencyBtn = findViewById(R.id.btn_emergency);
+        newsSlider = findViewById(R.id.news_slider);
+        newsSliderDots = findViewById(R.id.news_slider_dots);
+    }
+
+    private void initNewsSlider() {
+        if (newsSlider == null || newsSliderDots == null) {
+            return;
+        }
+
+        newsSliderAdapter = new NewsSliderAdapter(this::openNewsArticleInBrowser);
+        newsSlider.setAdapter(newsSliderAdapter);
+        showNewsSlides(buildFallbackNewsSlides());
+
+        newsSliderRunnable = () -> {
+            int itemCount = newsSliderAdapter != null ? newsSliderAdapter.getItemCount() : 0;
+            if (newsSlider == null || itemCount <= 1) {
+                return;
+            }
+            int nextItem = (newsSlider.getCurrentItem() + 1) % itemCount;
+            newsSlider.setCurrentItem(nextItem, true);
+        };
+
+        if (!isNewsSliderCallbackRegistered) {
+            newsSlider.registerOnPageChangeCallback(newsSliderPageChangeCallback);
+            isNewsSliderCallbackRegistered = true;
+        }
+    }
+
+    private List<NewsSliderAdapter.NewsSlideItem> buildFallbackNewsSlides() {
+        return Arrays.asList(
+                new NewsSliderAdapter.NewsSlideItem(
+                        "2025 Floods in Peshawar: Rescue operations continue",
+                        null,
+                null,
+                        R.drawable.flood_banner
+                ),
+                new NewsSliderAdapter.NewsSlideItem(
+                        "Flood preparedness: Monsoon awareness across KP",
+                        null,
+                null,
+                        R.drawable.ic_launcher_background_flood_alltips_screen
+                ),
+                new NewsSliderAdapter.NewsSlideItem(
+                        "Earthquake safety updates for northern regions",
+                        null,
+                null,
+                        R.drawable.ic_launcher_background_earthquake_alltips_screen
+                ),
+                new NewsSliderAdapter.NewsSlideItem(
+                        "Landslide risk alerts for hilly districts",
+                        null,
+                null,
+                        R.drawable.ic_launcher_background_landslide_alltips_screen
+                )
+        );
+    }
+
+    private void showNewsSlides(List<NewsSliderAdapter.NewsSlideItem> slides) {
+        if (newsSliderAdapter == null || newsSlider == null) {
+            return;
+        }
+
+        List<NewsSliderAdapter.NewsSlideItem> effectiveSlides = slides;
+        if (effectiveSlides == null || effectiveSlides.isEmpty()) {
+            effectiveSlides = buildFallbackNewsSlides();
+        }
+
+        int currentPosition = Math.max(0, newsSlider.getCurrentItem());
+        int newCount = effectiveSlides.size();
+        int targetPosition = Math.min(currentPosition, Math.max(0, newCount - 1));
+
+        newsSliderAdapter.submitItems(effectiveSlides);
+        setupNewsDots(newCount);
+        newsSlider.setCurrentItem(targetPosition, false);
+        updateNewsDots(targetPosition);
+        restartNewsAutoSlide();
+    }
+
+    private void refreshNewsFromExternalApi() {
+        newsApiExecutor.execute(() -> {
+            List<NewsSliderAdapter.NewsSlideItem> apiSlides = fetchDisasterNewsFromApi();
+            runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
+                showNewsSlides(apiSlides);
+            });
+        });
+    }
+
+    private List<NewsSliderAdapter.NewsSlideItem> fetchDisasterNewsFromApi() {
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL(DISASTER_NEWS_API_URL);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(NEWS_HTTP_TIMEOUT_MS);
+            connection.setReadTimeout(NEWS_HTTP_TIMEOUT_MS);
+            connection.setRequestProperty("Accept", "application/json");
+
+            int statusCode = connection.getResponseCode();
+            if (statusCode != HttpURLConnection.HTTP_OK) {
+                Log.w(TAG, "Disaster API returned status code: " + statusCode);
+                return new ArrayList<>();
+            }
+
+            String responseJson = readResponseBody(connection.getInputStream());
+            return parseDisasterApiResponse(responseJson);
+        } catch (Exception e) {
+            Log.w(TAG, "External disaster API fetch failed", e);
+            return new ArrayList<>();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+    }
+
+    private List<NewsSliderAdapter.NewsSlideItem> parseDisasterApiResponse(String responseJson) {
+        List<NewsSliderAdapter.NewsSlideItem> slides = new ArrayList<>();
+        try {
+            JSONObject root = new JSONObject(responseJson);
+            JSONArray articles = root.optJSONArray("articles");
+            if (articles == null) {
+                return slides;
+            }
+
+            for (int i = 0; i < articles.length() && slides.size() < NEWS_FETCH_LIMIT; i++) {
+                JSONObject article = articles.optJSONObject(i);
+                if (article == null) {
+                    continue;
+                }
+
+                String headline = normalizeHeadline(article.optString("title"));
+                String imageUrl = sanitizeUrl(article.optString("socialimage"));
+                String articleUrl = sanitizeUrl(article.optString("url"));
+
+                if (TextUtils.isEmpty(articleUrl)) {
+                    continue;
+                }
+
+                slides.add(new NewsSliderAdapter.NewsSlideItem(
+                        headline,
+                        imageUrl,
+                        articleUrl,
+                        getFallbackImageForIndex(slides.size())
+                ));
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Failed to parse disaster API response", e);
+        }
+        return slides;
+    }
+
+    private String readResponseBody(InputStream stream) throws IOException {
+        StringBuilder builder = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
+            }
+        }
+        return builder.toString();
+    }
+
+    private int getFallbackImageForIndex(int index) {
+        if (NEWS_FALLBACK_IMAGES.length == 0) {
+            return R.drawable.flood_banner;
+        }
+        return NEWS_FALLBACK_IMAGES[index % NEWS_FALLBACK_IMAGES.length];
+    }
+
+    private String sanitizeUrl(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
+        return URLUtil.isValidUrl(trimmed) ? trimmed : null;
+    }
+
+    private void openNewsArticleInBrowser(NewsSliderAdapter.NewsSlideItem item) {
+        if (item == null || TextUtils.isEmpty(item.getArticleUrl())) {
+            Toast.makeText(this, "News link is unavailable", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(item.getArticleUrl()));
+            startActivity(browserIntent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "No browser app found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String normalizeHeadline(String title) {
+        if (title == null) {
+            return NEWS_DEFAULT_HEADLINE;
+        }
+
+        String trimmed = title.trim();
+        return trimmed.isEmpty() ? NEWS_DEFAULT_HEADLINE : trimmed;
+    }
+
+    private void setupNewsDots(int count) {
+        newsSliderDots.removeAllViews();
+
+        int dotSize = dpToPx(8);
+        int dotMargin = dpToPx(2);
+
+        for (int i = 0; i < count; i++) {
+            View dot = new View(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dotSize, dotSize);
+            params.setMargins(dotMargin, dotMargin, dotMargin, dotMargin);
+            dot.setLayoutParams(params);
+            dot.setBackgroundResource(R.drawable.dot_inactive);
+            newsSliderDots.addView(dot);
+        }
+    }
+
+    private void updateNewsDots(int activePosition) {
+        if (newsSliderDots == null) {
+            return;
+        }
+
+        int dotCount = newsSliderDots.getChildCount();
+        for (int i = 0; i < dotCount; i++) {
+            View dot = newsSliderDots.getChildAt(i);
+            dot.setBackgroundResource(i == activePosition ? R.drawable.dot_active : R.drawable.dot_inactive);
+        }
+    }
+
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
+    }
+
+    private void startNewsAutoSlide() {
+        int itemCount = newsSliderAdapter != null ? newsSliderAdapter.getItemCount() : 0;
+        if (newsSliderRunnable == null || itemCount <= 1) {
+            return;
+        }
+        newsSliderHandler.removeCallbacks(newsSliderRunnable);
+        newsSliderHandler.postDelayed(newsSliderRunnable, NEWS_SLIDE_INTERVAL_MS);
+    }
+
+    private void stopNewsAutoSlide() {
+        if (newsSliderRunnable != null) {
+            newsSliderHandler.removeCallbacks(newsSliderRunnable);
+        }
+    }
+
+    private void restartNewsAutoSlide() {
+        stopNewsAutoSlide();
+        startNewsAutoSlide();
     }
 
     private void initNotificationDrawer() {
@@ -741,6 +1049,7 @@ public class HomePageActivity extends AppCompatActivity {
         super.onStart();
         loadSosAlerts();
         startListeningToIncidents();
+        refreshNewsFromExternalApi();
         ContextCompat.registerReceiver(
                 this,
                 sosStatusReceiver,
@@ -749,6 +1058,7 @@ public class HomePageActivity extends AppCompatActivity {
         );
         startMeshServiceIfReady();
         handleLaunchIntent(getIntent());
+        startNewsAutoSlide();
     }
 
     private IntentFilter buildNotificationIntentFilter() {
@@ -766,6 +1076,7 @@ public class HomePageActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
+        stopNewsAutoSlide();
         super.onStop();
         if (incidentsListener != null) {
             incidentsListener.remove();
@@ -777,5 +1088,16 @@ public class HomePageActivity extends AppCompatActivity {
         } catch (IllegalArgumentException ignored) {
             // Receiver may already be unregistered.
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (newsSlider != null && isNewsSliderCallbackRegistered) {
+            newsSlider.unregisterOnPageChangeCallback(newsSliderPageChangeCallback);
+            isNewsSliderCallbackRegistered = false;
+        }
+        stopNewsAutoSlide();
+        newsApiExecutor.shutdownNow();
+        super.onDestroy();
     }
 }
