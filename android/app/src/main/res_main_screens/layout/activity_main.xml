@@ -82,56 +82,30 @@
             </FrameLayout>
         </RelativeLayout>
 
-        <!-- Banner Section -->
+        <!-- News Carousel Section -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="180dp"
             android:layout_marginTop="12dp"
             android:layout_marginHorizontal="16dp"
             android:layout_marginBottom="12dp"
-            android:background="@drawable/banner_card_bg"
-            android:clipToOutline="true"
             android:elevation="2dp">
 
-            <ImageView
-                android:id="@+id/banner_image"
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/news_view_pager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/flood_banner" />
+                android:background="@drawable/banner_card_bg"
+                android:clipToOutline="true" />
 
-            <!-- Carousel Dots (example) -->
+            <!-- Carousel Dots -->
             <LinearLayout
+                android:id="@+id/carousel_dots_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center_horizontal"
                 android:layout_marginBottom="8dp"
-                android:orientation="horizontal">
-
-                <View
-                    android:layout_width="8dp"
-                    android:layout_height="8dp"
-                    android:layout_margin="2dp"
-                    android:background="@drawable/dot_active" />
-
-                <View
-                    android:layout_width="8dp"
-                    android:layout_height="8dp"
-                    android:layout_margin="2dp"
-                    android:background="@drawable/dot_inactive" />
-
-                <View
-                    android:layout_width="8dp"
-                    android:layout_height="8dp"
-                    android:layout_margin="2dp"
-                    android:background="@drawable/dot_inactive" />
-
-                <View
-                    android:layout_width="8dp"
-                    android:layout_height="8dp"
-                    android:layout_margin="2dp"
-                    android:background="@drawable/dot_inactive" />
-            </LinearLayout>
+                android:orientation="horizontal" />
         </FrameLayout>
 
         <!-- Emergency SOS Button -->

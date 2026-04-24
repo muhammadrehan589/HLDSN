@@ -40,6 +40,7 @@ import com.example.hldsn.notification_module.NotificationAdapter;
 import com.example.hldsn.notification_module.NotificationItem;
 import com.example.hldsn.notification_module.SosAlertRecord;
 import com.example.hldsn.notification_module.SosAlertStore;
+import com.example.hldsn.services.news.NewsActivity;
 import com.example.hldsn.services.safety_tips.SafetyTipsActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -54,6 +55,17 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.example.hldsn.home.NewsCarouselAdapter;
+import com.example.hldsn.services.news.ApiNewsRepository;
+import com.example.hldsn.services.news.NewsDetailActivity;
+import com.example.hldsn.services.news.NewsItem;
+import com.example.hldsn.services.news.NewsRepository;
+import androidx.viewpager2.widget.ViewPager2;
+import android.os.Handler;
+import android.os.Looper;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class HomePageActivity extends AppCompatActivity {
 
@@ -75,7 +87,7 @@ public class HomePageActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ImageView menuIcon, notificationIcon;
     private TextView tvNotificationCount;
-    private MaterialButton chatBtn, tipsBtn;
+    private MaterialButton chatBtn, tipsBtn, newsBtn;
     private View emergencyBtn;
 
     private FirebaseAuth auth;
@@ -97,6 +109,13 @@ public class HomePageActivity extends AppCompatActivity {
     private View emptyStateLayout;
     List<IncidentModel> unreadIncidents = new ArrayList<>();
     private final List<SosAlertRecord> sosAlerts = new ArrayList<>();
+
+    // Carousel fields
+    private ViewPager2 newsViewPager;
+    private NewsCarouselAdapter newsCarouselAdapter;
+    private final List<NewsItem> carouselNewsList = new ArrayList<>();
+    private Timer carouselTimer;
+    private final Handler carouselHandler = new Handler(Looper.getMainLooper());
 
     /** Prevents the "no internet" toast from firing on every Firestore retry. */
     private boolean hasShownNetworkError = false;
@@ -197,6 +216,8 @@ public class HomePageActivity extends AppCompatActivity {
             return;
         }
 
+        setupNewsCarousel();
+
         currentUserId = auth.getCurrentUser().getUid();
 
         initViews();
@@ -216,6 +237,7 @@ public class HomePageActivity extends AppCompatActivity {
         tvNotificationCount = findViewById(R.id.tv_notification_count);
         chatBtn = findViewById(R.id.btn_service_chats);
         tipsBtn = findViewById(R.id.btn_info_safety);
+        newsBtn = findViewById(R.id.btn_info_news);
         emergencyBtn = findViewById(R.id.btn_emergency);
     }
 
@@ -255,6 +277,7 @@ public class HomePageActivity extends AppCompatActivity {
 
         chatBtn.setOnClickListener(v -> startActivity(new Intent(this, ChatsActivity.class)));
         tipsBtn.setOnClickListener(v -> startActivity(new Intent(this, SafetyTipsActivity.class)));
+        newsBtn.setOnClickListener(v -> startActivity(new Intent(this, NewsActivity.class)));
         emergencyBtn.setOnClickListener(v -> triggerSos());
 
         // Profile menu example
@@ -350,6 +373,103 @@ public class HomePageActivity extends AppCompatActivity {
             refreshNotificationContent();
             drawerLayout.openDrawer(GravityCompat.END);
         });
+    }
+
+    private void setupNewsCarousel() {
+        newsViewPager = findViewById(R.id.news_view_pager);
+        if (newsViewPager == null) return;
+
+        newsCarouselAdapter = new NewsCarouselAdapter(this::openNewsDetail);
+        newsViewPager.setAdapter(newsCarouselAdapter);
+
+        fetchCarouselNews();
+    }
+
+    private void fetchCarouselNews() {
+        new ApiNewsRepository(this).fetchNews(false, new NewsRepository.Callback() {
+            @Override
+            public void onSuccess(List<NewsItem> items) {
+                if (items != null && !items.isEmpty()) {
+                    carouselNewsList.clear();
+                    // Take top 3 news
+                    for (int i = 0; i < Math.min(3, items.size()); i++) {
+                        carouselNewsList.add(items.get(i));
+                    }
+                    newsCarouselAdapter.setItems(carouselNewsList);
+                    setupCarouselAutoScroll();
+                    setupDots(carouselNewsList.size());
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                Log.e(TAG, "Carousel news fetch error: " + message);
+            }
+        });
+    }
+
+    private void setupCarouselAutoScroll() {
+        if (carouselTimer != null) carouselTimer.cancel();
+        
+        carouselTimer = new Timer();
+        carouselTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                carouselHandler.post(() -> {
+                    if (newsViewPager != null && newsCarouselAdapter != null && newsCarouselAdapter.getItemCount() > 0) {
+                        int nextItem = (newsViewPager.getCurrentItem() + 1) % newsCarouselAdapter.getItemCount();
+                        newsViewPager.setCurrentItem(nextItem, true);
+                    }
+                });
+            }
+        }, 4000, 4000); // Change every 4 seconds
+    }
+
+    private void setupDots(int count) {
+        android.widget.LinearLayout dotsContainer = findViewById(R.id.carousel_dots_container);
+        if (dotsContainer == null) return;
+        dotsContainer.removeAllViews();
+
+        ImageView[] dots = new ImageView[count];
+        for (int i = 0; i < count; i++) {
+            dots[i] = new ImageView(this);
+            dots[i].setImageResource(i == 0 ? R.drawable.dot_active : R.drawable.dot_inactive);
+            android.widget.LinearLayout.LayoutParams params = new android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(8, 0, 8, 0);
+            dotsContainer.addView(dots[i], params);
+        }
+
+        newsViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                for (int i = 0; i < count; i++) {
+                    dots[i].setImageResource(i == position ? R.drawable.dot_active : R.drawable.dot_inactive);
+                }
+            }
+        });
+    }
+
+    private void openNewsDetail(NewsItem item) {
+        Intent intent = new Intent(this, NewsDetailActivity.class);
+        intent.putExtra(NewsDetailActivity.EXTRA_HEADLINE, item.getHeadline());
+        intent.putExtra(NewsDetailActivity.EXTRA_DESCRIPTION, item.getDescription());
+        intent.putExtra(NewsDetailActivity.EXTRA_FULL_TEXT, item.getFullText());
+        intent.putExtra(NewsDetailActivity.EXTRA_LOCATION, item.getLocation());
+        intent.putExtra(NewsDetailActivity.EXTRA_PUBLISHED_AT, item.getPublishedAt());
+        intent.putExtra(NewsDetailActivity.EXTRA_IMAGE_URL, item.getImageUrl());
+        intent.putExtra(NewsDetailActivity.EXTRA_IMAGE_RES_ID, item.getImageResId());
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (carouselTimer != null) {
+            carouselTimer.cancel();
+        }
     }
 
     private void startListeningToIncidents() {
