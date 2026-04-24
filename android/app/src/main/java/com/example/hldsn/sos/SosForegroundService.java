@@ -102,8 +102,8 @@ public class SosForegroundService extends Service {
     private static final long BLE_RETRY_COOLDOWN_MS = 10_000L;
     private static final long BLE_REINIT_MIN_INTERVAL_MS = 1_500L;
     private static final long IDENTITY_BROADCAST_INTERVAL_MS = 15_000L;
-    private static final long GPS_MAX_STALE_MS = 30_000L;
-    private static final float GPS_MAX_ACCURACY_METERS = 100f;
+    private static final long GPS_MAX_STALE_MS = 600_000L; // 10 minutes
+    private static final float GPS_MAX_ACCURACY_METERS = 500f; 
     private static final long GPS_SINGLE_FIX_TIMEOUT_MS = 10_000L;
     private static final String SOS_PREFS = "sos_sender_profile";
     private static final String KEY_CACHED_SENDER_NAME = "cached_sender_name";
@@ -208,6 +208,15 @@ public class SosForegroundService extends Service {
             @Override
             public void onStatus(String status) {
                 sendStatus(status);
+            }
+
+            @Override
+            public void onPeerLinksChanged(int activeConnections) {
+                Log.d(MESH_TAG, "topology: active_links=" + activeConnections);
+                identityBroadcastPending = true;
+                if (activeConnections > 0) {
+                    broadcastIdentityIfDue(true);
+                }
             }
         });
         registerBluetoothStateReceiver();
@@ -554,16 +563,41 @@ public class SosForegroundService extends Service {
         Log.i(TAG, "SOS trigger requested.");
         final String senderHint = triggerIntent != null ? triggerIntent.getStringExtra(EXTRA_SENDER_NAME) : null;
         Log.d(TAG, "SOS trigger senderHint=" + (senderHint == null || senderHint.trim().isEmpty() ? "none" : senderHint));
+
+        // --- STEP A: IMMEDIATE BEST-EFFORT DISPATCH ---
+        // Don't wait for fresh GPS. Send with whatever we have immediately.
+        sendStatus("Sending SOS alert...");
+        long immediatePacketId = -1L;
+        try {
+            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            Location lastGps = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Location lastNet = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            Location bestAvailable = chooseBetterLocation(lastGps, lastNet);
+
+            if (bestAvailable != null) {
+                Log.i(TAG, "Immediate SOS dispatch using cached location: " + bestAvailable.getProvider());
+                immediatePacketId = queueOriginSos(bestAvailable.getLatitude(), bestAvailable.getLongitude(), senderHint);
+            } else {
+                Log.i(TAG, "No cached location. Sending Blind SOS (0,0).");
+                immediatePacketId = queueOriginSos(0, 0, senderHint);
+            }
+        } catch (SecurityException e) {
+            Log.w(TAG, "Permission error during immediate dispatch", e);
+            immediatePacketId = queueOriginSos(0, 0, senderHint);
+        }
+
+        final long existingPacketId = immediatePacketId;
+
+        // --- STEP B: BACKGROUND HIGH-ACCURACY REFINEMENT ---
         clearSingleFixRequest();
         if (!hasFineLocationPermission()) {
-            Log.w(TAG, "SOS blocked: precise location permission missing.");
-            sendStatus("Precise location permission required for SOS");
+            Log.w(TAG, "Background GPS refinement skipped: permission missing.");
             return;
         }
 
         if (forceLocationManagerFallback) {
             Log.i(TAG, "Using forced LocationManager fallback (FLP disabled for session).");
-            fetchLocationManagerFallback(senderHint);
+            fetchLocationManagerFallback(senderHint, existingPacketId);
             return;
         }
 
@@ -571,7 +605,7 @@ public class SosForegroundService extends Service {
             Log.w(TAG, "Google Play services unavailable. Using LocationManager fallback.");
             sendStatus("Using device GPS fallback");
             forceLocationManagerFallback = true;
-            fetchLocationManagerFallback(senderHint);
+            fetchLocationManagerFallback(senderHint, existingPacketId);
             return;
         }
 
@@ -585,10 +619,10 @@ public class SosForegroundService extends Service {
             task.addOnSuccessListener(location -> {
                 if (isValidSosLocation(location)) {
                     Log.i(TAG, "FLP current location success lat=" + location.getLatitude() + " lon=" + location.getLongitude());
-                    sendSosWithResolvedLocation(location, senderHint);
+                    sendSosWithResolvedLocation(location, senderHint, existingPacketId);
                 } else {
                     Log.w(TAG, "FLP current location unavailable or invalid. Trying fallback chain.");
-                    fetchLastLocationFallback(senderHint);
+                    fetchLastLocationFallback(senderHint, existingPacketId);
                 }
             }).addOnFailureListener(e -> {
                 Log.w(TAG, "getCurrentLocation failed", e);
@@ -597,14 +631,15 @@ public class SosForegroundService extends Service {
                     sendStatus("Google location service unstable, using device GPS fallback");
                     Log.w(TAG, "Detected broker package failure. Forcing LocationManager fallback for this session.");
                 }
-                fetchLastLocationFallback(senderHint);
+                fetchLastLocationFallback(senderHint, existingPacketId);
             });
         } catch (SecurityException sec) {
             if (isBrokerPackageFailure(sec)) {
                 forceLocationManagerFallback = true;
                 sendStatus("Google location service unstable, using device GPS fallback");
                 Log.w(TAG, "SecurityException from FLP broker. Switching to LocationManager fallback.", sec);
-                fetchLocationManagerFallback(senderHint);
+                fetchLocationManagerFallback(senderHint, existingPacketId);
+
                 return;
             }
             Log.w(TAG, "SecurityException while requesting FLP location.", sec);
@@ -612,12 +647,12 @@ public class SosForegroundService extends Service {
         } catch (RuntimeException runtimeException) {
             Log.w(TAG, "FLP runtime failure. Falling back to LocationManager.", runtimeException);
             forceLocationManagerFallback = true;
-            fetchLocationManagerFallback(senderHint);
+            fetchLocationManagerFallback(senderHint, existingPacketId);
         }
     }
 
     @SuppressLint("MissingPermission")
-    private void fetchLastLocationFallback(@Nullable String senderHint) {
+    private void fetchLastLocationFallback(@Nullable String senderHint, long existingPacketId) {
         if (!hasFineLocationPermission()) {
             Log.w(TAG, "No precise location permission during fallback.");
             sendStatus("Unable to fetch precise GPS location");
@@ -625,17 +660,17 @@ public class SosForegroundService extends Service {
         }
         if (forceLocationManagerFallback) {
             Log.i(TAG, "Skipping FLP lastLocation due to forced fallback flag.");
-            fetchLocationManagerFallback(senderHint);
+            fetchLocationManagerFallback(senderHint, existingPacketId);
             return;
         }
         locationClient.getLastLocation()
                 .addOnSuccessListener(location -> {
                     if (isValidSosLocation(location)) {
                         Log.i(TAG, "FLP lastLocation success lat=" + location.getLatitude() + " lon=" + location.getLongitude());
-                        sendSosWithResolvedLocation(location, senderHint);
+                        sendSosWithResolvedLocation(location, senderHint, existingPacketId);
                     } else {
                         Log.w(TAG, "FLP lastLocation unavailable/invalid. Using LocationManager fallback.");
-                        fetchLocationManagerFallback(senderHint);
+                        fetchLocationManagerFallback(senderHint, existingPacketId);
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -644,7 +679,7 @@ public class SosForegroundService extends Service {
                         forceLocationManagerFallback = true;
                         Log.w(TAG, "Broker failure confirmed during lastLocation. Keeping forced fallback enabled.");
                     }
-                    fetchLocationManagerFallback(senderHint);
+                    fetchLocationManagerFallback(senderHint, existingPacketId);
                 });
     }
 
@@ -656,7 +691,7 @@ public class SosForegroundService extends Service {
         return message != null && message.contains("Unknown calling package name 'com.google.android.gms'");
     }
 
-    private void fetchLocationManagerFallback(@Nullable String senderHint) {
+    private void fetchLocationManagerFallback(@Nullable String senderHint, long existingPacketId) {
         if (!hasFineLocationPermission()) {
             Log.w(TAG, "LocationManager fallback blocked: no precise location permission.");
             sendStatus("Enable precise location to send SOS with GPS");
@@ -685,10 +720,10 @@ public class SosForegroundService extends Service {
             Location best = chooseBetterLocation(gps, network);
             if (isValidSosLocation(best)) {
                 Log.i(TAG, "LocationManager fallback selected lat=" + best.getLatitude() + " lon=" + best.getLongitude());
-                sendSosWithResolvedLocation(best, senderHint);
+                sendSosWithResolvedLocation(best, senderHint, existingPacketId);
             } else {
                 Log.w(TAG, "No valid last known location from providers. Requesting single GPS fix.");
-                requestSingleGpsFix(locationManager, senderHint);
+                requestSingleGpsFix(locationManager, senderHint, existingPacketId);
             }
         } catch (SecurityException e) {
             Log.w(TAG, "LocationManager fallback permission error", e);
@@ -697,7 +732,7 @@ public class SosForegroundService extends Service {
     }
 
     @SuppressLint("MissingPermission")
-    private void requestSingleGpsFix(LocationManager locationManager, @Nullable String senderHint) {
+    private void requestSingleGpsFix(LocationManager locationManager, @Nullable String senderHint, long existingPacketId) {
         clearSingleFixRequest();
         String provider = null;
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -717,7 +752,7 @@ public class SosForegroundService extends Service {
                 clearSingleFixRequest();
                 if (isValidSosLocation(location)) {
                     Log.i(TAG, "Single GPS fix received lat=" + location.getLatitude() + " lon=" + location.getLongitude());
-                    sendSosWithResolvedLocation(location, senderHint);
+                    sendSosWithResolvedLocation(location, senderHint, existingPacketId);
                 } else {
                     sendStatus("Unable to get valid GPS fix. Retry SOS.");
                 }
@@ -748,31 +783,39 @@ public class SosForegroundService extends Service {
         activeSingleFixTimeout = null;
     }
 
-    private void sendSosWithResolvedLocation(Location location, @Nullable String senderHint) {
+    private void sendSosWithResolvedLocation(Location location, @Nullable String senderHint, long existingPacketId) {
         if (!isValidSosLocation(location)) {
             sendStatus("Unable to get valid GPS location");
             return;
         }
-        queueOriginSos(location.getLatitude(), location.getLongitude(), senderHint);
+        queueOriginSos(location.getLatitude(), location.getLongitude(), senderHint, existingPacketId);
     }
 
     private boolean isValidSosLocation(@Nullable Location location) {
         if (location == null) {
+            Log.d(TAG, "Location rejected: null");
             return false;
         }
         if (!isValidSosCoordinates(location.getLatitude(), location.getLongitude())) {
+            Log.d(TAG, "Location rejected: invalid coordinates (" + location.getLatitude() + "," + location.getLongitude() + ")");
             return false;
         }
         long ageMs = Math.max(0L, System.currentTimeMillis() - location.getTime());
         if (ageMs > GPS_MAX_STALE_MS) {
+            Log.d(TAG, "Location rejected: too stale (" + (ageMs / 1000) + "s > " + (GPS_MAX_STALE_MS / 1000) + "s)");
             return false;
         }
-        return !location.hasAccuracy() || location.getAccuracy() <= GPS_MAX_ACCURACY_METERS;
+        if (location.hasAccuracy() && location.getAccuracy() > GPS_MAX_ACCURACY_METERS) {
+            Log.d(TAG, "Location rejected: low accuracy (" + location.getAccuracy() + "m > " + GPS_MAX_ACCURACY_METERS + "m)");
+            return false;
+        }
+        return true;
     }
 
     private boolean isValidSosCoordinates(double lat, double lon) {
+        // Allow (0,0) specifically for Blind SOS (no GPS available)
         if (Math.abs(lat) < 0.000001d && Math.abs(lon) < 0.000001d) {
-            return false;
+            return true;
         }
         return lat >= -90d && lat <= 90d && lon >= -180d && lon <= 180d;
     }
@@ -795,23 +838,36 @@ public class SosForegroundService extends Service {
         return status == ConnectionResult.SUCCESS;
     }
 
-    private void queueOriginSos(double lat, double lon, @Nullable String senderHint) {
+    private long queueOriginSos(double lat, double lon, @Nullable String senderHint) {
+        return queueOriginSos(lat, lon, senderHint, -1L);
+    }
+
+    private long queueOriginSos(double lat, double lon, @Nullable String senderHint, long existingPacketId) {
         int nowEpoch = (int) Instant.now().getEpochSecond();
         String senderName = resolveSenderName(senderHint);
-        SosPacket packet = SosPacket.createSos(lat, lon, nowEpoch, senderName);
+
+        SosPacket packet;
+        if (existingPacketId != -1L) {
+            packet = SosPacket.createSos(existingPacketId, lat, lon, nowEpoch, senderName);
+        } else {
+            packet = SosPacket.createSos(lat, lon, nowEpoch, senderName);
+        }
+
         synchronized (lock) {
             seenSosAt.put(packet.messageId, SystemClock.elapsedRealtime());
             originStates.put(packet.messageId, new OriginState(SystemClock.elapsedRealtime()));
             outbound.addFirst(new QueuedPacket(packet, SystemClock.elapsedRealtime() + 10_000L, 12, true));
         }
-        Log.i(TAG, "Queued origin SOS: " + packetSummary(packet) + " lat=" + lat + " lon=" + lon + " sender=" + senderName);
+        Log.i(TAG, "Queued origin SOS: " + packetSummary(packet) + " lat=" + lat + " lon=" + lon + " sender=" + senderName + " refined=" + (existingPacketId != -1L));
         Log.i(SOS_TRACE_TAG, "ORIGIN_SOS id=" + packet.shortId()
                 + " sender=" + senderName
                 + " lat=" + lat
                 + " lon=" + lon
-                + " epoch=" + nowEpoch);
+                + " epoch=" + nowEpoch
+                + " refined=" + (existingPacketId != -1L));
         updateNotification("Broadcasting SOS " + packet.shortId());
-        sendStatus("SOS broadcast started");
+        sendStatus(existingPacketId != -1L ? "SOS location refined" : "SOS broadcast started");
+        return packet.messageId;
     }
 
     private void onPacketReceived(SosPacket packet, boolean fullFrameReceived) {

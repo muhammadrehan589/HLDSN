@@ -24,7 +24,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ChatsActivity extends AppCompatActivity {
@@ -145,11 +147,24 @@ public class ChatsActivity extends AppCompatActivity {
 
     private void loadNearbyUsers() {
         List<MeshIdentity> nearbyPeers = meshPeerStore.getRecentPeers(NEARBY_PEER_MAX_AGE_MS);
+        List<MeshIdentity> allKnownPeers = meshPeerStore.getAll();
+        Map<String, MeshIdentity> deduped = new LinkedHashMap<>();
+        for (MeshIdentity peer : nearbyPeers) {
+            if (peer != null && peer.getUserId() != null && !peer.getUserId().trim().isEmpty()) {
+                deduped.put(peer.getUserId(), peer);
+            }
+        }
+        for (MeshIdentity peer : allKnownPeers) {
+            if (peer != null && peer.getUserId() != null && !peer.getUserId().trim().isEmpty()) {
+                deduped.putIfAbsent(peer.getUserId(), peer);
+            }
+        }
+        nearbyPeers = new ArrayList<>(deduped.values());
         long now = System.currentTimeMillis();
         
-        Log.d(TAG, "loadNearbyUsers: found " + nearbyPeers.size() + " peers within " 
-                + (NEARBY_PEER_MAX_AGE_MS / 1000) + " seconds");
-        
+        Log.d(TAG, "loadNearbyUsers: found " + nearbyPeers.size() + " peers total (recent-first), recent_window="
+                + (NEARBY_PEER_MAX_AGE_MS / 1000) + "s");
+
         if (!nearbyPeers.isEmpty()) {
             for (MeshIdentity peer : nearbyPeers) {
                 long ageMs = now - peer.getUpdatedAtMs();
