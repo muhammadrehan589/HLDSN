@@ -5,7 +5,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -43,8 +45,9 @@ public class NgoNotificationsActivity extends AppCompatActivity {
         }
 
         notificationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        notificationAdapter = new NotificationAdapter(this);
+        notificationAdapter = new NotificationAdapter(this, this::clearNotification);
         notificationRecyclerView.setAdapter(notificationAdapter);
+        attachSwipeToRevealClear();
 
         loadAlerts();
     }
@@ -72,5 +75,33 @@ public class NgoNotificationsActivity extends AppCompatActivity {
         }
 
         SosAlertStore.markAllSeen(this);
+    }
+
+    private void attachSwipeToRevealClear() {
+        ItemTouchHelper.SimpleCallback swipeCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder,
+                                  @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    notificationAdapter.setSwipedPosition(position);
+                }
+            }
+        };
+
+        new ItemTouchHelper(swipeCallback).attachToRecyclerView(notificationRecyclerView);
+    }
+
+    private void clearNotification(NotificationItem item) {
+        if (item == null) {
+            return;
+        }
+        SosAlertStore.removeAlertById(this, item.getId());
+        loadAlerts();
     }
 }

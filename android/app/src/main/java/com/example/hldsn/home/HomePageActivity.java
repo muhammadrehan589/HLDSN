@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
@@ -34,6 +35,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
@@ -527,21 +529,49 @@ public class HomePageActivity extends AppCompatActivity {
     private void initNotificationDrawer() {
         notificationRecyclerView = findViewById(R.id.notificationRecyclerView);
         emptyStateLayout = findViewById(R.id.empty_state_layout);
-        if (notificationRecyclerView == null) {
-            Log.e(TAG, "notificationRecyclerView not found in layout!");
+
+        if (notificationRecyclerView == null) return;
+
+        notificationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        notificationAdapter = new NotificationAdapter(this, this::handleNotificationCleared);
+        notificationRecyclerView.setAdapter(notificationAdapter);
+
+        ItemTouchHelper.SimpleCallback swipeCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView rv, @NonNull RecyclerView.ViewHolder vh, @NonNull RecyclerView.ViewHolder t) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                if (notificationAdapter != null && position != RecyclerView.NO_POSITION) {
+                    notificationAdapter.setSwipedPosition(position);
+                }
+            }
+        };
+
+        new ItemTouchHelper(swipeCallback).attachToRecyclerView(notificationRecyclerView);
+
+        refreshNotificationContent();
+    }
+
+    private void handleNotificationCleared(NotificationItem itemToClear) {
+        if (itemToClear == null) {
             return;
         }
 
-        // TEMP: Force red background to see if RecyclerView is visible
+        if (itemToClear.isSosAlert()) {
+            SosAlertStore.removeAlertById(this, itemToClear.getId());
+        } else {
+            seenIncidentIds.add(itemToClear.getId());
+            saveSeenIncidentIds();
+            unreadIncidents.removeIf(incident -> incident.getId().equals(itemToClear.getId()));
+        }
 
-        notificationRecyclerView.setVisibility(View.VISIBLE);
-
-        notificationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        notificationAdapter = new NotificationAdapter(this);
-        notificationRecyclerView.setAdapter(notificationAdapter);
+        loadSosAlerts();
         refreshNotificationContent();
-
-
+        Toast.makeText(this, "Notification cleared", Toast.LENGTH_SHORT).show();
     }
 
     private void initListeners() {
@@ -551,9 +581,15 @@ public class HomePageActivity extends AppCompatActivity {
             if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
                 drawerLayout.closeDrawer(GravityCompat.END);
                 markCurrentNotificationsAsSeen();
+                if (notificationAdapter != null) {
+                    notificationAdapter.clearSwipedPosition();
+                }
             } else {
                 drawerLayout.openDrawer(GravityCompat.END);
                 updateNotificationBadge(0);
+                if (notificationAdapter != null) {
+                    notificationAdapter.clearSwipedPosition();
+                }
 
             }
         });

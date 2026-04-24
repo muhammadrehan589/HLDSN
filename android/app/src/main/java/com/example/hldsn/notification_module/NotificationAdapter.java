@@ -31,18 +31,31 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     private static final int COLOR_CARD_SOS    = 0xFF1C0D0D;
     private static final int COLOR_TITLE_NORMAL = Color.WHITE;
     private static final int COLOR_TITLE_SOS    = 0xFFFF474C;
+    private static final int CLEAR_REVEAL_DP = 96;
 
     private final List<NotificationItem> items = new ArrayList<>();
     private final Context context;
+    private final OnNotificationClearListener clearListener;
+    private int swipedPosition = RecyclerView.NO_POSITION;
+
+    public interface OnNotificationClearListener {
+        void onNotificationClear(NotificationItem item);
+    }
 
     public NotificationAdapter(Context context) {
+        this(context, null);
+    }
+
+    public NotificationAdapter(Context context, OnNotificationClearListener clearListener) {
         this.context = context;
+        this.clearListener = clearListener;
     }
 
     public void updateList(List<NotificationItem> newList) {
         Log.d("NotificationAdapter", "updateList called with " + newList.size() + " items");
         items.clear();
         items.addAll(newList);
+        swipedPosition = RecyclerView.NO_POSITION;
         notifyDataSetChanged();
     }
 
@@ -71,6 +84,17 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             holder.tvIncidentType.setTextColor(COLOR_TITLE_NORMAL);
             holder.tvSosUrgencyBadge.setVisibility(View.GONE);
         }
+
+        float translationX = position == swipedPosition ? -dpToPx(CLEAR_REVEAL_DP) : 0f;
+        holder.cardView.setTranslationX(translationX);
+
+        holder.btnClear.setOnClickListener(v -> {
+            int adapterPosition = holder.getBindingAdapterPosition();
+            if (clearListener != null && adapterPosition != RecyclerView.NO_POSITION && adapterPosition < items.size()) {
+                clearListener.onNotificationClear(items.get(adapterPosition));
+            }
+            clearSwipedPosition();
+        });
 
         holder.btnDetail.setOnClickListener(v -> {
             if (item.isSosAlert()) {
@@ -115,6 +139,35 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         context.startActivity(new Intent(Intent.ACTION_VIEW, browserUri));
     }
 
+    public void setSwipedPosition(int position) {
+        if (position < 0 || position >= items.size()) {
+            clearSwipedPosition();
+            return;
+        }
+
+        int previous = swipedPosition;
+        swipedPosition = position;
+
+        if (previous != RecyclerView.NO_POSITION && previous != swipedPosition) {
+            notifyItemChanged(previous);
+        }
+        notifyItemChanged(swipedPosition);
+    }
+
+    public void clearSwipedPosition() {
+        if (swipedPosition == RecyclerView.NO_POSITION) {
+            return;
+        }
+
+        int previous = swipedPosition;
+        swipedPosition = RecyclerView.NO_POSITION;
+        notifyItemChanged(previous);
+    }
+
+    private float dpToPx(int dp) {
+        return dp * context.getResources().getDisplayMetrics().density;
+    }
+
     public List<NotificationItem> getCurrentList() {
         return new ArrayList<>(items);
     }
@@ -126,15 +179,16 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
-        TextView tvIncidentType, tvIncidentLocation, btnDetail, tvSosUrgencyBadge;
+        TextView tvIncidentType, tvIncidentLocation, btnDetail, tvSosUrgencyBadge, btnClear;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            cardView = (CardView) itemView;
+            cardView = itemView.findViewById(R.id.notificationCard);
             tvIncidentType = itemView.findViewById(R.id.tvIncidentType);
             tvIncidentLocation = itemView.findViewById(R.id.tvIncidentLocation);
             btnDetail = itemView.findViewById(R.id.btnDetail);
             tvSosUrgencyBadge = itemView.findViewById(R.id.tvSosUrgencyBadge);
+            btnClear = itemView.findViewById(R.id.btnClear);
         }
     }
 }
