@@ -2,12 +2,14 @@ package com.example.hldsn.notification_module;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -16,6 +18,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.hldsn.R;
 import com.example.hldsn.incident_report_module.DisplayReportActivity;
 import com.example.hldsn.sos.SosDetailActivity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,15 +76,43 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             if (item.isSosAlert()) {
                 String json = item.getSosAlertJson();
                 if (json != null) {
-                    Intent intent = new Intent(context, SosDetailActivity.class);
-                    intent.putExtra(SosDetailActivity.EXTRA_ALERT_JSON, json);
-                    context.startActivity(intent);
+                    try {
+                        SosAlertRecord alert = SosAlertRecord.fromJson(new JSONObject(json));
+                        openAlertLocation(alert, json);
+                    } catch (JSONException e) {
+                        Toast.makeText(context, "Unable to open SOS location", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(context, "Unable to open SOS location", Toast.LENGTH_SHORT).show();
                 }
                 return;
             }
             Intent intent = new Intent(context, DisplayReportActivity.class);
             context.startActivity(intent);
         });
+    }
+
+    private void openAlertLocation(SosAlertRecord alert, String alertJson) {
+        if (alert == null || !alert.hasLocation()) {
+            Intent intent = new Intent(context, SosDetailActivity.class);
+            intent.putExtra(SosDetailActivity.EXTRA_ALERT_JSON, alertJson);
+            context.startActivity(intent);
+            return;
+        }
+
+        double lat = alert.getLatMilli() / 1000.0d;
+        double lon = alert.getLonMilli() / 1000.0d;
+        Uri geoUri = Uri.parse(String.format(java.util.Locale.US,
+                "geo:%f,%f?q=%f,%f(SOS Alert)", lat, lon, lat, lon));
+        Intent mapsIntent = new Intent(Intent.ACTION_VIEW, geoUri);
+        if (mapsIntent.resolveActivity(context.getPackageManager()) != null) {
+            context.startActivity(mapsIntent);
+            return;
+        }
+
+        Uri browserUri = Uri.parse(String.format(java.util.Locale.US,
+                "https://www.google.com/maps?q=%f,%f", lat, lon));
+        context.startActivity(new Intent(Intent.ACTION_VIEW, browserUri));
     }
 
     public List<NotificationItem> getCurrentList() {

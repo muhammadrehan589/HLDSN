@@ -122,6 +122,7 @@
         <activity android:name=".admin_module.AdminUsersManagementActivity" android:exported="false" />
         <activity android:name=".admin_module.AdminNgoRequestsActivity" android:exported="false" />
         <activity android:name=".ngo_module.NgoDashboardActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoNotificationsActivity" android:exported="false" />
         <activity android:name=".ngo_module.NgoVolunteerApprovalsActivity" android:exported="false" />
         <activity android:name=".ngo_module.NgoRegistrationRequestActivity" android:exported="false" />
 

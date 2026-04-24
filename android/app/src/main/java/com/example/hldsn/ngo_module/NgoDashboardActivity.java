@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hldsn.R;
 import com.example.hldsn.login_module.LoginActivity;
+import com.example.hldsn.notification_module.SosAlertStore;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -17,6 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class NgoDashboardActivity extends AppCompatActivity {
 
     private TextView ngoNameText;
+    private TextView notificationCountText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,12 +26,19 @@ public class NgoDashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ngo_dashboard);
 
         ImageView backButton = findViewById(R.id.backButton);
+        ImageView notificationIcon = findViewById(R.id.notificationIcon);
+        notificationCountText = findViewById(R.id.tvNotificationCount);
         ngoNameText = findViewById(R.id.ngoDashboardNameText);
         MaterialButton manageVolunteersButton = findViewById(R.id.manageVolunteerRequestsButton);
         MaterialButton logoutButton = findViewById(R.id.ngoLogoutButton);
 
         if (backButton != null) {
             backButton.setOnClickListener(v -> finish());
+        }
+
+        if (notificationIcon != null) {
+            notificationIcon.setOnClickListener(v ->
+                    startActivity(new Intent(this, NgoNotificationsActivity.class)));
         }
 
         if (manageVolunteersButton != null) {
@@ -48,6 +57,13 @@ public class NgoDashboardActivity extends AppCompatActivity {
         }
 
         loadNgoName();
+        updateNotificationBadge();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateNotificationBadge();
     }
 
     private void loadNgoName() {
@@ -70,5 +86,22 @@ public class NgoDashboardActivity extends AppCompatActivity {
                     ngoNameText.setText(ngoName.trim());
                 })
                 .addOnFailureListener(error -> ngoNameText.setText("NGO Dashboard"));
+    }
+
+    private void updateNotificationBadge() {
+        if (notificationCountText == null) {
+            return;
+        }
+
+        int count = SosAlertStore.getUnseenCount(this);
+        if (count <= 0) {
+            notificationCountText.setVisibility(android.view.View.GONE);
+        } else if (count >= 10) {
+            notificationCountText.setText("10+");
+            notificationCountText.setVisibility(android.view.View.VISIBLE);
+        } else {
+            notificationCountText.setText(String.valueOf(count));
+            notificationCountText.setVisibility(android.view.View.VISIBLE);
+        }
     }
 }
