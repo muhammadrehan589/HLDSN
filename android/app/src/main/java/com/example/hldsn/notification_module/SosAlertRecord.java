@@ -12,6 +12,7 @@ public class SosAlertRecord {
     private static final String KEY_SEEN = "seen";
     private static final String KEY_LAT_MILLI = "latMilli";
     private static final String KEY_LON_MILLI = "lonMilli";
+    private static final String KEY_SENDER_NAME = "senderName";
 
     private final String messageId;
     private final String title;
@@ -20,14 +21,20 @@ public class SosAlertRecord {
     private final boolean seen;
     private final int latMilli;
     private final int lonMilli;
+    private final String senderName;
 
     /** Backward-compatible constructor (no location). */
     public SosAlertRecord(String messageId, String title, String subtitle, long timestampMs, boolean seen) {
-        this(messageId, title, subtitle, timestampMs, seen, 0, 0);
+        this(messageId, title, subtitle, timestampMs, seen, 0, 0, "");
     }
 
     public SosAlertRecord(String messageId, String title, String subtitle, long timestampMs, boolean seen,
                           int latMilli, int lonMilli) {
+        this(messageId, title, subtitle, timestampMs, seen, latMilli, lonMilli, "");
+    }
+
+    public SosAlertRecord(String messageId, String title, String subtitle, long timestampMs, boolean seen,
+                          int latMilli, int lonMilli, String senderName) {
         this.messageId = messageId;
         this.title = title;
         this.subtitle = subtitle;
@@ -35,6 +42,7 @@ public class SosAlertRecord {
         this.seen = seen;
         this.latMilli = latMilli;
         this.lonMilli = lonMilli;
+        this.senderName = senderName == null ? "" : senderName.trim();
     }
 
     public String getMessageId() { return messageId; }
@@ -44,10 +52,11 @@ public class SosAlertRecord {
     public boolean isSeen() { return seen; }
     public int getLatMilli() { return latMilli; }
     public int getLonMilli() { return lonMilli; }
+    public String getSenderName() { return senderName; }
     public boolean hasLocation() { return latMilli != 0 || lonMilli != 0; }
 
     public SosAlertRecord withSeen(boolean seenValue) {
-        return new SosAlertRecord(messageId, title, subtitle, timestampMs, seenValue, latMilli, lonMilli);
+        return new SosAlertRecord(messageId, title, subtitle, timestampMs, seenValue, latMilli, lonMilli, senderName);
     }
 
     public JSONObject toJson() throws JSONException {
@@ -59,6 +68,7 @@ public class SosAlertRecord {
         object.put(KEY_SEEN, seen);
         object.put(KEY_LAT_MILLI, latMilli);
         object.put(KEY_LON_MILLI, lonMilli);
+        object.put(KEY_SENDER_NAME, senderName);
         return object;
     }
 
@@ -70,7 +80,8 @@ public class SosAlertRecord {
                 object.optLong(KEY_TIMESTAMP),
                 object.optBoolean(KEY_SEEN, false),
                 object.optInt(KEY_LAT_MILLI, 0),
-                object.optInt(KEY_LON_MILLI, 0)
+                object.optInt(KEY_LON_MILLI, 0),
+                object.optString(KEY_SENDER_NAME, "")
         );
     }
 }

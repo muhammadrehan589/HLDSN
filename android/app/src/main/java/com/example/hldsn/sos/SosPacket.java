@@ -32,9 +32,13 @@ public final class SosPacket {
     static SosPacket createSos(double lat, double lon, int epochSeconds, String senderName) {
         SecureRandom random = new SecureRandom();
         long id = random.nextLong() & 0x0000FFFFFFFFFFFFL;
+        return createSos(id, lat, lon, epochSeconds, senderName);
+    }
+
+    static SosPacket createSos(long id, double lat, double lon, int epochSeconds, String senderName) {
         int latMilli = (int) Math.max(-90000, Math.min(90000, Math.round(lat * 1000d)));
         int lonMilli = (int) Math.max(-180000, Math.min(180000, Math.round(lon * 1000d)));
-        return new SosPacket(TYPE_SOS, id, latMilli, lonMilli, epochSeconds, DEFAULT_TTL, 0, senderName);
+        return new SosPacket(TYPE_SOS, id & 0x0000FFFFFFFFFFFFL, latMilli, lonMilli, epochSeconds, DEFAULT_TTL, 0, senderName);
     }
 
     static SosPacket createAck(long messageId) {

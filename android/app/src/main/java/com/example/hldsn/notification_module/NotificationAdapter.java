@@ -26,6 +26,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     private static final int COLOR_CARD_SOS    = 0xFF1C0D0D;
     private static final int COLOR_TITLE_NORMAL = Color.WHITE;
     private static final int COLOR_TITLE_SOS    = 0xFFFF474C;
+    private static final String SOS_UI_TRACE_TAG = "SOS_UI_TRACE";
 
     private final List<NotificationItem> items = new ArrayList<>();
     private final Context context;
@@ -56,6 +57,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.tvIncidentType.setText(item.getTitle());
         holder.tvIncidentLocation.setText(item.getSubtitle());
         holder.btnDetail.setText(item.getDetailLabel());
+
+        if (item.isSosAlert()) {
+            Log.d(SOS_UI_TRACE_TAG, "BIND_CARD id=" + item.getId()
+                    + " title=" + item.getTitle()
+                    + " subtitle=" + item.getSubtitle());
+        }
 
         if (item.isSosAlert()) {
             holder.cardView.setCardBackgroundColor(COLOR_CARD_SOS);
