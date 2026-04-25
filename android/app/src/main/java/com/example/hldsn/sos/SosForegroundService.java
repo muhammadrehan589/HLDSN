@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -37,14 +38,21 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.hldsn.mesh.MeshMessagingCoordinator;
+import com.example.hldsn.mesh.model.MeshIdentity;
+import com.example.hldsn.mesh.model.MeshMessage;
+import com.example.hldsn.mesh.model.RelayDecision;
 import com.example.hldsn.R;
 import com.example.hldsn.home.HomePageActivity;
 import com.example.hldsn.notification_module.SosAlertRecord;
 import com.example.hldsn.notification_module.SosAlertStore;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -54,6 +62,7 @@ import com.google.android.gms.tasks.CancellationTokenSource;
 
 import java.time.Instant;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -65,19 +74,37 @@ public class SosForegroundService extends Service {
     public static final String ACTION_SOS_STATUS = "com.example.hldsn.sos.ACTION_SOS_STATUS";
     public static final String ACTION_SOS_ALERTS_UPDATED = "com.example.hldsn.sos.ACTION_SOS_ALERTS_UPDATED";
     public static final String ACTION_OPEN_NOTIFICATIONS = "com.example.hldsn.sos.ACTION_OPEN_NOTIFICATIONS";
+    public static final String ACTION_SEND_MESH_MESSAGE = "com.example.hldsn.sos.ACTION_SEND_MESH_MESSAGE";
+    public static final String ACTION_MESH_MESSAGE_RECEIVED = "com.example.hldsn.sos.ACTION_MESH_MESSAGE_RECEIVED";
     public static final String EXTRA_SENDER_NAME = "extra_sender_name";
     public static final String EXTRA_STATUS = "extra_status";
+    public static final String EXTRA_MESH_DESTINATION_ID = "extra_mesh_destination_id";
+    public static final String EXTRA_MESH_TEXT = "extra_mesh_text";
+    public static final String EXTRA_MESH_TTL = "extra_mesh_ttl";
+    public static final String EXTRA_MESH_SOURCE_ID = "extra_mesh_source_id";
+    public static final String EXTRA_MESH_MESSAGE_ID = "extra_mesh_message_id";
+    public static final String EXTRA_MESH_PUBLIC_KEY = "extra_mesh_public_key";
+    public static final String EXTRA_MESH_DISPLAY_NAME = "extra_mesh_display_name";
+    public static final String EXTRA_MESH_DEVICE_NAME = "extra_mesh_device_name";
 
     private static final String TAG = "SosFgService";
+    private static final String SOS_TRACE_TAG = "SOS_TRACE";
+    private static final String MESH_TAG = "MeshMessaging";  // Dedicated tag for mesh offline messaging
     private static final String CHANNEL_ID = "sos_mesh_channel";
     private static final String ALERT_CHANNEL_ID = "sos_received_alerts";
+    private static final String MESH_ALERT_CHANNEL_ID = "mesh_received_alerts";
     private static final int NOTIFICATION_ID = 3101;
+    private static final int MESH_NOTIFICATION_BASE_ID = 6400;
 
     private static final long TICK_MS = 800L;
     private static final long ADVERTISE_WINDOW_MS = 650L;
     private static final long MAX_SEEN_AGE_MS = 2 * 60_000L;
     private static final long BLE_RETRY_COOLDOWN_MS = 10_000L;
     private static final long BLE_REINIT_MIN_INTERVAL_MS = 1_500L;
+    private static final long IDENTITY_BROADCAST_INTERVAL_MS = 15_000L;
+    private static final long GPS_MAX_STALE_MS = 600_000L; // 10 minutes
+    private static final float GPS_MAX_ACCURACY_METERS = 500f; 
+    private static final long GPS_SINGLE_FIX_TIMEOUT_MS = 10_000L;
     private static final String SOS_PREFS = "sos_sender_profile";
     private static final String KEY_CACHED_SENDER_NAME = "cached_sender_name";
 
@@ -101,6 +128,12 @@ public class SosForegroundService extends Service {
     private volatile boolean bleScanRunning;
 
     private FusedLocationProviderClient locationClient;
+    private MeshMessagingCoordinator meshCoordinator;
+    private long nextIdentityBroadcastAtMs;
+    private boolean identityBroadcastPending;
+    private LocationManager activeSingleFixManager;
+    private LocationListener activeSingleFixListener;
+    private Runnable activeSingleFixTimeout;
 
     private final Runnable meshTick = new Runnable() {
         @Override
@@ -158,6 +191,7 @@ public class SosForegroundService extends Service {
     public void onCreate() {
         super.onCreate();
         locationClient = LocationServices.getFusedLocationProviderClient(this);
+        meshCoordinator = new MeshMessagingCoordinator(this, resolveSenderName(null));
         Log.i(TAG, "Service created. Initializing mesh transports.");
         wifiDirectTransport = new WifiDirectTransport(this, new WifiDirectTransport.Callback() {
             @Override
@@ -166,12 +200,23 @@ public class SosForegroundService extends Service {
                 if (packet != null) {
                     Log.i(TAG, "Wi-Fi Direct full frame received: " + packetSummary(packet));
                     onPacketReceived(packet, true);
+                    return;
                 }
+                onMeshFrameReceived(frame);
             }
 
             @Override
             public void onStatus(String status) {
                 sendStatus(status);
+            }
+
+            @Override
+            public void onPeerLinksChanged(int activeConnections) {
+                Log.d(MESH_TAG, "topology: active_links=" + activeConnections);
+                identityBroadcastPending = true;
+                if (activeConnections > 0) {
+                    broadcastIdentityIfDue(true);
+                }
             }
         });
         registerBluetoothStateReceiver();
@@ -187,6 +232,9 @@ public class SosForegroundService extends Service {
         if (ACTION_TRIGGER_SOS.equals(action)) {
             startMesh();
             triggerSos(intent);
+        } else if (ACTION_SEND_MESH_MESSAGE.equals(action)) {
+            startMesh();
+            sendMeshMessage(intent);
         } else {
             startMesh();
         }
@@ -203,6 +251,7 @@ public class SosForegroundService extends Service {
     public void onDestroy() {
         Log.i(TAG, "Service destroy requested. Stopping mesh transports.");
         handler.removeCallbacksAndMessages(null);
+        clearSingleFixRequest();
         stopScanning();
         stopActiveAdvertiser();
         unregisterBluetoothStateReceiver();
@@ -289,8 +338,186 @@ public class SosForegroundService extends Service {
         if (wifiDirectTransport != null) {
             wifiDirectTransport.start();
         }
+        nextIdentityBroadcastAtMs = 0L;
+        identityBroadcastPending = true;
         handler.post(meshTick);
         sendStatus("HLDSN SOS mesh ready");
+    }
+
+    private void sendMeshMessage(@Nullable Intent intent) {
+        if (intent == null) {
+            return;
+        }
+        String destinationId = safeTrim(intent.getStringExtra(EXTRA_MESH_DESTINATION_ID));
+        String clearText = safeTrim(intent.getStringExtra(EXTRA_MESH_TEXT));
+        int ttl = Math.max(1, intent.getIntExtra(EXTRA_MESH_TTL, 5));
+        String destinationPublicKey = safeTrim(intent.getStringExtra(EXTRA_MESH_PUBLIC_KEY));
+        String destinationDisplayName = safeTrim(intent.getStringExtra(EXTRA_MESH_DISPLAY_NAME));
+        String destinationDeviceName = safeTrim(intent.getStringExtra(EXTRA_MESH_DEVICE_NAME));
+
+        Log.d(MESH_TAG, "sendMeshMessage: START dest=" + destinationId + " text_len=" + clearText.length()
+                + " ttl=" + ttl + " has_pubkey=" + !destinationPublicKey.isEmpty());
+
+        if (destinationId.isEmpty() || clearText.isEmpty()) {
+            Log.e(MESH_TAG, "sendMeshMessage: FAILED - destination or message empty");
+            sendStatus("Mesh send failed: destination or message missing");
+            return;
+        }
+        if (meshCoordinator == null || wifiDirectTransport == null) {
+            Log.e(MESH_TAG, "sendMeshMessage: FAILED - transport unavailable coordinator=" + (meshCoordinator != null)
+                    + " wfd=" + (wifiDirectTransport != null));
+            sendStatus("Mesh send failed: transport unavailable");
+            return;
+        }
+
+        if (!destinationPublicKey.isEmpty()) {
+            String display = destinationDisplayName.isEmpty() ? "Peer" : destinationDisplayName;
+            String device = destinationDeviceName.isEmpty() ? "Unknown device" : destinationDeviceName;
+            Log.d(MESH_TAG, "sendMeshMessage: saving peer dest=" + destinationId + " display=" + display + " device=" + device);
+            meshCoordinator.saveDiscoveredPeer(new MeshIdentity(destinationId, display, device, destinationPublicKey));
+        }
+
+        try {
+            Log.d(MESH_TAG, "sendMeshMessage: building encrypted message");
+            MeshMessage message = meshCoordinator.buildEncryptedMessage(destinationId, clearText, ttl);
+            Log.d(MESH_TAG, "sendMeshMessage: message built id=" + message.getMessageId() + " payload_len=" + message.getEncryptedPayload().length());
+
+            byte[] encoded = meshCoordinator.encodeMessage(message);
+            Log.d(MESH_TAG, "sendMeshMessage: message encoded frame_len=" + encoded.length);
+
+            wifiDirectTransport.sendFrame(encoded);
+            Log.i(MESH_TAG, "sendMeshMessage: SUCCESS queued for relay msg_id=" + message.getMessageId());
+
+            sendStatus("Mesh message queued for relay");
+            identityBroadcastPending = true;
+            broadcastIdentityIfDue(true);
+        } catch (IllegalArgumentException e) {
+            Log.e(MESH_TAG, "sendMeshMessage: FAILED - peer identity not discovered dest=" + destinationId, e);
+            sendStatus("Mesh send failed: peer identity not discovered");
+        } catch (Exception e) {
+            Log.e(MESH_TAG, "sendMeshMessage: FAILED - exception", e);
+            sendStatus("Mesh send failed");
+        }
+    }
+
+    private void onMeshFrameReceived(byte[] frame) {
+        if (meshCoordinator == null || frame == null || frame.length == 0) {
+            Log.d(MESH_TAG, "onMeshFrameReceived: skip - invalid input");
+            return;
+        }
+
+        Log.d(MESH_TAG, "onMeshFrameReceived: START frame_len=" + frame.length);
+
+        RelayDecision decision = meshCoordinator.onIncomingFrame(frame);
+        if (decision == null) {
+            Log.d(MESH_TAG, "onMeshFrameReceived: decision=null (likely identity frame)");
+            return;
+        }
+
+        Log.d(MESH_TAG, "onMeshFrameReceived: decision=" + decision.getAction() + " has_msg=" + (decision.getMessage() != null));
+
+        if (decision.getAction() == RelayDecision.Action.FORWARD && decision.getMessage() != null) {
+            if (wifiDirectTransport != null) {
+                Log.d(MESH_TAG, "onMeshFrameReceived: RELAYING message msg_id=" + decision.getMessage().getMessageId());
+                wifiDirectTransport.sendFrame(meshCoordinator.encodeMessage(decision.getMessage()));
+            }
+            sendStatus("Mesh relay forwarding message");
+            return;
+        }
+
+        if (decision.getAction() == RelayDecision.Action.DELIVER && decision.getMessage() != null) {
+            MeshMessage delivered = decision.getMessage();
+            String senderLabel = resolveMeshSenderLabel(delivered.getSourceId());
+            String clearText = decision.getClearText();
+            
+            Log.i(MESH_TAG, "onMeshFrameReceived: DELIVERING message msg_id=" + delivered.getMessageId() 
+                    + " from=" + delivered.getSourceId() + " text_len=" + (clearText != null ? clearText.length() : 0));
+
+            persistIncomingMeshMessage(delivered, senderLabel, clearText);
+
+            showReceivedMeshNotification(delivered.getMessageId(), senderLabel, clearText);
+
+            Intent deliveredIntent = new Intent(ACTION_MESH_MESSAGE_RECEIVED);
+            deliveredIntent.setPackage(getPackageName());
+            deliveredIntent.putExtra(EXTRA_MESH_MESSAGE_ID, delivered.getMessageId());
+            deliveredIntent.putExtra(EXTRA_MESH_SOURCE_ID, delivered.getSourceId());
+            deliveredIntent.putExtra(EXTRA_MESH_DESTINATION_ID, delivered.getDestinationId());
+
+            if (clearText != null && !clearText.isEmpty()) {
+                deliveredIntent.putExtra(EXTRA_MESH_TEXT, clearText);
+            }
+            try {
+                sendBroadcast(deliveredIntent);
+                Log.d(MESH_TAG, "onMeshFrameReceived: broadcast sent msg_id=" + delivered.getMessageId());
+            } catch (Exception e) {
+                Log.w(MESH_TAG, "onMeshFrameReceived: broadcast send failed", e);
+            }
+            return;
+        }
+
+        Log.d(MESH_TAG, "onMeshFrameReceived: decision=" + decision.getAction() + " - no action taken");
+    }
+
+    private void persistIncomingMeshMessage(MeshMessage delivered, String senderLabel, @Nullable String clearText) {
+        if (delivered == null || clearText == null || clearText.trim().isEmpty()) {
+            return;
+        }
+        FirebaseUser me = FirebaseAuth.getInstance().getCurrentUser();
+        if (me == null) {
+            Log.w(MESH_TAG, "persistIncomingMeshMessage: skipped user not authenticated");
+            return;
+        }
+
+        String currentUid = me.getUid();
+        String sourceMeshId = delivered.getSourceId() != null ? delivered.getSourceId().trim() : "";
+        if (sourceMeshId.isEmpty()) {
+            Log.w(MESH_TAG, "persistIncomingMeshMessage: skipped missing source mesh id");
+            return;
+        }
+
+        String[] ids = {currentUid, sourceMeshId};
+        Arrays.sort(ids);
+        String chatId = ids[0] + "_" + ids[1];
+
+        Timestamp now = Timestamp.now();
+        Map<String, Object> msgMap = new HashMap<>();
+        msgMap.put("senderId", sourceMeshId);
+        msgMap.put("senderName", senderLabel != null && !senderLabel.trim().isEmpty() ? senderLabel.trim() : "Mesh peer");
+        msgMap.put("text", clearText);
+        msgMap.put("timestamp", now);
+        msgMap.put("read", false);
+
+        String messageId = delivered.getMessageId() != null && !delivered.getMessageId().trim().isEmpty()
+                ? delivered.getMessageId().trim()
+                : String.valueOf(System.currentTimeMillis());
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("chats")
+                .document(chatId)
+                .collection("messages")
+                .document(messageId)
+                .set(msgMap, SetOptions.merge())
+                .addOnSuccessListener(v -> Log.d(MESH_TAG, "persistIncomingMeshMessage: stored msg_id=" + messageId + " chatId=" + chatId))
+                .addOnFailureListener(e -> Log.w(MESH_TAG, "persistIncomingMeshMessage: message write failed", e));
+
+        Map<String, Object> chatMeta = new HashMap<>();
+        chatMeta.put("participants", Arrays.asList(currentUid, sourceMeshId));
+        chatMeta.put("lastMessage", clearText);
+        chatMeta.put("lastMessageTime", now);
+        chatMeta.put("unreadCounts." + currentUid, FieldValue.increment(1));
+
+        db.collection("chats")
+                .document(chatId)
+                .set(chatMeta, SetOptions.merge())
+                .addOnFailureListener(e -> Log.w(MESH_TAG, "persistIncomingMeshMessage: chat meta write failed", e));
+    }
+
+    private String resolveMeshSenderLabel(String sourceId) {
+        if (meshCoordinator == null) {
+            return "Mesh peer";
+        }
+        MeshIdentity peer = meshCoordinator.getPeerByUserId(sourceId);
+        return peer == null ? "Mesh peer" : peer.getDisplayLabel();
     }
 
     @SuppressLint("MissingPermission")
@@ -336,15 +563,41 @@ public class SosForegroundService extends Service {
         Log.i(TAG, "SOS trigger requested.");
         final String senderHint = triggerIntent != null ? triggerIntent.getStringExtra(EXTRA_SENDER_NAME) : null;
         Log.d(TAG, "SOS trigger senderHint=" + (senderHint == null || senderHint.trim().isEmpty() ? "none" : senderHint));
-        if (!hasLocationPermission()) {
-            Log.w(TAG, "SOS blocked: no location permission.");
-            sendStatus("Location permission required for SOS");
+
+        // --- STEP A: IMMEDIATE BEST-EFFORT DISPATCH ---
+        // Don't wait for fresh GPS. Send with whatever we have immediately.
+        sendStatus("Sending SOS alert...");
+        long immediatePacketId = -1L;
+        try {
+            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            Location lastGps = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Location lastNet = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            Location bestAvailable = chooseBetterLocation(lastGps, lastNet);
+
+            if (bestAvailable != null) {
+                Log.i(TAG, "Immediate SOS dispatch using cached location: " + bestAvailable.getProvider());
+                immediatePacketId = queueOriginSos(bestAvailable.getLatitude(), bestAvailable.getLongitude(), senderHint);
+            } else {
+                Log.i(TAG, "No cached location. Sending Blind SOS (0,0).");
+                immediatePacketId = queueOriginSos(0, 0, senderHint);
+            }
+        } catch (SecurityException e) {
+            Log.w(TAG, "Permission error during immediate dispatch", e);
+            immediatePacketId = queueOriginSos(0, 0, senderHint);
+        }
+
+        final long existingPacketId = immediatePacketId;
+
+        // --- STEP B: BACKGROUND HIGH-ACCURACY REFINEMENT ---
+        clearSingleFixRequest();
+        if (!hasFineLocationPermission()) {
+            Log.w(TAG, "Background GPS refinement skipped: permission missing.");
             return;
         }
 
         if (forceLocationManagerFallback) {
             Log.i(TAG, "Using forced LocationManager fallback (FLP disabled for session).");
-            fetchLocationManagerFallback(senderHint);
+            fetchLocationManagerFallback(senderHint, existingPacketId);
             return;
         }
 
@@ -352,7 +605,7 @@ public class SosForegroundService extends Service {
             Log.w(TAG, "Google Play services unavailable. Using LocationManager fallback.");
             sendStatus("Using device GPS fallback");
             forceLocationManagerFallback = true;
-            fetchLocationManagerFallback(senderHint);
+            fetchLocationManagerFallback(senderHint, existingPacketId);
             return;
         }
 
@@ -364,12 +617,12 @@ public class SosForegroundService extends Service {
             com.google.android.gms.tasks.Task<android.location.Location> task =
                     locationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, tokenSource.getToken());
             task.addOnSuccessListener(location -> {
-                if (location != null) {
+                if (isValidSosLocation(location)) {
                     Log.i(TAG, "FLP current location success lat=" + location.getLatitude() + " lon=" + location.getLongitude());
-                    queueOriginSos(location.getLatitude(), location.getLongitude(), senderHint);
+                    sendSosWithResolvedLocation(location, senderHint, existingPacketId);
                 } else {
-                    Log.w(TAG, "FLP current location returned null. Trying fallback chain.");
-                    fetchLastLocationFallback(senderHint);
+                    Log.w(TAG, "FLP current location unavailable or invalid. Trying fallback chain.");
+                    fetchLastLocationFallback(senderHint, existingPacketId);
                 }
             }).addOnFailureListener(e -> {
                 Log.w(TAG, "getCurrentLocation failed", e);
@@ -378,14 +631,15 @@ public class SosForegroundService extends Service {
                     sendStatus("Google location service unstable, using device GPS fallback");
                     Log.w(TAG, "Detected broker package failure. Forcing LocationManager fallback for this session.");
                 }
-                fetchLastLocationFallback(senderHint);
+                fetchLastLocationFallback(senderHint, existingPacketId);
             });
         } catch (SecurityException sec) {
             if (isBrokerPackageFailure(sec)) {
                 forceLocationManagerFallback = true;
                 sendStatus("Google location service unstable, using device GPS fallback");
                 Log.w(TAG, "SecurityException from FLP broker. Switching to LocationManager fallback.", sec);
-                fetchLocationManagerFallback(senderHint);
+                fetchLocationManagerFallback(senderHint, existingPacketId);
+
                 return;
             }
             Log.w(TAG, "SecurityException while requesting FLP location.", sec);
@@ -393,30 +647,30 @@ public class SosForegroundService extends Service {
         } catch (RuntimeException runtimeException) {
             Log.w(TAG, "FLP runtime failure. Falling back to LocationManager.", runtimeException);
             forceLocationManagerFallback = true;
-            fetchLocationManagerFallback(senderHint);
+            fetchLocationManagerFallback(senderHint, existingPacketId);
         }
     }
 
     @SuppressLint("MissingPermission")
-    private void fetchLastLocationFallback(@Nullable String senderHint) {
-        if (!hasLocationPermission()) {
-            Log.w(TAG, "No location permission during fallback. Sending SOS with 0,0.");
-            queueOriginSos(0d, 0d, senderHint);
+    private void fetchLastLocationFallback(@Nullable String senderHint, long existingPacketId) {
+        if (!hasFineLocationPermission()) {
+            Log.w(TAG, "No precise location permission during fallback.");
+            sendStatus("Unable to fetch precise GPS location");
             return;
         }
         if (forceLocationManagerFallback) {
             Log.i(TAG, "Skipping FLP lastLocation due to forced fallback flag.");
-            fetchLocationManagerFallback(senderHint);
+            fetchLocationManagerFallback(senderHint, existingPacketId);
             return;
         }
         locationClient.getLastLocation()
                 .addOnSuccessListener(location -> {
-                    if (location != null) {
+                    if (isValidSosLocation(location)) {
                         Log.i(TAG, "FLP lastLocation success lat=" + location.getLatitude() + " lon=" + location.getLongitude());
-                        queueOriginSos(location.getLatitude(), location.getLongitude(), senderHint);
+                        sendSosWithResolvedLocation(location, senderHint, existingPacketId);
                     } else {
-                        Log.w(TAG, "FLP lastLocation returned null. Using LocationManager fallback.");
-                        fetchLocationManagerFallback(senderHint);
+                        Log.w(TAG, "FLP lastLocation unavailable/invalid. Using LocationManager fallback.");
+                        fetchLocationManagerFallback(senderHint, existingPacketId);
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -425,7 +679,7 @@ public class SosForegroundService extends Service {
                         forceLocationManagerFallback = true;
                         Log.w(TAG, "Broker failure confirmed during lastLocation. Keeping forced fallback enabled.");
                     }
-                    fetchLocationManagerFallback(senderHint);
+                    fetchLocationManagerFallback(senderHint, existingPacketId);
                 });
     }
 
@@ -437,18 +691,18 @@ public class SosForegroundService extends Service {
         return message != null && message.contains("Unknown calling package name 'com.google.android.gms'");
     }
 
-    private void fetchLocationManagerFallback(@Nullable String senderHint) {
-        if (!hasLocationPermission()) {
-            Log.w(TAG, "LocationManager fallback blocked: no location permission. Sending 0,0.");
-            queueOriginSos(0d, 0d, senderHint);
+    private void fetchLocationManagerFallback(@Nullable String senderHint, long existingPacketId) {
+        if (!hasFineLocationPermission()) {
+            Log.w(TAG, "LocationManager fallback blocked: no precise location permission.");
+            sendStatus("Enable precise location to send SOS with GPS");
             return;
         }
 
         try {
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             if (locationManager == null) {
-                Log.w(TAG, "LocationManager unavailable. Sending SOS with 0,0.");
-                queueOriginSos(0d, 0d, senderHint);
+                Log.w(TAG, "LocationManager unavailable.");
+                sendStatus("Unable to access device GPS");
                 return;
             }
 
@@ -464,17 +718,106 @@ public class SosForegroundService extends Service {
             Log.i(TAG, "LocationManager fallback providers gps=" + (gps != null) + " network=" + (network != null));
 
             Location best = chooseBetterLocation(gps, network);
-            if (best != null) {
+            if (isValidSosLocation(best)) {
                 Log.i(TAG, "LocationManager fallback selected lat=" + best.getLatitude() + " lon=" + best.getLongitude());
-                queueOriginSos(best.getLatitude(), best.getLongitude(), senderHint);
+                sendSosWithResolvedLocation(best, senderHint, existingPacketId);
             } else {
-                Log.w(TAG, "No last known location from providers. Sending SOS with 0,0.");
-                queueOriginSos(0d, 0d, senderHint);
+                Log.w(TAG, "No valid last known location from providers. Requesting single GPS fix.");
+                requestSingleGpsFix(locationManager, senderHint, existingPacketId);
             }
         } catch (SecurityException e) {
             Log.w(TAG, "LocationManager fallback permission error", e);
-            queueOriginSos(0d, 0d, senderHint);
+            sendStatus("Unable to get GPS location permission");
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void requestSingleGpsFix(LocationManager locationManager, @Nullable String senderHint, long existingPacketId) {
+        clearSingleFixRequest();
+        String provider = null;
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            provider = LocationManager.GPS_PROVIDER;
+        } else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            provider = LocationManager.NETWORK_PROVIDER;
+        }
+        if (provider == null) {
+            sendStatus("Enable GPS/location services, then retry SOS");
+            return;
+        }
+
+        activeSingleFixManager = locationManager;
+        activeSingleFixListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@Nullable Location location) {
+                clearSingleFixRequest();
+                if (isValidSosLocation(location)) {
+                    Log.i(TAG, "Single GPS fix received lat=" + location.getLatitude() + " lon=" + location.getLongitude());
+                    sendSosWithResolvedLocation(location, senderHint, existingPacketId);
+                } else {
+                    sendStatus("Unable to get valid GPS fix. Retry SOS.");
+                }
+            }
+        };
+        activeSingleFixTimeout = () -> {
+            clearSingleFixRequest();
+            sendStatus("GPS timeout. Move outdoors and retry SOS");
+        };
+
+        locationManager.requestSingleUpdate(provider, activeSingleFixListener, Looper.getMainLooper());
+        handler.postDelayed(activeSingleFixTimeout, GPS_SINGLE_FIX_TIMEOUT_MS);
+    }
+
+    private void clearSingleFixRequest() {
+        if (activeSingleFixManager != null && activeSingleFixListener != null) {
+            try {
+                activeSingleFixManager.removeUpdates(activeSingleFixListener);
+            } catch (Exception ignored) {
+                // Listener may already be removed.
+            }
+        }
+        if (activeSingleFixTimeout != null) {
+            handler.removeCallbacks(activeSingleFixTimeout);
+        }
+        activeSingleFixManager = null;
+        activeSingleFixListener = null;
+        activeSingleFixTimeout = null;
+    }
+
+    private void sendSosWithResolvedLocation(Location location, @Nullable String senderHint, long existingPacketId) {
+        if (!isValidSosLocation(location)) {
+            sendStatus("Unable to get valid GPS location");
+            return;
+        }
+        queueOriginSos(location.getLatitude(), location.getLongitude(), senderHint, existingPacketId);
+    }
+
+    private boolean isValidSosLocation(@Nullable Location location) {
+        if (location == null) {
+            Log.d(TAG, "Location rejected: null");
+            return false;
+        }
+        if (!isValidSosCoordinates(location.getLatitude(), location.getLongitude())) {
+            Log.d(TAG, "Location rejected: invalid coordinates (" + location.getLatitude() + "," + location.getLongitude() + ")");
+            return false;
+        }
+        long ageMs = Math.max(0L, System.currentTimeMillis() - location.getTime());
+        if (ageMs > GPS_MAX_STALE_MS) {
+            Log.d(TAG, "Location rejected: too stale (" + (ageMs / 1000) + "s > " + (GPS_MAX_STALE_MS / 1000) + "s)");
+            return false;
+        }
+        if (location.hasAccuracy() && location.getAccuracy() > GPS_MAX_ACCURACY_METERS) {
+            Log.d(TAG, "Location rejected: low accuracy (" + location.getAccuracy() + "m > " + GPS_MAX_ACCURACY_METERS + "m)");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isValidSosCoordinates(double lat, double lon) {
+        // Allow (0,0) specifically for Blind SOS (no GPS available)
+        if (Math.abs(lat) < 0.000001d && Math.abs(lon) < 0.000001d) {
+            return true;
+        }
+        return lat >= -90d && lat <= 90d && lon >= -180d && lon <= 180d;
     }
 
     private Location chooseBetterLocation(Location first, Location second) {
@@ -495,18 +838,36 @@ public class SosForegroundService extends Service {
         return status == ConnectionResult.SUCCESS;
     }
 
-    private void queueOriginSos(double lat, double lon, @Nullable String senderHint) {
+    private long queueOriginSos(double lat, double lon, @Nullable String senderHint) {
+        return queueOriginSos(lat, lon, senderHint, -1L);
+    }
+
+    private long queueOriginSos(double lat, double lon, @Nullable String senderHint, long existingPacketId) {
         int nowEpoch = (int) Instant.now().getEpochSecond();
         String senderName = resolveSenderName(senderHint);
-        SosPacket packet = SosPacket.createSos(lat, lon, nowEpoch, senderName);
+
+        SosPacket packet;
+        if (existingPacketId != -1L) {
+            packet = SosPacket.createSos(existingPacketId, lat, lon, nowEpoch, senderName);
+        } else {
+            packet = SosPacket.createSos(lat, lon, nowEpoch, senderName);
+        }
+
         synchronized (lock) {
             seenSosAt.put(packet.messageId, SystemClock.elapsedRealtime());
             originStates.put(packet.messageId, new OriginState(SystemClock.elapsedRealtime()));
             outbound.addFirst(new QueuedPacket(packet, SystemClock.elapsedRealtime() + 10_000L, 12, true));
         }
-        Log.i(TAG, "Queued origin SOS: " + packetSummary(packet) + " lat=" + lat + " lon=" + lon + " sender=" + senderName);
+        Log.i(TAG, "Queued origin SOS: " + packetSummary(packet) + " lat=" + lat + " lon=" + lon + " sender=" + senderName + " refined=" + (existingPacketId != -1L));
+        Log.i(SOS_TRACE_TAG, "ORIGIN_SOS id=" + packet.shortId()
+                + " sender=" + senderName
+                + " lat=" + lat
+                + " lon=" + lon
+                + " epoch=" + nowEpoch
+                + " refined=" + (existingPacketId != -1L));
         updateNotification("Broadcasting SOS " + packet.shortId());
-        sendStatus("SOS broadcast started");
+        sendStatus(existingPacketId != -1L ? "SOS location refined" : "SOS broadcast started");
+        return packet.messageId;
     }
 
     private void onPacketReceived(SosPacket packet, boolean fullFrameReceived) {
@@ -540,6 +901,15 @@ public class SosForegroundService extends Service {
 
         if (isNew || fullFrameReceived) {
             SosAlertRecord alertRecord = SosAlertStore.saveOrUpdateAlert(this, packet, fullFrameReceived);
+            Log.i(SOS_TRACE_TAG, "ALERT_STORE_WRITE id=" + packet.shortId()
+                    + " transport=" + (fullFrameReceived ? "WIFI_FULL" : "BLE_BEACON")
+                    + " packet_latMilli=" + packet.getLatMilli()
+                    + " packet_lonMilli=" + packet.getLonMilli()
+                    + " packet_sender=" + packet.getSenderName()
+                    + " stored_hasLocation=" + alertRecord.hasLocation()
+                    + " stored_latMilli=" + alertRecord.getLatMilli()
+                    + " stored_lonMilli=" + alertRecord.getLonMilli()
+                    + " stored_sender=" + alertRecord.getSenderName());
             notifyAlertListUpdated();
             if (isNew) {
                 showReceivedSosNotification(packet, alertRecord);
@@ -616,6 +986,9 @@ public class SosForegroundService extends Service {
             queued = pickNextPacketLocked();
         }
         if (queued == null) {
+            if (wifiDirectTransport != null && wifiDirectTransport.isReady()) {
+                broadcastIdentityIfDue(false);
+            }
             return;
         }
 
@@ -657,16 +1030,24 @@ public class SosForegroundService extends Service {
             wifiDirectTransport.sendFrame(fullFrame);
             sentOnWifi = true;
             Log.d(TAG, "SOS_WIFI_SEND packet=" + packetSummary(queued.packet));
+            Log.d(SOS_TRACE_TAG, "TX_WIFI id=" + queued.packet.shortId() + " reason=chosen_wifi");
         }
 
         if (chosen == TransportSelector.Transport.BLE && bleReady) {
+            if (queued.packet.type == SosPacket.TYPE_SOS && wifiReady && wifiDirectTransport != null && queued.hasFullPayload && !sentOnWifi) {
+                wifiDirectTransport.sendFrame(fullFrame);
+                sentOnWifi = true;
+                Log.d(SOS_TRACE_TAG, "TX_WIFI id=" + queued.packet.shortId() + " reason=parallel_with_ble");
+            }
             advertiseFrame(queued);
+            Log.d(SOS_TRACE_TAG, "TX_BLE id=" + queued.packet.shortId() + " reason=chosen_ble");
             return;
         }
 
         if (!wifiReady && bleReady) {
             Log.d(TAG, "SOS_FALLBACK using BLE because Wi-Fi Direct not ready. packet=" + packetSummary(queued.packet));
             advertiseFrame(queued);
+            Log.d(SOS_TRACE_TAG, "TX_BLE id=" + queued.packet.shortId() + " reason=wifi_unavailable");
             return;
         }
 
@@ -674,15 +1055,40 @@ public class SosForegroundService extends Service {
             if (!sentOnWifi && wifiDirectTransport != null && queued.hasFullPayload) {
                 Log.d(TAG, "SOS_WIFI_ATTEMPT packet=" + packetSummary(queued.packet));
                 wifiDirectTransport.sendFrame(fullFrame);
+                Log.d(SOS_TRACE_TAG, "TX_WIFI id=" + queued.packet.shortId() + " reason=final_attempt");
             }
             if (bleReady) {
                 Log.d(TAG, "SOS_BLE_ATTEMPT packet=" + packetSummary(queued.packet));
                 advertiseFrame(queued);
+                Log.d(SOS_TRACE_TAG, "TX_BLE id=" + queued.packet.shortId() + " reason=final_attempt");
             } else if (!wifiReady) {
                 Log.w(TAG, "SOS_NOT_SENT packet=" + packetSummary(queued.packet)
                         + " reason=no_transport_ready");
+                Log.w(SOS_TRACE_TAG, "TX_FAIL id=" + queued.packet.shortId() + " reason=no_transport_ready");
             }
         }
+    }
+
+    private void broadcastIdentityIfDue(boolean force) {
+        if (meshCoordinator == null || wifiDirectTransport == null) {
+            Log.d(MESH_TAG, "identityBroadcast: skipped coordinator_or_transport_missing");
+            return;
+        }
+        if (!wifiDirectTransport.isReady()) {
+            identityBroadcastPending = true;
+            Log.d(MESH_TAG, "identityBroadcast: skipped transport_not_ready pending=true");
+            return;
+        }
+        long now = SystemClock.elapsedRealtime();
+        if (!force && !identityBroadcastPending && now < nextIdentityBroadcastAtMs) {
+            Log.d(MESH_TAG, "identityBroadcast: skipped cooldown remaining_ms=" + (nextIdentityBroadcastAtMs - now));
+            return;
+        }
+        byte[] frame = meshCoordinator.buildIdentityFrame();
+        Log.d(MESH_TAG, "identityBroadcast: sending frame_len=" + frame.length + " force=" + force);
+        identityBroadcastPending = false;
+        wifiDirectTransport.sendFrame(frame);
+        nextIdentityBroadcastAtMs = now + IDENTITY_BROADCAST_INTERVAL_MS;
     }
 
     private String buildBleBlockedReason(boolean btEnabled, boolean blePermission) {
@@ -942,6 +1348,14 @@ public class SosForegroundService extends Service {
         );
         alertChannel.setDescription("Popup alerts for nearby SOS detections");
         manager.createNotificationChannel(alertChannel);
+
+        NotificationChannel meshAlertChannel = new NotificationChannel(
+                MESH_ALERT_CHANNEL_ID,
+                "Mesh Messages",
+                NotificationManager.IMPORTANCE_HIGH
+        );
+        meshAlertChannel.setDescription("Popup alerts for encrypted offline mesh messages");
+        manager.createNotificationChannel(meshAlertChannel);
     }
 
     private void sendStatus(String status) {
@@ -993,6 +1407,28 @@ public class SosForegroundService extends Service {
         }
     }
 
+    private void showReceivedMeshNotification(String messageId, String senderLabel, String text) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        Notification notification = new NotificationCompat.Builder(this, MESH_ALERT_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle("New offline message")
+                .setContentText(senderLabel + ": " + text)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(senderLabel + ": " + text))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .build();
+
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (manager != null) {
+            manager.notify(MESH_NOTIFICATION_BASE_ID + Math.abs(messageId.hashCode() % 1000), notification);
+        }
+    }
+
     private boolean isBleInCooldown() {
         return bleUnavailableUntilMs > SystemClock.elapsedRealtime();
     }
@@ -1040,6 +1476,11 @@ public class SosForegroundService extends Service {
                 == PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private boolean hasFineLocationPermission() {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     private boolean canScan() {

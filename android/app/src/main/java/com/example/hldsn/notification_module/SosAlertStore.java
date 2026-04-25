@@ -20,6 +20,7 @@ import java.util.Locale;
 public final class SosAlertStore {
 
     private static final String TAG = "SosAlertStore";
+    private static final String TRACE_TAG = "SOS_ALERT_TRACE";
     private static final String PREFS_NAME = "sos_alert_store";
     private static final String KEY_ALERTS = "alerts";
     private static final int MAX_ALERTS = 25;
@@ -31,25 +32,48 @@ public final class SosAlertStore {
         List<SosAlertRecord> alerts = getAlerts(context);
         String messageId = packet.shortId();
         long timestampMs = packet.getEpochSeconds() > 0 ? packet.getEpochSeconds() * 1000L : System.currentTimeMillis();
-        String sender = packet.getSenderName();
-        String title = buildTitle(fullFrameReceived, sender);
-        String subtitle = buildSubtitle(packet, fullFrameReceived, timestampMs);
+        String packetSender = packet.getSenderName();
+        int mergedLat = packet.getLatMilli();
+        int mergedLon = packet.getLonMilli();
+        String mergedSender = packetSender == null ? "" : packetSender.trim();
+        boolean seen = false;
 
-        SosAlertRecord updated = new SosAlertRecord(messageId, title, subtitle, timestampMs, false,
-                packet.getLatMilli(), packet.getLonMilli());
         boolean replaced = false;
         for (int i = 0; i < alerts.size(); i++) {
             SosAlertRecord current = alerts.get(i);
             if (messageId.equals(current.getMessageId())) {
-                boolean keepSeen = current.isSeen() && !fullFrameReceived;
-                // Prefer non-zero coordinates: keep existing if new packet has no location
-                int lat = packet.getLatMilli() != 0 ? packet.getLatMilli() : current.getLatMilli();
-                int lon = packet.getLonMilli() != 0 ? packet.getLonMilli() : current.getLonMilli();
-                updated = new SosAlertRecord(messageId, title, subtitle, timestampMs,
-                        keepSeen ? current.isSeen() : false, lat, lon);
-                alerts.set(i, updated);
+                Log.d(TRACE_TAG, "MERGE_BEFORE id=" + messageId
+                        + " fullFrame=" + fullFrameReceived
+                        + " packet_sender=" + mergedSender
+                        + " packet_latMilli=" + mergedLat
+                        + " packet_lonMilli=" + mergedLon
+                        + " existing_sender=" + current.getSenderName()
+                        + " existing_latMilli=" + current.getLatMilli()
+                        + " existing_lonMilli=" + current.getLonMilli());
+                seen = current.isSeen() && !fullFrameReceived;
+                if (mergedLat == 0 && mergedLon == 0 && current.hasLocation()) {
+                    mergedLat = current.getLatMilli();
+                    mergedLon = current.getLonMilli();
+                }
+                if (mergedSender.isEmpty()) {
+                    mergedSender = current.getSenderName();
+                }
                 replaced = true;
                 break;
+            }
+        }
+
+        String title = buildTitle(fullFrameReceived, mergedSender);
+        String subtitle = buildSubtitle(mergedSender, mergedLat, mergedLon, fullFrameReceived, timestampMs);
+        SosAlertRecord updated = new SosAlertRecord(messageId, title, subtitle, timestampMs, seen,
+                mergedLat, mergedLon, mergedSender);
+
+        if (replaced) {
+            for (int i = 0; i < alerts.size(); i++) {
+                if (messageId.equals(alerts.get(i).getMessageId())) {
+                    alerts.set(i, updated);
+                    break;
+                }
             }
         }
         if (!replaced) {
@@ -62,6 +86,12 @@ public final class SosAlertStore {
         }
         persist(context, alerts);
         Log.d(TAG, "Stored SOS alert " + messageId + " fullFrame=" + fullFrameReceived);
+        Log.i(TRACE_TAG, "MERGE_AFTER id=" + messageId
+                + " fullFrame=" + fullFrameReceived
+                + " stored_sender=" + updated.getSenderName()
+                + " stored_latMilli=" + updated.getLatMilli()
+                + " stored_lonMilli=" + updated.getLonMilli()
+                + " hasLocation=" + updated.hasLocation());
         return updated;
     }
 
@@ -133,11 +163,11 @@ public final class SosAlertStore {
                 .apply();
     }
 
-    private static String buildSubtitle(SosPacket packet, boolean fullFrameReceived, long timestampMs) {
+    private static String buildSubtitle(String senderName, int latMilli, int lonMilli, boolean fullFrameReceived, long timestampMs) {
         String time = new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(new Date(timestampMs));
-        String senderPart = packet.getSenderName().isEmpty() ? "" : "From: " + packet.getSenderName() + " • ";
-        if (fullFrameReceived && packet.getLatMilli() != 0 && packet.getLonMilli() != 0) {
-            return senderPart + "Location: " + (packet.getLatMilli() / 1000.0d) + ", " + (packet.getLonMilli() / 1000.0d) + " • " + time;
+        String senderPart = senderName == null || senderName.trim().isEmpty() ? "" : "From: " + senderName.trim() + " • ";
+        if (latMilli != 0 || lonMilli != 0) {
+            return senderPart + String.format(Locale.US, "Location: %.6f, %.6f • %s", latMilli / 1000.0d, lonMilli / 1000.0d, time);
         }
         return senderPart + (fullFrameReceived ? "Emergency details received" : "Emergency beacon received") + " • " + time;
     }
