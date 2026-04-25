@@ -13,4 +13,14 @@
     <string name="edhi_icon_desc">Edhi Icon</string>
     <string name="hospital_icon_desc">Hospital Icon</string>
     <string name="police_icon_desc">Police Icon</string>
+    <string name="news_back">Navigate back</string>
+    <string name="news_title">Natural Disaster News</string>
+    <string name="news_detail_title">News Detail</string>
+    <string name="news_image_desc">News image</string>
+    <string name="news_read_more">Read more</string>
+    <string name="news_read_less">Read less</string>
+    <string name="news_next_page">Next</string>
+    <string name="news_fallback_notice">Showing cached demo news while API is unavailable.</string>
+    <string name="news_sample_headline">Monsoon Flooding Displaces Families in Southern Sindh</string>
+    <string name="news_sample_description">Heavy monsoon rain has flooded low-lying villages near Badin, with rescue teams shifting families to temporary camps.</string>
 </resources>

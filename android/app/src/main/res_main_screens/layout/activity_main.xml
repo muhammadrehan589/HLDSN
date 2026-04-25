@@ -82,24 +82,25 @@
             </FrameLayout>
         </RelativeLayout>
 
-        <!-- Banner Section -->
+        <!-- News Carousel Section -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="180dp"
             android:layout_marginTop="12dp"
             android:layout_marginHorizontal="16dp"
             android:layout_marginBottom="12dp"
-            android:background="@drawable/banner_card_bg"
-            android:clipToOutline="true"
             android:elevation="2dp">
 
             <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/news_slider"
+                android:id="@+id/news_view_pager"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:background="@drawable/banner_card_bg"
+                android:clipToOutline="true" />
 
+            <!-- Carousel Dots -->
             <LinearLayout
-                android:id="@+id/news_slider_dots"
+                android:id="@+id/carousel_dots_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center_horizontal"
