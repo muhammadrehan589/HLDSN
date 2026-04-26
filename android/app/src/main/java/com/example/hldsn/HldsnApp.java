@@ -6,6 +6,7 @@ import android.util.Log;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.PersistentCacheSettings;
+import org.osmdroid.config.Configuration;
 
 /**
  * Application entry-point.
@@ -19,7 +20,16 @@ public class HldsnApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        configureOsmdroid();
         configureFirestoreOffline();
+    }
+
+    private void configureOsmdroid() {
+        Configuration.getInstance().load(
+                getApplicationContext(),
+                getSharedPreferences("osmdroid", MODE_PRIVATE)
+        );
+        Configuration.getInstance().setUserAgentValue(getPackageName());
     }
 
     private void configureFirestoreOffline() {

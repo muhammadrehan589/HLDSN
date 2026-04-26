@@ -8,7 +8,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.hldsn.home.HomePageActivity;
+import com.example.hldsn.auth.RoleBasedNavigator;
 import com.example.hldsn.R;
 import com.example.hldsn.mesh.identity.MeshIdentityManager;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,10 +27,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         if (auth != null && auth.getCurrentUser() != null) {
             ensureMeshIdentityAndSync(auth.getCurrentUser());
-            Intent intent = new Intent(LoginActivity.this, HomePageActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
+            RoleBasedNavigator.routeAfterLogin(this, auth.getCurrentUser());
         }
     }
 
@@ -78,11 +75,7 @@ public class LoginActivity extends AppCompatActivity {
                         FirebaseUser user = auth.getCurrentUser();
                         if (user != null) {
                             ensureMeshIdentityAndSync(user);
-                            // User successfully logged in
-                            Intent intent = new Intent(LoginActivity.this, HomePageActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                            finish();
+                            RoleBasedNavigator.routeAfterLogin(LoginActivity.this, user);
                         }
                     } else {
                         String error = task.getException() != null

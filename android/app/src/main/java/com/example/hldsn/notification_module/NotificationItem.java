@@ -59,7 +59,7 @@ public class NotificationItem {
                 TYPE_SOS,
                 alert.getTitle(),
                 alert.getSubtitle(),
-                "Details",
+                "View Location",
                 alert.getTimestampMs(),
                 json
         );
