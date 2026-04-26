@@ -18,7 +18,7 @@
         android:background="@drawable/header_gradient">
 
         <ImageView
-            android:id="@+id/chatBackIcon"
+            android:id="@+id/backButton"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_centerVertical="true"

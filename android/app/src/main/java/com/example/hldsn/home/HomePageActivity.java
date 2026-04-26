@@ -16,6 +16,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,6 +43,7 @@ import com.example.hldsn.notification_module.SosAlertRecord;
 import com.example.hldsn.notification_module.SosAlertStore;
 import com.example.hldsn.services.news.NewsActivity;
 import com.example.hldsn.services.safety_tips.SafetyTipsActivity;
+import com.example.hldsn.sos.SosListenerService;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -672,6 +674,19 @@ public class HomePageActivity extends AppCompatActivity {
         });
 
         dialog.show();
+    }
+
+    // ── SOS ───────────────────────────────────────────────────────────────────
+
+    private void showSosConfirmDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("🊘 Send SOS Alert?")
+                .setMessage("This will IMMEDIATELY alert all your contacts with your "
+                        + "current location.\n\nOnly use in a real emergency.")
+                .setPositiveButton("YES, SEND SOS", (dialog, which) -> triggerSos())
+                .setNegativeButton("Cancel", null)
+                .setCancelable(true)
+                .show();
     }
 
     private void requestNearbyGroupIfNeeded() {

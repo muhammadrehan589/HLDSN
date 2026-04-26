@@ -61,6 +61,19 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- Foreground service (required for SosListenerService) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"
+        tools:targetApi="34" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"
+        tools:targetApi="34" />
+
+    <!-- Vibration (SOS alert feedback) -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- Wake lock (keep CPU alive during offline SOS broadcast) -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <!-- ==================== APPLICATION ==================== -->
     <application
         android:name=".HldsnApp"
@@ -98,6 +111,10 @@
         <activity android:name=".services.news.NewsDetailActivity" android:exported="false" />
         <activity android:name=".login_module.SaveUserProfileActivity" android:exported="false" />
         <activity android:name=".login_module.UserProfileActivity" android:exported="false" />
+        <activity android:name=".volunteer.VolunteerBasicFormActivity" android:exported="false" />
+        <activity android:name=".volunteer.VolunteerSkillsFormActivity" android:exported="false" />
+        <activity android:name=".volunteer.VolunteerAgreementActivity" android:exported="false" />
+        <activity android:name=".volunteer.VolunteerSuccessActivity" android:exported="false" />
         <activity android:name=".incident_report_module.DisplayReportActivity" android:exported="false"/>
         <activity android:name=".services.safety_tips.SafetyTypeActivity" android:exported="false"/>
         <activity android:name=".sos.SosDetailActivity" android:exported="false"/>
@@ -105,6 +122,12 @@
         <service
             android:name=".sos.SosForegroundService"
             android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice|location" />
+
+        <!-- SOS background listener service -->
+        <service
+            android:name=".sos.SosListenerService"
             android:exported="false"
             android:foregroundServiceType="connectedDevice|location" />
 

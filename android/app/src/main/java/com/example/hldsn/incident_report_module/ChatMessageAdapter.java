@@ -21,6 +21,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private static final int VIEW_TYPE_SENT     = 1;
     private static final int VIEW_TYPE_RECEIVED = 2;
+    private static final int VIEW_TYPE_SOS      = 3;   // full-width red alert card
 
     private final Context           context;
     private final List<ChatMessage> messages;
@@ -38,6 +39,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public int getItemViewType(int position) {
         ChatMessage msg = messages.get(position);
+        if (msg.isSosMessage()) return VIEW_TYPE_SOS;
         return msg.getSenderId() != null && msg.getSenderId().equals(currentUid)
                 ? VIEW_TYPE_SENT
                 : VIEW_TYPE_RECEIVED;
@@ -47,7 +49,10 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inf = LayoutInflater.from(context);
-        if (viewType == VIEW_TYPE_SENT) {
+        if (viewType == VIEW_TYPE_SOS) {
+            View v = inf.inflate(R.layout.item_message_sos, parent, false);
+            return new SosViewHolder(v);
+        } else if (viewType == VIEW_TYPE_SENT) {
             View v = inf.inflate(R.layout.item_message_sent, parent, false);
             return new SentViewHolder(v);
         } else {
@@ -61,7 +66,13 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         ChatMessage msg = messages.get(position);
         String timeStr = formatTime(msg.getTimestamp());
 
-        if (holder instanceof SentViewHolder) {
+        if (holder instanceof SosViewHolder) {
+            SosViewHolder h = (SosViewHolder) holder;
+            // Strip the raw text — sender name is already in the header
+            h.senderNameLabel.setText(msg.getSenderName() != null ? msg.getSenderName() : "");
+            h.messageText.setText(msg.getText());
+            h.timeText.setText(timeStr);
+        } else if (holder instanceof SentViewHolder) {
             SentViewHolder h = (SentViewHolder) holder;
             h.messageText.setText(msg.getText());
             h.timeText.setText(timeStr);
@@ -89,6 +100,19 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     // ── ViewHolders ────────────────────────────────────────────────────────────
+
+    static class SosViewHolder extends RecyclerView.ViewHolder {
+        final TextView senderNameLabel;
+        final TextView messageText;
+        final TextView timeText;
+
+        SosViewHolder(@NonNull View itemView) {
+            super(itemView);
+            senderNameLabel = itemView.findViewById(R.id.sosSenderName);
+            messageText     = itemView.findViewById(R.id.sosMessageText);
+            timeText        = itemView.findViewById(R.id.sosTimeText);
+        }
+    }
 
     static class SentViewHolder extends RecyclerView.ViewHolder {
         final TextView messageText;
