@@ -47,54 +47,19 @@
             android:contentDescription="Notifications" />
     </RelativeLayout>
 
-    <!-- ── Tabs ── -->
-    <LinearLayout
-        android:id="@+id/chatTabs"
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/usersTabLayout"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
-
-        <TextView
-            android:id="@+id/communityTab"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Message"
-            android:textColor="#FFDE59"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:fontFamily="sans-serif-medium"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Group"
-            android:textColor="#80FFFFFF"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:fontFamily="sans-serif-medium" />
-
-        <TextView
-            android:id="@+id/communitybtn"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Community"
-            android:textColor="#80FFFFFF"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:fontFamily="sans-serif-medium"
-            android:clickable="true"
-            android:focusable="true" />
-    </LinearLayout>
+        android:layout_height="wrap_content"
+        android:background="#6D4C41"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        app:tabIndicatorColor="#FFDE59"
+        app:tabIndicatorFullWidth="false"
+        app:tabMode="fixed"
+        app:tabRippleColor="@android:color/transparent"
+        app:tabSelectedTextColor="@android:color/white"
+        app:tabTextColor="@android:color/white" />
 
     <!-- ── Divider ── -->
     <View
@@ -135,25 +100,13 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <!-- ── Chat list ── -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/chatListRecyclerView"
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/usersViewPager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:overScrollMode="never"
-            android:paddingBottom="16dp"
-            tools:listitem="@layout/item_chat_user" />
-
-        <TextView
-            android:id="@+id/chatsEmptyState"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="No nearby devices"
-            android:textColor="#B3FFFFFF"
-            android:textSize="14sp"
-            android:visibility="gone" />
+            android:paddingBottom="16dp" />
     </FrameLayout>
 
 </LinearLayout>
