@@ -87,9 +87,6 @@ import com.example.hldsn.services.news.ApiNewsRepository;
 import com.example.hldsn.services.news.NewsDetailActivity;
 import com.example.hldsn.services.news.NewsItem;
 import com.example.hldsn.services.news.NewsRepository;
-import androidx.viewpager2.widget.ViewPager2;
-import android.os.Handler;
-import android.os.Looper;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -134,6 +131,14 @@ public class HomePageActivity extends AppCompatActivity {
     private final ExecutorService newsApiExecutor = Executors.newSingleThreadExecutor();
     private Runnable newsSliderRunnable;
     private boolean isNewsSliderCallbackRegistered;
+    private final ViewPager2.OnPageChangeCallback newsSliderPageChangeCallback =
+            new ViewPager2.OnPageChangeCallback() {
+                @Override
+                public void onPageSelected(int position) {
+                    updateNewsDots(position);
+                    restartNewsAutoSlide();
+                }
+            };
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -285,8 +290,18 @@ public class HomePageActivity extends AppCompatActivity {
         tipsBtn = findViewById(R.id.btn_info_safety);
         newsBtn = findViewById(R.id.btn_info_news);
         emergencyBtn = findViewById(R.id.btn_emergency);
-        newsSlider = findViewById(R.id.news_slider);
-        newsSliderDots = findViewById(R.id.news_slider_dots);
+        newsSlider = findOptionalViewPager("news_slider");
+        newsSliderDots = findOptionalLinearLayout("news_slider_dots");
+    }
+
+    private ViewPager2 findOptionalViewPager(String idName) {
+        int viewId = getResources().getIdentifier(idName, "id", getPackageName());
+        return viewId != 0 ? findViewById(viewId) : null;
+    }
+
+    private LinearLayout findOptionalLinearLayout(String idName) {
+        int viewId = getResources().getIdentifier(idName, "id", getPackageName());
+        return viewId != 0 ? findViewById(viewId) : null;
     }
 
     private void initNewsSlider() {
@@ -810,14 +825,6 @@ public class HomePageActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (carouselTimer != null) {
-            carouselTimer.cancel();
-        }
-    }
-
     private void startListeningToIncidents() {
         Log.d(TAG, "===== Starting incidents listener =====");
 
@@ -1253,6 +1260,9 @@ public class HomePageActivity extends AppCompatActivity {
             isNewsSliderCallbackRegistered = false;
         }
         stopNewsAutoSlide();
+        if (carouselTimer != null) {
+            carouselTimer.cancel();
+        }
         newsApiExecutor.shutdownNow();
         super.onDestroy();
     }
