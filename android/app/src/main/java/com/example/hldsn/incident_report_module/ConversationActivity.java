@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hldsn.R;
+import com.example.hldsn.firestore.MessageTtlHelper;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,6 +34,7 @@ import java.util.Map;
 public class ConversationActivity extends AppCompatActivity {
 
     private static final String MESH_TAG = "MeshMessaging";
+    private static final String MESSAGE_LOG_TAG = "MessageWriteAudit";
     public static final String EXTRA_USER_ID   = "extra_user_id";
     public static final String EXTRA_USER_NAME = "extra_user_name";
     public static final String EXTRA_MESH_USER_ID = "extra_mesh_user_id";
@@ -196,6 +198,7 @@ public class ConversationActivity extends AppCompatActivity {
         sendMeshMessageIfPossible(text);
 
         Timestamp now = Timestamp.now();
+        Timestamp expireAt = MessageTtlHelper.calculateExpireAt(now);
 
         // Build message map
         Map<String, Object> msgMap = new HashMap<>();
@@ -203,13 +206,25 @@ public class ConversationActivity extends AppCompatActivity {
         msgMap.put("senderName", currentName);
         msgMap.put("text",       text);
         msgMap.put("timestamp",  now);
+        msgMap.put("expireAt",   expireAt);
         msgMap.put("read",       false);
+
+        String messageCollectionPath = "chats/" + chatId + "/messages";
+        Log.i(MESSAGE_LOG_TAG, "WRITE_REQUEST collection=" + messageCollectionPath + " payload=" + msgMap);
 
         // Write message sub-document
         db.collection("chats").document(chatId)
                 .collection("messages")
                 .add(msgMap)
-                .addOnSuccessListener(ref -> updateChatMeta(text, now))
+                .addOnSuccessListener(ref -> {
+                    updateChatMeta(text, now);
+                    Log.i(MESSAGE_LOG_TAG, "WRITE_SUCCESS docPath=" + ref.getPath() + " expireAt_present=" + msgMap.containsKey("expireAt"));
+                    ref.get()
+                            .addOnSuccessListener(snapshot -> Log.i(MESSAGE_LOG_TAG,
+                                    "WRITE_READBACK docPath=" + ref.getPath() + " data=" + snapshot.getData()))
+                            .addOnFailureListener(e -> Log.w(MESSAGE_LOG_TAG,
+                                    "WRITE_READBACK_FAILED docPath=" + ref.getPath(), e));
+                })
                 .addOnFailureListener(e ->
                         Toast.makeText(this, "Failed to send message",
                                 Toast.LENGTH_SHORT).show());

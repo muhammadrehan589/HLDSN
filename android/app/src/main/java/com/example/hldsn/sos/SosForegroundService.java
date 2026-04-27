@@ -44,6 +44,7 @@ import com.example.hldsn.mesh.model.MeshIdentity;
 import com.example.hldsn.mesh.model.MeshMessage;
 import com.example.hldsn.mesh.model.RelayDecision;
 import com.example.hldsn.R;
+import com.example.hldsn.firestore.MessageTtlHelper;
 import com.example.hldsn.home.HomePageActivity;
 import com.example.hldsn.notification_module.SosAlertRecord;
 import com.example.hldsn.notification_module.SosAlertStore;
@@ -95,6 +96,7 @@ public class SosForegroundService extends Service {
     private static final String TAG = "SosFgService";
     private static final String SOS_TRACE_TAG = "SOS_TRACE";
     private static final String MESH_TAG = "MeshMessaging";  // Dedicated tag for mesh offline messaging
+    private static final String MESSAGE_LOG_TAG = "MessageWriteAudit";
     private static final String CHANNEL_ID = "sos_mesh_channel";
     private static final String ALERT_CHANNEL_ID = "sos_received_alerts";
     private static final String MESH_ALERT_CHANNEL_ID = "mesh_received_alerts";
@@ -513,11 +515,13 @@ public class SosForegroundService extends Service {
         String chatId = ids[0] + "_" + ids[1];
 
         Timestamp now = Timestamp.now();
+        Timestamp expireAt = MessageTtlHelper.calculateExpireAt(now);
         Map<String, Object> msgMap = new HashMap<>();
         msgMap.put("senderId", sourceMeshId);
         msgMap.put("senderName", senderLabel != null && !senderLabel.trim().isEmpty() ? senderLabel.trim() : "Mesh peer");
         msgMap.put("text", clearText);
         msgMap.put("timestamp", now);
+        msgMap.put("expireAt", expireAt);
         msgMap.put("read", false);
 
         String messageId = delivered.getMessageId() != null && !delivered.getMessageId().trim().isEmpty()
@@ -525,12 +529,26 @@ public class SosForegroundService extends Service {
                 : String.valueOf(System.currentTimeMillis());
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String messageDocPath = "chats/" + chatId + "/messages/" + messageId;
+        Log.i(MESSAGE_LOG_TAG, "WRITE_REQUEST docPath=" + messageDocPath + " payload=" + msgMap);
         db.collection("chats")
                 .document(chatId)
                 .collection("messages")
                 .document(messageId)
                 .set(msgMap, SetOptions.merge())
-                .addOnSuccessListener(v -> Log.d(MESH_TAG, "persistIncomingMeshMessage: stored msg_id=" + messageId + " chatId=" + chatId))
+                .addOnSuccessListener(v -> {
+                    Log.i(MESSAGE_LOG_TAG, "WRITE_SUCCESS docPath=" + messageDocPath + " expireAt_present=" + msgMap.containsKey("expireAt"));
+                    db.collection("chats")
+                            .document(chatId)
+                            .collection("messages")
+                            .document(messageId)
+                            .get()
+                            .addOnSuccessListener(snapshot -> Log.i(MESSAGE_LOG_TAG,
+                                    "WRITE_READBACK docPath=" + messageDocPath + " data=" + snapshot.getData()))
+                            .addOnFailureListener(e -> Log.w(MESSAGE_LOG_TAG,
+                                    "WRITE_READBACK_FAILED docPath=" + messageDocPath, e));
+                    Log.d(MESH_TAG, "persistIncomingMeshMessage: stored msg_id=" + messageId + " chatId=" + chatId);
+                })
                 .addOnFailureListener(e -> Log.w(MESH_TAG, "persistIncomingMeshMessage: message write failed", e));
 
         Map<String, Object> chatMeta = new HashMap<>();
@@ -1932,4 +1950,10 @@ public class SosForegroundService extends Service {
         }
     }
 }
+
+
+
+
+
+
 
