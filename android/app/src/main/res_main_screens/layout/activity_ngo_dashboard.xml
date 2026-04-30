@@ -108,6 +108,33 @@
             android:textAllCaps="false"
             app:cornerRadius="12dp" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="8dp"
+            android:text="Camp and center locations"
+            android:textColor="#E6FFFFFF"
+            android:textSize="13sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/addCampCenterButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="Add Camps or Centers"
+            android:textAllCaps="false"
+            app:cornerRadius="12dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/manageCampCenterButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="Update Camps and Centers"
+            android:textAllCaps="false"
+            app:cornerRadius="12dp" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/ngoLogoutButton"
             android:layout_width="match_parent"

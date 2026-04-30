@@ -1,14 +1,18 @@
 package com.example.hldsn.volunteer_module;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.example.hldsn.R;
-import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -21,10 +25,11 @@ import org.osmdroid.views.overlay.Marker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-public class VolunteerNetworkMapActivity extends AppCompatActivity {
+public class CampLocationsMapActivity extends AppCompatActivity {
 
-    private static final String TAG = "VolunteerNetworkMap";
+    private static final String TAG = "CampLocationsMap";
     private static final GeoPoint PAKISTAN_CENTER = new GeoPoint(30.3753, 69.3451);
     private static final BoundingBox PAKISTAN_BOUNDS = new BoundingBox(
             37.2,
@@ -33,7 +38,7 @@ public class VolunteerNetworkMapActivity extends AppCompatActivity {
             60.8
     );
 
-    private final List<Marker> volunteerMarkers = new ArrayList<>();
+    private final List<Marker> markers = new ArrayList<>();
 
     private MapView mapView;
     private FirebaseFirestore db;
@@ -41,26 +46,19 @@ public class VolunteerNetworkMapActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_volunteer_network_map);
+        setContentView(R.layout.activity_camp_locations_map);
 
         db = FirebaseFirestore.getInstance();
 
-        mapView = findViewById(R.id.volunteerMapView);
+        mapView = findViewById(R.id.campLocationsMapView);
         configureMapView();
 
         ImageView backButton = findViewById(R.id.backButton);
-        MaterialButton joinUsButton = findViewById(R.id.joinUsButton);
-
         if (backButton != null) {
             backButton.setOnClickListener(v -> finish());
         }
 
-        if (joinUsButton != null) {
-            joinUsButton.setOnClickListener(v ->
-                    startActivity(new Intent(this, VolunteerBasicFormActivity.class)));
-        }
-
-        loadVolunteerMarkers();
+        loadCampMarkers();
     }
 
     @Override
@@ -81,7 +79,7 @@ public class VolunteerNetworkMapActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        clearVolunteerMarkers();
+        clearMarkers();
         if (mapView != null) {
             mapView.onDetach();
         }
@@ -109,52 +107,35 @@ public class VolunteerNetworkMapActivity extends AppCompatActivity {
         mapView.post(() -> mapView.zoomToBoundingBox(PAKISTAN_BOUNDS, true));
     }
 
-    private void loadVolunteerMarkers() {
-        db.collection("volunteer_locations")
+    private void loadCampMarkers() {
+        db.collection("camp_center_locations")
                 .whereEqualTo("isActive", true)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
-                    clearVolunteerMarkers();
+                    clearMarkers();
 
-                    int addedCount = 0;
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                         Double latitude = toDouble(document.get("latitude"));
                         Double longitude = toDouble(document.get("longitude"));
-
                         if (latitude == null || longitude == null || !isInsidePakistan(latitude, longitude)) {
                             continue;
                         }
 
-                        String volunteerName = firstNonBlank(document.getString("name"), "Volunteer Team");
-                        String city = firstNonBlank(document.getString("city"), "Pakistan");
-                        addVolunteerMarker(latitude, longitude, volunteerName, city);
-                        addedCount++;
-                    }
-
-                    if (addedCount == 0) {
-                        addFallbackMarkers();
+                        String type = safe(document.getString("type"));
+                        String name = firstNonBlank(document.getString("name"), "Camp Location");
+                        String locationText = firstNonBlank(document.getString("locationText"), "Pakistan");
+                        addMarker(latitude, longitude, type, name, locationText);
                     }
 
                     mapView.invalidate();
                 })
                 .addOnFailureListener(error -> {
-                    Log.w(TAG, "Failed to load volunteer locations from Firestore", error);
-                    clearVolunteerMarkers();
-                    addFallbackMarkers();
-                    mapView.invalidate();
+                    Log.w(TAG, "Failed to load camp locations", error);
+                    Toast.makeText(this, "Could not load camp locations", Toast.LENGTH_SHORT).show();
                 });
     }
 
-    private void addFallbackMarkers() {
-        addVolunteerMarker(33.6844, 73.0479, "Islamabad Volunteer Team", "Islamabad");
-        addVolunteerMarker(31.5204, 74.3587, "Lahore Volunteer Team", "Lahore");
-        addVolunteerMarker(24.8607, 67.0011, "Karachi Volunteer Team", "Karachi");
-        addVolunteerMarker(30.1798, 66.9750, "Quetta Volunteer Team", "Quetta");
-        addVolunteerMarker(34.0151, 71.5249, "Peshawar Volunteer Team", "Peshawar");
-        addVolunteerMarker(30.1575, 71.5249, "Multan Volunteer Team", "Multan");
-    }
-
-    private void addVolunteerMarker(double latitude, double longitude, String title, String city) {
+    private void addMarker(double latitude, double longitude, String type, String title, String locationText) {
         if (mapView == null) {
             return;
         }
@@ -162,19 +143,47 @@ public class VolunteerNetworkMapActivity extends AppCompatActivity {
         Marker marker = new Marker(mapView);
         marker.setPosition(new GeoPoint(latitude, longitude));
         marker.setTitle(title);
-        marker.setSubDescription("Active with HLDSN - " + city);
+        marker.setSubDescription(locationText);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setIcon(ContextCompat.getDrawable(this, "center".equalsIgnoreCase(type) ? R.drawable.ic_center_marker : R.drawable.ic_camp));
+        marker.setOnMarkerClickListener((clickedMarker, clickedMapView) -> {
+            showMarkerOptions(title, locationText, latitude, longitude, type);
+            return true;
+        });
 
         mapView.getOverlays().add(marker);
-        volunteerMarkers.add(marker);
+        markers.add(marker);
     }
 
-    private void clearVolunteerMarkers() {
+    private void showMarkerOptions(String title, String locationText, double latitude, double longitude, String type) {
+        String message = String.format(Locale.US, "%s\n%s", capitalize(type), locationText);
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("View Location", (dialog, which) -> openGoogleMaps(latitude, longitude))
+                .setNegativeButton("Close", null)
+                .show();
+    }
+
+    private void openGoogleMaps(double latitude, double longitude) {
+        String query = String.format(Locale.US, "%f,%f", latitude, longitude);
+        Uri mapsUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=" + query);
+        Intent intent = new Intent(Intent.ACTION_VIEW, mapsUri);
+        intent.setPackage("com.google.android.apps.maps");
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException ignored) {
+            intent.setPackage(null);
+            startActivity(intent);
+        }
+    }
+
+    private void clearMarkers() {
         if (mapView == null) {
             return;
         }
-        mapView.getOverlays().removeAll(volunteerMarkers);
-        volunteerMarkers.clear();
+        mapView.getOverlays().removeAll(markers);
+        markers.clear();
     }
 
     private boolean isInsidePakistan(double latitude, double longitude) {
@@ -188,7 +197,6 @@ public class VolunteerNetworkMapActivity extends AppCompatActivity {
         if (value instanceof Number) {
             return ((Number) value).doubleValue();
         }
-
         if (value instanceof String) {
             try {
                 return Double.parseDouble(((String) value).trim());
@@ -196,14 +204,23 @@ public class VolunteerNetworkMapActivity extends AppCompatActivity {
                 return null;
             }
         }
-
         return null;
     }
 
     private String firstNonBlank(String primary, String fallback) {
-        if (primary != null && !primary.trim().isEmpty()) {
-            return primary.trim();
+        String value = safe(primary);
+        return value.isEmpty() ? fallback : value;
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value.trim();
+    }
+
+    private String capitalize(String value) {
+        String text = safe(value);
+        if (text.isEmpty()) {
+            return "Location";
         }
-        return fallback;
+        return text.substring(0, 1).toUpperCase(Locale.US) + text.substring(1).toLowerCase(Locale.US);
     }
 }

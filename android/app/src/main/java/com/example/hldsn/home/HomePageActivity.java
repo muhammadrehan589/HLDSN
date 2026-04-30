@@ -54,6 +54,7 @@ import com.example.hldsn.notification_module.SosAlertStore;
 import com.example.hldsn.services.news.NewsActivity;
 import com.example.hldsn.services.safety_tips.SafetyTipsActivity;
 import com.example.hldsn.sos.SosListenerService;
+import com.example.hldsn.volunteer_module.CampLocationsMapActivity;
 import com.example.hldsn.volunteer_module.VolunteerNetworkMapActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -631,6 +632,16 @@ public class HomePageActivity extends AppCompatActivity {
         chatBtn.setOnClickListener(v -> startActivity(new Intent(this, ChatsActivity.class)));
         tipsBtn.setOnClickListener(v -> startActivity(new Intent(this, SafetyTipsActivity.class)));
         newsBtn.setOnClickListener(v -> startActivity(new Intent(this, NewsActivity.class)));
+        View campBtn = findViewById(R.id.btn_service_camp);
+        if (campBtn != null) {
+            campBtn.setOnClickListener(v ->
+                    startActivity(new Intent(this, CampLocationsMapActivity.class)));
+        }
+        View volunteerBtn = findViewById(R.id.btn_service_volunteer);
+        if (volunteerBtn != null) {
+            volunteerBtn.setOnClickListener(v ->
+                startActivity(new Intent(this, VolunteerNetworkMapActivity.class)));
+        }
         emergencyBtn.setOnClickListener(v -> triggerSos());
 
         // Profile menu example
