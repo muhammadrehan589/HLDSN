@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +19,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText emailField, passwordField;
     private Button loginButton, signupButton;
+    private TextView forgotPassword;
 
     private FirebaseAuth auth;
     private MeshIdentityManager meshIdentityManager;
@@ -43,10 +45,37 @@ public class LoginActivity extends AppCompatActivity {
         passwordField = findViewById(R.id.passwordField);
         loginButton = findViewById(R.id.loginButton);
         signupButton = findViewById(R.id.signupButton);
+        forgotPassword = findViewById(R.id.forgotPassword);
 
         // Navigate to SignupActivity
         signupButton.setOnClickListener(v -> {
             startActivity(new Intent(LoginActivity.this, SignupActivity.class));
+        });
+
+        forgotPassword.setOnClickListener(v -> {
+            String email = emailField.getText().toString().trim();
+            if (email.isEmpty()) {
+                Toast.makeText(this, "Please enter your email first", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            forgotPassword.setEnabled(false);
+            auth.sendPasswordResetEmail(email)
+                    .addOnCompleteListener(task -> {
+                        forgotPassword.setEnabled(true);
+                        if (task.isSuccessful()) {
+                            Toast.makeText(this, "Password reset email sent. Check your inbox and spam/junk folder.", Toast.LENGTH_LONG).show();
+                        } else {
+                            String error = task.getException() != null
+                                    ? task.getException().getMessage()
+                                    : "Unknown error";
+                            Toast.makeText(this, "Could not send reset email: " + error + ". Check inbox and spam/junk if the request was accepted.", Toast.LENGTH_LONG).show();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        forgotPassword.setEnabled(true);
+                        Toast.makeText(this, "Could not send reset email: " + e.getMessage() + ". Check inbox and spam/junk if the request was accepted.", Toast.LENGTH_LONG).show();
+                    });
         });
 
         // Login button click

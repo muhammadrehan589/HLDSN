@@ -101,7 +101,6 @@
         <activity android:name=".login_module.LoginActivity" android:exported="false" />
         <activity android:name=".login_module.SignupActivity" android:exported="false" />
         <activity android:name=".home.Main" android:exported="false" />
-        <activity android:name=".OtpVerificationActivity" android:exported="false" />
         <activity android:name=".home.HomePageActivity" android:exported="false" />
         <activity android:name=".volunteer_module.CampLocationsMapActivity" android:exported="false" />
         <activity android:name=".volunteer_module.VolunteerNetworkMapActivity" android:exported="false" />
