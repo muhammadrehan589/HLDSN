@@ -30,6 +30,7 @@ public class NgoDashboardActivity extends AppCompatActivity {
         notificationCountText = findViewById(R.id.tvNotificationCount);
         ngoNameText = findViewById(R.id.ngoDashboardNameText);
         MaterialButton manageVolunteersButton = findViewById(R.id.manageVolunteerRequestsButton);
+        MaterialButton viewVolunteersButton = findViewById(R.id.viewVolunteersButton);
         MaterialButton addCampCenterButton = findViewById(R.id.addCampCenterButton);
         MaterialButton manageCampCenterButton = findViewById(R.id.manageCampCenterButton);
         MaterialButton logoutButton = findViewById(R.id.ngoLogoutButton);
@@ -46,6 +47,11 @@ public class NgoDashboardActivity extends AppCompatActivity {
         if (manageVolunteersButton != null) {
             manageVolunteersButton.setOnClickListener(v ->
                     startActivity(new Intent(this, NgoVolunteerApprovalsActivity.class)));
+        }
+
+        if (viewVolunteersButton != null) {
+            viewVolunteersButton.setOnClickListener(v ->
+                    startActivity(new Intent(this, NgoViewVolunteersActivity.class)));
         }
 
         if (addCampCenterButton != null) {

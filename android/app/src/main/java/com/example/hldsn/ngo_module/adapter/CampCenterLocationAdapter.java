@@ -51,13 +51,11 @@ public class CampCenterLocationAdapter extends RecyclerView.Adapter<CampCenterLo
 
         String type = safe(snapshot.getString("type"));
         String name = firstNonBlank(snapshot.getString("name"), "Unnamed Location");
-        String locationText = firstNonBlank(snapshot.getString("locationText"), "No address saved");
         Double latitude = toDouble(snapshot.get("latitude"));
         Double longitude = toDouble(snapshot.get("longitude"));
 
         holder.typeText.setText(capitalize(type));
         holder.nameText.setText(name);
-        holder.locationText.setText(locationText);
         holder.coordinatesText.setText(latitude == null || longitude == null
                 ? "Coordinates unavailable"
                 : String.format(Locale.US, "%.5f, %.5f", latitude, longitude));
@@ -83,7 +81,7 @@ public class CampCenterLocationAdapter extends RecyclerView.Adapter<CampCenterLo
     static class LocationViewHolder extends RecyclerView.ViewHolder {
         private final TextView typeText;
         private final TextView nameText;
-        private final TextView locationText;
+
         private final TextView coordinatesText;
         private final MaterialButton editButton;
         private final MaterialButton deleteButton;
@@ -92,7 +90,6 @@ public class CampCenterLocationAdapter extends RecyclerView.Adapter<CampCenterLo
             super(itemView);
             typeText = itemView.findViewById(R.id.campLocationTypeText);
             nameText = itemView.findViewById(R.id.campLocationNameText);
-            locationText = itemView.findViewById(R.id.campLocationAddressText);
             coordinatesText = itemView.findViewById(R.id.campLocationCoordinatesText);
             editButton = itemView.findViewById(R.id.editCampLocationButton);
             deleteButton = itemView.findViewById(R.id.deleteCampLocationButton);

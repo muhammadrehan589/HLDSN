@@ -35,13 +35,7 @@
             android:textSize="17sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/campLocationAddressText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="#314A5A"
-            android:textSize="13sp" />
+
 
         <TextView
             android:id="@+id/campLocationCoordinatesText"
