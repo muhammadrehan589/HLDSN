@@ -116,6 +116,10 @@
         <activity android:name=".services.news.NewsDetailActivity" android:exported="false" />
         <activity android:name=".login_module.SaveUserProfileActivity" android:exported="false" />
         <activity android:name=".login_module.UserProfileActivity" android:exported="false" />
+        <activity android:name=".volunteer.VolunteerBasicFormActivity" android:exported="false" />
+        <activity android:name=".volunteer.VolunteerSkillsFormActivity" android:exported="false" />
+        <activity android:name=".volunteer.VolunteerAgreementActivity" android:exported="false" />
+        <activity android:name=".volunteer.VolunteerSuccessActivity" android:exported="false" />
         <activity android:name=".incident_report_module.DisplayReportActivity" android:exported="false"/>
         <activity android:name=".services.safety_tips.SafetyTypeActivity" android:exported="false"/>
         <activity android:name=".sos.SosDetailActivity" android:exported="false"/>
