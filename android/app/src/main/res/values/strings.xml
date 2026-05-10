@@ -1,11 +1,22 @@
 <resources>
     <string name="app_name">HLDSN</string>
-    <string name="emergency_sos">Emergency | SOS</string>
+    <string name="emergency_sos">SOS - EMERGENCY</string>
     <string name="contacts">Contacts</string>
-    <string name="fire">Fire</string>
-    <string name="edhi">Edhi</string>
+    <string name="fire">Fire Rescue</string>
+    <string name="edhi">Edhi Foundation</string>
     <string name="hospital">Hospital</string>
     <string name="police">Police</string>
+    <string name="services">Services</string>
+    <string name="camp_locations">CAMP Locations</string>
+    <string name="volunteer_network">Volunteer Network</string>
+    <string name="hazard_alert">Hazard Alert</string>
+    <string name="chats">Chats</string>
+    <string name="information">Information</string>
+    <string name="safety_tips">Safety Tips</string>
+    <string name="community_chat">Community Chat</string>
+    <string name="emergency_preparedness">Emergency Preparedness</string>
+    <string name="first_aid_tips">First Aid Tips</string>
+    <string name="news">News</string>
     <string name="menu_icon_desc">Menu Icon</string>
     <string name="notification_icon_desc">Notification Icon</string>
     <string name="flood_banner_desc">Flood Banner</string>
@@ -14,4 +25,14 @@
     <string name="hospital_icon_desc">Hospital Icon</string>
     <string name="police_icon_desc">Police Icon</string>
     <string name="volunteer_click_here_underlined"><u>Click Here</u></string>
+    <string name="news_back">Back</string>
+    <string name="news_title">News</string>
+    <string name="news_next_page">Next page</string>
+    <string name="news_detail_title">News Details</string>
+    <string name="news_image_desc">News image</string>
+    <string name="news_read_more">Read more</string>
+    <string name="news_read_less">Read less</string>
+    <string name="news_sample_headline">Sample headline</string>
+    <string name="news_sample_description">Sample description</string>
+    <string name="news_fallback_notice">Showing offline news because live feed is unavailable.</string>
 </resources>

@@ -29,7 +29,6 @@ public class ChatsActivity extends AppCompatActivity {
         if (me == null) { finish(); return; }
         chatsViewModel = new ViewModelProvider(this).get(ChatsViewModel.class);
 
-        db = FirebaseFirestore.getInstance();
 
         // ── Header buttons ───────────────────────────────────────────────────
         ImageView backIcon = findViewById(R.id.backButton);
