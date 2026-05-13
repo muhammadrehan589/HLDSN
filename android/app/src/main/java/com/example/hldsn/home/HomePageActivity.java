@@ -337,83 +337,106 @@ public class HomePageActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     CrashDebugger.logButtonClickError("menuIcon", e);
                 }
-            } else {
-                drawerLayout.openDrawer(GravityCompat.END);
-                updateNotificationBadge(0);
-                if (notificationAdapter != null) {
-                    notificationAdapter.clearSwipedPosition();
-                }
+            });
 
+            // Notification icon
+            notificationIcon.setOnClickListener(v -> {
+                try {
+                    CrashDebugger.logButtonClick("notificationIcon", "Toggle notifications drawer");
+                    if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
+                        drawerLayout.closeDrawer(GravityCompat.END);
+                        markCurrentNotificationsAsSeen();
+                        if (notificationAdapter != null) {
+                            notificationAdapter.clearSwipedPosition();
+                        }
+                    } else {
+                        drawerLayout.openDrawer(GravityCompat.END);
+                        updateNotificationBadge(0);
+                        if (notificationAdapter != null) {
+                            notificationAdapter.clearSwipedPosition();
+                        }
+                    }
+                } catch (Exception e) {
+                    CrashDebugger.logButtonClickError("notificationIcon", e);
+                }
+            });
+
+            chatBtn.setOnClickListener(v -> startActivity(new Intent(this, ChatsActivity.class)));
+            tipsBtn.setOnClickListener(v -> startActivity(new Intent(this, SafetyTipsActivity.class)));
+            if (hazardAlertBtn != null) {
+                hazardAlertBtn.setOnClickListener(v -> startActivity(new Intent(this, HazardAlertMapActivity.class)));
             }
-        });
+            if (communityChatBtn != null) {
+                communityChatBtn.setOnClickListener(v -> startActivity(new Intent(this, DisplayReportActivity.class)));
+            }
 
-        chatBtn.setOnClickListener(v -> startActivity(new Intent(this, ChatsActivity.class)));
-        tipsBtn.setOnClickListener(v -> startActivity(new Intent(this, SafetyTipsActivity.class)));
-        if (hazardAlertBtn != null) {
-            hazardAlertBtn.setOnClickListener(v -> startActivity(new Intent(this, HazardAlertMapActivity.class)));
-        }
-        if (communityChatBtn != null) {
-            communityChatBtn.setOnClickListener(v -> startActivity(new Intent(this, DisplayReportActivity.class)));
-        }
-        View campLocationsBtn = findViewById(R.id.btn_service_camp);
-        if (campLocationsBtn != null) {
-            campLocationsBtn.setOnClickListener(v ->
-                    startActivity(new Intent(this, CampLocationsMapActivity.class)));
-        }
-        View volunteerNetworkBtn = findViewById(R.id.btn_service_volunteer);
-        if (volunteerNetworkBtn != null) {
-            volunteerNetworkBtn.setOnClickListener(v ->
-                    startActivity(new Intent(this, VolunteerNetworkMapActivity.class)));
-        }
-        newsBtn.setOnClickListener(v -> startActivity(new Intent(this, NewsActivity.class)));
-        emergencyBtn.setOnClickListener(v -> showSosConfirmDialog());
+            View campLocationsBtn = findViewById(R.id.btn_service_camp);
+            if (campLocationsBtn != null) {
+                campLocationsBtn.setOnClickListener(v -> startActivity(new Intent(this, CampLocationsMapActivity.class)));
+            }
 
-        // Profile menu example
-        findViewById(R.id.profileMenuItem).setOnClickListener(v -> {
-            Intent intent = new Intent(this,
-                    auth.getCurrentUser() != null ? UserProfileActivity.class : SaveUserProfileActivity.class);
-            startActivity(intent);
-            drawerLayout.closeDrawer(GravityCompat.START);
-        });
+            View volunteerNetworkBtn = findViewById(R.id.btn_service_volunteer);
+            if (volunteerNetworkBtn != null) {
+                volunteerNetworkBtn.setOnClickListener(v -> startActivity(new Intent(this, VolunteerNetworkMapActivity.class)));
+            }
 
-        View ngoRegistrationItem = findViewById(R.id.ngoRegistrationMenuItem);
-        if (ngoRegistrationItem != null) {
-            ngoRegistrationItem.setOnClickListener(v -> {
-                startActivity(new Intent(this, NgoRegistrationRequestActivity.class));
+            newsBtn.setOnClickListener(v -> startActivity(new Intent(this, NewsActivity.class)));
+            emergencyBtn.setOnClickListener(v -> showSosConfirmDialog());
+
+            // Profile menu example
+            findViewById(R.id.profileMenuItem).setOnClickListener(v -> {
+                Intent intent = new Intent(this, auth.getCurrentUser() != null ? UserProfileActivity.class : SaveUserProfileActivity.class);
+                startActivity(intent);
                 drawerLayout.closeDrawer(GravityCompat.START);
             });
 
-        findViewById(R.id.logoutMenuItem).setOnClickListener(v -> {
-            auth.signOut();
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-        });
-
-        // Home menu item - return to home page
-        View homeMenuItem = findViewById(R.id.homeMenuItem);
-        if (homeMenuItem != null) {
-            homeMenuItem.setOnClickListener(v -> {
-                drawerLayout.closeDrawer(GravityCompat.START);
-                Toast.makeText(this, "Already on Home", Toast.LENGTH_SHORT).show();
-            });
-        }
-
-        // Back button
-        ImageView backButton = findViewById(R.id.backButton);
-        if (backButton != null) {
-            backButton.setOnClickListener(v -> {
-                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            View ngoRegistrationItem = findViewById(R.id.ngoRegistrationMenuItem);
+            if (ngoRegistrationItem != null) {
+                ngoRegistrationItem.setOnClickListener(v -> {
+                    startActivity(new Intent(this, NgoRegistrationRequestActivity.class));
                     drawerLayout.closeDrawer(GravityCompat.START);
-                } else {
-                    onBackPressed();
-                }
-            });
-        }
+                });
+            }
 
-        // About Us menu item
-        View aboutMenuItem = findViewById(R.id.aboutMenuItem);
-        if (aboutMenuItem != null) {
-            aboutMenuItem.setOnClickListener(v -> showAboutUsDialog());
+            View logoutMenuItem = findViewById(R.id.logoutMenuItem);
+            if (logoutMenuItem != null) {
+                logoutMenuItem.setOnClickListener(v -> {
+                    auth.signOut();
+                    startActivity(new Intent(this, LoginActivity.class));
+                    finish();
+                });
+            }
+
+            // Home menu item - return to home page
+            View homeMenuItem = findViewById(R.id.homeMenuItem);
+            if (homeMenuItem != null) {
+                homeMenuItem.setOnClickListener(v -> {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    Toast.makeText(this, "Already on Home", Toast.LENGTH_SHORT).show();
+                });
+            }
+
+            // Back button
+            ImageView backButton = findViewById(R.id.backButton);
+            if (backButton != null) {
+                backButton.setOnClickListener(v -> {
+                    if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                    } else {
+                        onBackPressed();
+                    }
+                });
+            }
+
+            // About Us menu item
+            View aboutMenuItem = findViewById(R.id.aboutMenuItem);
+            if (aboutMenuItem != null) {
+                aboutMenuItem.setOnClickListener(v -> showAboutUsDialog());
+            }
+
+            CrashDebugger.logActivityEvent("HomePageActivity", "initListeners() SUCCESS");
+        } catch (Exception e) {
+            CrashDebugger.logActivityError("HomePageActivity", "initListeners()", e);
         }
     }
 
@@ -617,14 +640,17 @@ public class HomePageActivity extends AppCompatActivity {
             }
 
             CrashDebugger.logActivityEvent("HomePageActivity", "initListeners() SUCCESS");
-        } catch (Exception e) {
-            CrashDebugger.logActivityError("HomePageActivity", "initListeners()", e);
         }
     }
 
     private void loadSeenIncidentIds() {
         SharedPreferences prefs = getSharedPreferences("notification_prefs", MODE_PRIVATE);
-        seenIncidentIds = new HashSet<>(prefs.getStringSet("seen_incident_ids", new HashSet<>()));
+        Set<String> stored = prefs.getStringSet("seen_incident_ids", null);
+        if (stored != null) {
+            seenIncidentIds = new HashSet<>(stored);
+        } else {
+            seenIncidentIds = new HashSet<>();
+        }
         Log.d(TAG, "Loaded " + seenIncidentIds.size() + " seen incident IDs");
     }
 

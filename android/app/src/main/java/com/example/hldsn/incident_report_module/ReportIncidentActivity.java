@@ -176,35 +176,25 @@ public class ReportIncidentActivity extends AppCompatActivity {
         try {
             CrashDebugger.logActivityEvent("ReportIncidentActivity", "initListeners() START");
 
-        if (backButton != null) {
-            backButton.setOnClickListener(v -> finish());
-        }
+            if (backButton != null) {
+                backButton.setOnClickListener(v -> finish());
+            }
 
-        if (notificationIcon != null) {
-            notificationIcon.setOnClickListener(v -> {
-                startActivity(new Intent(this, DisplayReportActivity.class));
-                finish();
-            });
-        }
+            if (notificationIcon != null) {
+                notificationIcon.setOnClickListener(v -> {
+                    startActivity(new Intent(this, DisplayReportActivity.class));
+                    finish();
+                });
+            }
 
-        safeColor = ContextCompat.getColor(this, R.color.safe_green);
-        unsafeColor = ContextCompat.getColor(this, R.color.lightred);
-
-        // INITIAL UI STATE
-        setupSafeButtonUI();
-
-        uploadButton.setOnClickListener(v -> showMediaDialog());
-
-        safeButton.setOnClickListener(v -> {
-            isSafe = !isSafe; // toggle
+            safeColor = ContextCompat.getColor(this, R.color.safe_green);
+            unsafeColor = ContextCompat.getColor(this, R.color.lightred);
 
             // INITIAL UI STATE
             setupSafeButtonUI();
 
-            // Check for null views before setting listeners
-            if (uploadButton == null) {
-                CrashDebugger.logNullPointerDebug("ReportIncidentActivity", "uploadButton");
-            } else {
+            // upload button opens media chooser
+            if (uploadButton != null) {
                 uploadButton.setOnClickListener(v -> {
                     try {
                         CrashDebugger.logButtonClick("uploadButton", "Show media dialog");
@@ -214,30 +204,30 @@ public class ReportIncidentActivity extends AppCompatActivity {
                         Toast.makeText(ReportIncidentActivity.this, "Error selecting media", Toast.LENGTH_SHORT).show();
                     }
                 });
+            } else {
+                CrashDebugger.logNullPointerDebug("ReportIncidentActivity", "uploadButton");
             }
 
-            if (safeButton == null) {
-                CrashDebugger.logNullPointerDebug("ReportIncidentActivity", "safeButton");
-            } else {
+            // safe button toggles safety state
+            if (safeButton != null) {
                 safeButton.setOnClickListener(v -> {
                     try {
                         CrashDebugger.logButtonClick("safeButton", "Toggle safety status");
                         isSafe = !isSafe; // toggle
                         setupSafeButtonUI();
-                        Toast.makeText(
-                                ReportIncidentActivity.this,
+                        Toast.makeText(ReportIncidentActivity.this,
                                 isSafe ? "Marked as Safe" : "Marked as NOT Safe",
-                                Toast.LENGTH_SHORT
-                        ).show();
+                                Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
                         CrashDebugger.logButtonClickError("safeButton", e);
                     }
                 });
+            } else {
+                CrashDebugger.logNullPointerDebug("ReportIncidentActivity", "safeButton");
             }
 
-            if (submitReportButton == null) {
-                CrashDebugger.logNullPointerDebug("ReportIncidentActivity", "submitReportButton");
-            } else {
+            // submit report
+            if (submitReportButton != null) {
                 submitReportButton.setOnClickListener(v -> {
                     try {
                         CrashDebugger.logButtonClick("submitReportButton", "Submit incident report");
@@ -247,6 +237,8 @@ public class ReportIncidentActivity extends AppCompatActivity {
                         Toast.makeText(ReportIncidentActivity.this, "Error submitting report: " + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
+            } else {
+                CrashDebugger.logNullPointerDebug("ReportIncidentActivity", "submitReportButton");
             }
 
             CrashDebugger.logActivityEvent("ReportIncidentActivity", "initListeners() SUCCESS");
