@@ -41,6 +41,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.hldsn.R;
+import com.example.hldsn.debug.CrashDebugger;
+import com.example.hldsn.firstaid.EmergencyFirstAidActivity;
+import com.example.hldsn.nearby.NearbyHelpActivity;
 import com.example.hldsn.incident_report_module.ChatsActivity;
 import com.example.hldsn.incident_report_module.DisplayReportActivity;
 import com.example.hldsn.incident_report_module.IncidentModel;
@@ -116,6 +119,9 @@ public class HomePageActivity extends AppCompatActivity {
     private MaterialButton chatBtn, tipsBtn, newsBtn, communityChatBtn;
     private MaterialButton hazardAlertBtn;
     private View emergencyBtn;
+    private MaterialButton emergencyNumbersBtn;
+    private MaterialButton emergencyFirstAidBtn;
+    private MaterialButton nearbyHelpBtn;
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -266,6 +272,9 @@ public class HomePageActivity extends AppCompatActivity {
         newsBtn = findViewById(R.id.btn_info_news);
         hazardAlertBtn = findViewById(R.id.btn_service_alert);
         emergencyBtn = findViewById(R.id.btn_emergency);
+        emergencyNumbersBtn = findViewById(R.id.btn_emergency_numbers);
+        emergencyFirstAidBtn = findViewById(R.id.btn_info_first_aid);
+        nearbyHelpBtn = findViewById(R.id.btn_nearby_help);
     }
 
     private void initNotificationDrawer() {
@@ -317,14 +326,16 @@ public class HomePageActivity extends AppCompatActivity {
     }
 
     private void initListeners() {
-        menuIcon.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
+        try {
+            CrashDebugger.logActivityEvent("HomePageActivity", "initListeners() START");
 
-        notificationIcon.setOnClickListener(v -> {
-            if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
-                drawerLayout.closeDrawer(GravityCompat.END);
-                markCurrentNotificationsAsSeen();
-                if (notificationAdapter != null) {
-                    notificationAdapter.clearSwipedPosition();
+            // Menu button
+            menuIcon.setOnClickListener(v -> {
+                try {
+                    CrashDebugger.logButtonClick("menuIcon", "Open drawer");
+                    drawerLayout.openDrawer(GravityCompat.START);
+                } catch (Exception e) {
+                    CrashDebugger.logButtonClickError("menuIcon", e);
                 }
             } else {
                 drawerLayout.openDrawer(GravityCompat.END);
@@ -371,7 +382,6 @@ public class HomePageActivity extends AppCompatActivity {
                 startActivity(new Intent(this, NgoRegistrationRequestActivity.class));
                 drawerLayout.closeDrawer(GravityCompat.START);
             });
-        }
 
         findViewById(R.id.logoutMenuItem).setOnClickListener(v -> {
             auth.signOut();
@@ -432,6 +442,183 @@ public class HomePageActivity extends AppCompatActivity {
             dialog.getWindow().setBackgroundDrawableResource(R.drawable.login_gradient);
             dialog.getWindow().setLayout((int)(getResources().getDisplayMetrics().widthPixels * 0.85), 
                     android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+            // Notification button
+            notificationIcon.setOnClickListener(v -> {
+                try {
+                    CrashDebugger.logButtonClick("notificationIcon", "Toggle notifications drawer");
+                    if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
+                        drawerLayout.closeDrawer(GravityCompat.END);
+                        markCurrentNotificationsAsSeen();
+                        if (notificationAdapter != null) {
+                            notificationAdapter.clearSwipedPosition();
+                        }
+                    } else {
+                        drawerLayout.openDrawer(GravityCompat.END);
+                        updateNotificationBadge(0);
+                        if (notificationAdapter != null) {
+                            notificationAdapter.clearSwipedPosition();
+                        }
+                    }
+                } catch (Exception e) {
+                    CrashDebugger.logButtonClickError("notificationIcon", e);
+                }
+            });
+
+            // Chat button
+            if (chatBtn != null) {
+                chatBtn.setOnClickListener(v -> {
+                    try {
+                        CrashDebugger.logButtonClick("chatBtn", "Open ChatsActivity");
+                        startActivity(new Intent(HomePageActivity.this, ChatsActivity.class));
+                    } catch (Exception e) {
+                        CrashDebugger.logButtonClickError("chatBtn", e);
+                        Toast.makeText(HomePageActivity.this, "Error opening chat", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            // Tips button
+            if (tipsBtn != null) {
+                tipsBtn.setOnClickListener(v -> {
+                    try {
+                        CrashDebugger.logButtonClick("tipsBtn", "Open SafetyTipsActivity");
+                        startActivity(new Intent(HomePageActivity.this, SafetyTipsActivity.class));
+                    } catch (Exception e) {
+                        CrashDebugger.logButtonClickError("tipsBtn", e);
+                        Toast.makeText(HomePageActivity.this, "Error opening tips", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            // Community chat button
+            if (communityChatBtn != null) {
+                communityChatBtn.setOnClickListener(v -> {
+                    try {
+                        CrashDebugger.logButtonClick("communityChatBtn", "Open DisplayReportActivity");
+                        startActivity(new Intent(HomePageActivity.this, DisplayReportActivity.class));
+                    } catch (Exception e) {
+                        CrashDebugger.logButtonClickError("communityChatBtn", e);
+                        Toast.makeText(HomePageActivity.this, "Error opening community", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            // News button
+            if (newsBtn != null) {
+                newsBtn.setOnClickListener(v -> {
+                    try {
+                        CrashDebugger.logButtonClick("newsBtn", "Open NewsActivity");
+                        startActivity(new Intent(HomePageActivity.this, NewsActivity.class));
+                    } catch (Exception e) {
+                        CrashDebugger.logButtonClickError("newsBtn", e);
+                        Toast.makeText(HomePageActivity.this, "Error opening news", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            // Emergency button
+            if (emergencyBtn != null) {
+                emergencyBtn.setOnClickListener(v -> {
+                    try {
+                        CrashDebugger.logButtonClick("emergencyBtn", "Show SOS confirm dialog");
+                        showSosConfirmDialog();
+                    } catch (Exception e) {
+                        CrashDebugger.logButtonClickError("emergencyBtn", e);
+                        Toast.makeText(HomePageActivity.this, "Error with emergency button", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            // Emergency numbers button
+            if (emergencyNumbersBtn != null) {
+                emergencyNumbersBtn.setOnClickListener(v -> {
+                    try {
+                        CrashDebugger.logButtonClick("emergencyNumbersBtn", "Open EmergencyNumbersActivity");
+                        startActivity(new Intent(HomePageActivity.this, EmergencyNumbersActivity.class));
+                    } catch (Exception e) {
+                        CrashDebugger.logButtonClickError("emergencyNumbersBtn", e);
+                        Toast.makeText(HomePageActivity.this, "Error opening emergency numbers", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            // Emergency first aid button
+            if (emergencyFirstAidBtn != null) {
+                emergencyFirstAidBtn.setOnClickListener(v -> {
+                    try {
+                        CrashDebugger.logButtonClick("emergencyFirstAidBtn", "Open EmergencyFirstAidActivity");
+                        startActivity(new Intent(HomePageActivity.this, EmergencyFirstAidActivity.class));
+                    } catch (Exception e) {
+                        CrashDebugger.logButtonClickError("emergencyFirstAidBtn", e);
+                        Toast.makeText(HomePageActivity.this, "Error opening first aid", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            // Nearby help button
+            if (nearbyHelpBtn != null) {
+                nearbyHelpBtn.setOnClickListener(v -> {
+                    try {
+                        CrashDebugger.logButtonClick("nearbyHelpBtn", "Open NearbyHelpActivity");
+                        startActivity(new Intent(HomePageActivity.this, NearbyHelpActivity.class));
+                    } catch (Exception e) {
+                        CrashDebugger.logButtonClickError("nearbyHelpBtn", e);
+                        Toast.makeText(HomePageActivity.this, "Error opening nearby help", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            // Profile menu item
+            View profileMenuItem = findViewById(R.id.profileMenuItem);
+            if (profileMenuItem != null) {
+                profileMenuItem.setOnClickListener(v -> {
+                    try {
+                        CrashDebugger.logButtonClick("profileMenuItem", "Open user profile");
+                        Intent intent = new Intent(HomePageActivity.this,
+                                auth.getCurrentUser() != null ? UserProfileActivity.class : SaveUserProfileActivity.class);
+                        startActivity(intent);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                    } catch (Exception e) {
+                        CrashDebugger.logButtonClickError("profileMenuItem", e);
+                        Toast.makeText(HomePageActivity.this, "Error opening profile", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            // NGO registration menu item
+            View ngoRegistrationItem = findViewById(R.id.ngoRegistrationMenuItem);
+            if (ngoRegistrationItem != null) {
+                ngoRegistrationItem.setOnClickListener(v -> {
+                    try {
+                        CrashDebugger.logButtonClick("ngoRegistrationMenuItem", "Open NGO registration");
+                        startActivity(new Intent(HomePageActivity.this, NgoRegistrationRequestActivity.class));
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                    } catch (Exception e) {
+                        CrashDebugger.logButtonClickError("ngoRegistrationMenuItem", e);
+                        Toast.makeText(HomePageActivity.this, "Error opening NGO registration", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            // Logout menu item
+            View logoutMenuItem = findViewById(R.id.logoutMenuItem);
+            if (logoutMenuItem != null) {
+                logoutMenuItem.setOnClickListener(v -> {
+                    try {
+                        CrashDebugger.logButtonClick("logoutMenuItem", "User logout");
+                        auth.signOut();
+                        startActivity(new Intent(HomePageActivity.this, LoginActivity.class));
+                        finish();
+                    } catch (Exception e) {
+                        CrashDebugger.logButtonClickError("logoutMenuItem", e);
+                        Toast.makeText(HomePageActivity.this, "Error logging out", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            CrashDebugger.logActivityEvent("HomePageActivity", "initListeners() SUCCESS");
+        } catch (Exception e) {
+            CrashDebugger.logActivityError("HomePageActivity", "initListeners()", e);
         }
     }
 
@@ -810,7 +997,7 @@ public class HomePageActivity extends AppCompatActivity {
 
     private void showSosConfirmDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("🊘 Send SOS Alert?")
+                .setTitle(" Send SOS Alert?")
                 .setMessage("This will IMMEDIATELY alert all your contacts with your "
                         + "current location.\n\nOnly use in a real emergency.")
                 .setPositiveButton("YES, SEND SOS", (dialog, which) -> triggerSos())

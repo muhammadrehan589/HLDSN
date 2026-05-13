@@ -103,6 +103,9 @@
         <activity android:name=".home.Main" android:exported="false" />
         <activity android:name=".home.HomePageActivity" android:exported="false" />
         <activity android:name=".volunteer_module.CampLocationsMapActivity" android:exported="false" />
+        <activity android:name=".home.EmergencyNumbersActivity" android:exported="false" />
+        <activity android:name=".firstaid.EmergencyFirstAidActivity" android:exported="false" />
+        <activity android:name=".firstaid.FirstAidDetailActivity" android:exported="false" />
         <activity android:name=".volunteer_module.VolunteerNetworkMapActivity" android:exported="false" />
         <activity android:name=".hazard_module.HazardAlertMapActivity" android:exported="false" />
         <activity android:name=".volunteer_module.VolunteerBasicFormActivity" android:exported="false" />
@@ -137,6 +140,8 @@
         <activity android:name=".ngo_module.NgoRegistrationRequestActivity" android:exported="false" />
         <activity android:name=".ngo_module.NgoViewVolunteersActivity" android:exported="false" />
         <activity android:name=".ngo_module.NgoVolunteerDetailActivity" android:exported="false" />
+         <activity android:name=".ngo_module.NgoRegistrationRequestActivity" android:exported="false" />
+         <activity android:name=".nearby.NearbyHelpActivity" android:exported="false" />
 
         <service
             android:name=".sos.SosForegroundService"
