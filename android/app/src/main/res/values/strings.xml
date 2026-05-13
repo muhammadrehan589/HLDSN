@@ -10,6 +10,10 @@
     <string name="camp_locations">CAMP Locations</string>
     <string name="volunteer_network">Volunteer Network</string>
     <string name="hazard_alert">Hazard Alert</string>
+    <string name="hazard_alert_title">Pakistan Hazard Outlook</string>
+    <string name="hazard_alert_subtitle">Color-coded prediction zones show likely and ongoing hazards. Tap a ring to see timing and impact details.</string>
+    <string name="hazard_legend_title">Hazard legend</string>
+    <string name="hazard_selected_title">Selected zone</string>
     <string name="chats">Chats</string>
     <string name="information">Information</string>
     <string name="safety_tips">Safety Tips</string>

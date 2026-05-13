@@ -30,6 +30,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.hldsn.NetworkUtils;
 import com.example.hldsn.R;
+import com.example.hldsn.incident_report_module.DisplayReportActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
@@ -67,6 +68,7 @@ public class ReportIncidentActivity extends AppCompatActivity {
     private Button uploadButton, safeButton, submitReportButton;
     private ImageView imagePreview;
     private ProgressBar uploadProgress;
+    private ImageView backButton, notificationIcon;
 
     private Uri selectedMediaUri;
     private boolean isSafe = false;
@@ -111,6 +113,8 @@ public class ReportIncidentActivity extends AppCompatActivity {
         safeButton = findViewById(R.id.safeButton);
         imagePreview = findViewById(R.id.imagePreview);
         uploadProgress = findViewById(R.id.uploadProgress);
+        backButton = findViewById(R.id.backButton);
+        notificationIcon = findViewById(R.id.notificationIcon);
     }
 
     private void initFirebase() {
@@ -168,6 +172,17 @@ public class ReportIncidentActivity extends AppCompatActivity {
 
 
     private void initListeners() {
+
+        if (backButton != null) {
+            backButton.setOnClickListener(v -> finish());
+        }
+
+        if (notificationIcon != null) {
+            notificationIcon.setOnClickListener(v -> {
+                startActivity(new Intent(this, DisplayReportActivity.class));
+                finish();
+            });
+        }
 
         safeColor = ContextCompat.getColor(this, R.color.safe_green);
         unsafeColor = ContextCompat.getColor(this, R.color.lightred);

@@ -17,6 +17,7 @@
 
     <!-- Left drawer: menu -->
     <FrameLayout
+        android:id="@+id/menuDrawerContainer"
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start">

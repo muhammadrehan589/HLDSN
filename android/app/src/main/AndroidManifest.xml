@@ -104,6 +104,7 @@
         <activity android:name=".home.HomePageActivity" android:exported="false" />
         <activity android:name=".volunteer_module.CampLocationsMapActivity" android:exported="false" />
         <activity android:name=".volunteer_module.VolunteerNetworkMapActivity" android:exported="false" />
+        <activity android:name=".hazard_module.HazardAlertMapActivity" android:exported="false" />
         <activity android:name=".volunteer_module.VolunteerBasicFormActivity" android:exported="false" />
         <activity android:name=".volunteer_module.VolunteerSkillsFormActivity" android:exported="false" />
         <activity android:name=".volunteer_module.VolunteerAgreementActivity" android:exported="false" />

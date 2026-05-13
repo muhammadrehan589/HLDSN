@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.FrameLayout;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.hldsn.R;
+import com.example.hldsn.incident_report_module.ReportIncidentActivity;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -44,6 +46,8 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
     private ShimmerFrameLayout shimmerLayout;
     private TextView emptyStateText;
     private FloatingActionButton addReportBtn;
+    private ImageView backButton;
+    private ImageView communityBell;
 
     private IncidentAdapter adapter;
     private final ArrayList<IncidentModel> allIncidents = new ArrayList<>();
@@ -88,6 +92,8 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
             shimmerLayout = findViewById(R.id.shimmerLayout);
             emptyStateText = findViewById(R.id.emptyStateText);
             addReportBtn = findViewById(R.id.addCommunityPostFab);
+            backButton = findViewById(R.id.backButton);
+            communityBell = findViewById(R.id.communityBell);
         } catch (Exception e) {
             Log.e(TAG, "View init failed", e);
         }
@@ -124,6 +130,16 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
     }
 
     private void initListeners() {
+        if (backButton != null) {
+            backButton.setOnClickListener(v -> finish());
+        }
+
+        if (communityBell != null) {
+            communityBell.setOnClickListener(v -> {
+                startActivity(new Intent(this, ReportIncidentActivity.class));
+            });
+        }
+
         if (addReportBtn != null) {
             addReportBtn.setOnClickListener(v -> {
                 try {

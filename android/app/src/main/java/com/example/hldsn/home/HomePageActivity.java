@@ -52,6 +52,7 @@ import com.example.hldsn.notification_module.NotificationAdapter;
 import com.example.hldsn.notification_module.NotificationItem;
 import com.example.hldsn.notification_module.SosAlertRecord;
 import com.example.hldsn.notification_module.SosAlertStore;
+import com.example.hldsn.hazard_module.HazardAlertMapActivity;
 import com.example.hldsn.services.news.NewsActivity;
 import com.example.hldsn.services.safety_tips.SafetyTipsActivity;
 import com.example.hldsn.sos.SosListenerService;
@@ -113,6 +114,7 @@ public class HomePageActivity extends AppCompatActivity {
     private ImageView menuIcon, notificationIcon;
     private TextView tvNotificationCount;
     private MaterialButton chatBtn, tipsBtn, newsBtn, communityChatBtn;
+    private MaterialButton hazardAlertBtn;
     private View emergencyBtn;
 
     private FirebaseAuth auth;
@@ -262,6 +264,7 @@ public class HomePageActivity extends AppCompatActivity {
         tipsBtn = findViewById(R.id.btn_info_safety);
         communityChatBtn = findViewById(R.id.btn_info_community_chat);
         newsBtn = findViewById(R.id.btn_info_news);
+        hazardAlertBtn = findViewById(R.id.btn_service_alert);
         emergencyBtn = findViewById(R.id.btn_emergency);
     }
 
@@ -335,8 +338,21 @@ public class HomePageActivity extends AppCompatActivity {
 
         chatBtn.setOnClickListener(v -> startActivity(new Intent(this, ChatsActivity.class)));
         tipsBtn.setOnClickListener(v -> startActivity(new Intent(this, SafetyTipsActivity.class)));
+        if (hazardAlertBtn != null) {
+            hazardAlertBtn.setOnClickListener(v -> startActivity(new Intent(this, HazardAlertMapActivity.class)));
+        }
         if (communityChatBtn != null) {
             communityChatBtn.setOnClickListener(v -> startActivity(new Intent(this, DisplayReportActivity.class)));
+        }
+        View campLocationsBtn = findViewById(R.id.btn_service_camp);
+        if (campLocationsBtn != null) {
+            campLocationsBtn.setOnClickListener(v ->
+                    startActivity(new Intent(this, CampLocationsMapActivity.class)));
+        }
+        View volunteerNetworkBtn = findViewById(R.id.btn_service_volunteer);
+        if (volunteerNetworkBtn != null) {
+            volunteerNetworkBtn.setOnClickListener(v ->
+                    startActivity(new Intent(this, VolunteerNetworkMapActivity.class)));
         }
         newsBtn.setOnClickListener(v -> startActivity(new Intent(this, NewsActivity.class)));
         emergencyBtn.setOnClickListener(v -> showSosConfirmDialog());
@@ -362,6 +378,61 @@ public class HomePageActivity extends AppCompatActivity {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
         });
+
+        // Home menu item - return to home page
+        View homeMenuItem = findViewById(R.id.homeMenuItem);
+        if (homeMenuItem != null) {
+            homeMenuItem.setOnClickListener(v -> {
+                drawerLayout.closeDrawer(GravityCompat.START);
+                Toast.makeText(this, "Already on Home", Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        // Back button
+        ImageView backButton = findViewById(R.id.backButton);
+        if (backButton != null) {
+            backButton.setOnClickListener(v -> {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                } else {
+                    onBackPressed();
+                }
+            });
+        }
+
+        // About Us menu item
+        View aboutMenuItem = findViewById(R.id.aboutMenuItem);
+        if (aboutMenuItem != null) {
+            aboutMenuItem.setOnClickListener(v -> showAboutUsDialog());
+        }
+    }
+
+    private void showAboutUsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog);
+        
+        // Inflate custom layout for the dialog
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.dialog_about_us, null);
+        
+        builder.setView(dialogView);
+        
+        AlertDialog dialog = builder.create();
+        
+        // Handle close button
+        Button closeButton = dialogView.findViewById(R.id.closeButton);
+        closeButton.setOnClickListener(v -> {
+            dialog.dismiss();
+            drawerLayout.closeDrawer(GravityCompat.START);
+        });
+        
+        dialog.show();
+        
+        // Set dialog window properties for better styling
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(R.drawable.login_gradient);
+            dialog.getWindow().setLayout((int)(getResources().getDisplayMetrics().widthPixels * 0.85), 
+                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
     }
 
     private void loadSeenIncidentIds() {
