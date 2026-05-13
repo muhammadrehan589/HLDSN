@@ -155,16 +155,16 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <!-- Fire Rescue -->
+                <!-- Emergency Numbers -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_contact_fire"
+                    android:id="@+id/btn_emergency_numbers"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="6dp"
                     android:minHeight="120dp"
-                    android:text="@string/fire"
+                    android:text="@string/emergency_numbers"
                     android:textAllCaps="false"
                     android:textColor="#0A1F1F"
                     android:textSize="11sp"
@@ -177,7 +177,7 @@
                     android:ellipsize="none"
                     app:backgroundTint="#FFFFFFFF"
                     app:cornerRadius="22dp"
-                    app:icon="@drawable/ic_fire"
+                    app:icon="@drawable/ic_emergency_numbers"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
@@ -185,16 +185,16 @@
                     app:strokeColor="#1A000000"
                     app:strokeWidth="1dp" />
 
-                <!-- Edhi Foundation -->
+                <!-- Nearby Help -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_contact_edhi"
+                    android:id="@+id/btn_nearby_help"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="6dp"
                     android:minHeight="120dp"
-                    android:text="@string/edhi"
+                    android:text="@string/nearby_help"
                     android:textAllCaps="false"
                     android:textColor="#0A1F1F"
                     android:textSize="11sp"
@@ -207,11 +207,11 @@
                     android:ellipsize="none"
                     app:backgroundTint="#FFFFFFFF"
                     app:cornerRadius="22dp"
-                    app:icon="@drawable/ic_edhi"
+                    app:icon="@drawable/ic_location"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
-                    app:iconTint="@null"
+                    app:iconTint="#065c53"
                     app:strokeColor="#1A000000"
                     app:strokeWidth="1dp" />
 
@@ -533,7 +533,7 @@
                     android:layout_weight="1"
                     android:layout_margin="6dp"
                     android:minHeight="120dp"
-                    android:text="@string/first_aid_tips"
+                    android:text="@string/emergency_first_aid_card"
                     android:textAllCaps="false"
                     android:textColor="#0A1F1F"
                     android:textSize="11sp"
