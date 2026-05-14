@@ -9,6 +9,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.hldsn.NetworkUtils;
 import com.example.hldsn.mesh.model.MeshIdentity;
 import com.example.hldsn.mesh.storage.MeshPeerStore;
 import com.google.firebase.Timestamp;
@@ -30,6 +31,7 @@ public class ChatsViewModel extends AndroidViewModel {
 
     private static final long NEARBY_PEER_MAX_AGE_MS = 600_000L;
     private static final long PEER_REFRESH_MS = 3_000L;
+    private static final long ONLINE_ACTIVE_WINDOW_MS = 10 * 60_000L;
 
     private final FirebaseFirestore db;
     private final MeshPeerStore meshPeerStore;
@@ -116,10 +118,18 @@ public class ChatsViewModel extends AndroidViewModel {
                     }
 
                     long version = onlineVersion.incrementAndGet();
+                    if (!hasInternetConnection()) {
+                        postSortedOnlineUsers(new ArrayList<>(), version);
+                        return;
+                    }
+
                     List<ChatUser> users = new ArrayList<>();
                     for (DocumentSnapshot doc : snapshots.getDocuments()) {
                         String uid = safeTrim(doc.getId());
                         if (uid.isEmpty() || uid.equals(currentUid)) {
+                            continue;
+                        }
+                        if (!isUserOnlineNow(doc)) {
                             continue;
                         }
 
@@ -135,6 +145,45 @@ public class ChatsViewModel extends AndroidViewModel {
                     postSortedOnlineUsers(users, version);
                     enrichWithChatMeta(users, version, true);
                 });
+    }
+
+    private boolean hasInternetConnection() {
+        return NetworkUtils.isOnline(getApplication().getApplicationContext());
+    }
+
+    private boolean isUserOnlineNow(DocumentSnapshot doc) {
+        Long ageMs = activeAgeMs(doc, "lastActiveAt", "lastSeen", "updated_at", "mesh_synced_at");
+        if (ageMs != null && ageMs <= ONLINE_ACTIVE_WINDOW_MS) {
+            return true;
+        }
+
+        Boolean isActive = doc.getBoolean("isActive");
+        return Boolean.TRUE.equals(isActive) && ageMs != null && ageMs <= ONLINE_ACTIVE_WINDOW_MS;
+    }
+
+    private Long activeAgeMs(DocumentSnapshot doc, String... keys) {
+        long now = System.currentTimeMillis();
+        for (String key : keys) {
+            Object value = doc.get(key);
+            Long timestampMs = toTimestampMs(value);
+            if (timestampMs != null) {
+                return Math.max(0L, now - timestampMs);
+            }
+        }
+        return null;
+    }
+
+    private Long toTimestampMs(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Timestamp) {
+            return ((Timestamp) value).toDate().getTime();
+        }
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+        return null;
     }
 
     private void refreshNearbyUsers() {

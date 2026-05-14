@@ -77,33 +77,32 @@ Acceptance Criteria:
 •	Then other users in the vicinity receive a notification of the incident
 •	And the report automatically disappears from the system after 24 hours and I have option to manually delete from my own report before it expires.
 ________________________________________
-•	Epic 4: Community Coordination & Safety (E4)
-Description: As a community member, I want tools to organize groups and share locations so that we can coordinate relief efforts effectively.
-User Story 4.1 - Help Requests
-As a user needing help, I want to broadcast a help request (e.g., "Medical", "Food") so that volunteers nearby can assist me
+•	Epic 4: Community Incident Feed & Chat (E4)
+Description: As a community member, I want to post and discuss local incident updates in a live community feed so that nearby users can stay informed and coordinate safely.
+User Story 4.1 - Incident Reporting
+As a user, I want to post a local incident report with type, location, description, safety status, and optional media so that others can see what is happening around me
 Acceptance Criteria:
-•	Given I need assistance
-•	When I select a category and post a request
-•	Then available volunteers see my request on their feed
-User Story 4.2 - Volunteer Availability
-As a volunteer, I want to mark myself as "Available to Help" and see nearby help requests so that I can offer assistance efficiently
+•	Given I witness or experience an incident
+•	When I fill in the report form and submit it
+•	Then the incident appears in the community feed with its details and timestamp
+User Story 4.2 - Community Reactions
+As a user, I want to like, dislike, and comment on incident reports so that I can confirm details and add useful context
 Acceptance Criteria:
-•	Given I have button my status to "Available"
-•	When a help request is posted nearby
-•	Then I receive a notification to assist
-User Story 4.3 - Location Sharing
-As a user, I want to see the real-time locations of nearby users who have opted-in on the map so that I can coordinate with them
+•	Given an incident is visible in the feed
+•	When I react to or comment on the report
+•	Then the reaction counts and comment thread update in real time
+User Story 4.3 - Community Feed Access
+As a user, I want to open the community feed from the app so that I can quickly review the latest incident updates
 Acceptance Criteria:
-•	Given users have agreed to share location
-•	When I look at the map
-•	Then I see markers representing their current positions
-User Story 4.4 - Hyper-Local Community Chat 
-As a user, I want to join a temporary, location-based chat room so that I can exchange information and coordinate with other people in my immediate vicinity. 
+•	Given I am on the home screen or incident screen
+•	When I open the Community entry point
+•	Then I can browse the live incident feed, refresh it, and open the report form when needed
+User Story 4.4 - Nearby User Chat
+As a user, I want to chat with online or nearby users so that I can exchange live updates and coordinate assistance
 Acceptance Criteria:
-•	Given I am in a disaster-affected zone
-•	When I open the "Community" tab
-•	Then I am automatically placed in a chat group with other users in my mesh range (or defined radius)
-•	And I can send text messages that are visible to everyone in that specific zone
+•	Given I open the chat area
+•	When I browse online or nearby users and select one
+•	Then I can send text messages in a direct conversation with timestamps and unread tracking
 
 ________________________________________
 •	Epic 5: Maps (E5)
@@ -511,65 +510,81 @@ Test Case:	Verify incident reporting with severity works and notifications propa
 Input:	User submits incident with description and severity level.
 Expected Result:	Incident visible in feed and map overlay; nearby users receive notification; incident metadata saved.
 ________________________________________
-•	Epic 4: Community Coordination & Safety
+•	Epic 4: Community Incident Feed & Chat
 •	Test Case 26
-Epic:	E4 — Community Coordination & Safety
+Epic:	E4 — Community Incident Feed & Chat
 Test ID:	E4US1TC1
-User Story ID:	US4.1 – As a user needing help, I want to broadcast a help request (e.g., "Medical", "Food") so that volunteers nearby can assist me.
-Test Case:	Verify help request broadcast to nearby volunteers.
-Input:	User selects “Medical” and sends help request.
-Expected Result:	Nearby volunteers receive notification with location and details; request appears in volunteer feed.
+User Story ID:	US4.1 – As a user, I want to post a local incident report with type, location, description, safety status, and optional media so that others can see what is happening around me.
+Test Case:	Verify a new incident is published to the community feed.
+Input:	User selects an incident type, enters location and description, attaches optional media, and submits the report.
+Expected Result:	The incident appears in the live community feed with its details, safety flag, and timestamp.
 ________________________________________
 •	Test Case 27
-Epic:	E4 — Community Coordination & Safety
+Epic:	E4 — Community Incident Feed & Chat
 Test ID:	E4US1TC2
-User Story ID:	US4.1 – As a user needing help, I want to broadcast a help request (e.g., "Medical", "Food") so that volunteers nearby can assist me.
-Test Case:	Verify multiple help requests from same user are handled correctly.
-Input:	User posts "Need Water", then immediately posts "Need Medical".
-Expected Result:	System treats them as distinct requests OR updates the existing status (depending on policy); prevents spamming duplicate identical requests.
+User Story ID:	US4.2 – As a user, I want to like, dislike, and comment on incident reports so that I can confirm details and add useful context.
+Test Case:	Verify reactions and comments update on a report.
+Input:	User likes a report, then adds a comment on the same post.
+Expected Result:	Like/dislike counts and the comment thread update in real time.
 ________________________________________
 •	Test Case 28
-Epic:	E4 — Community Coordination & Safety
+Epic:	E4 — Community Incident Feed & Chat
 Test ID:	E4US2TC1
-User Story ID:	US4.2 – As a volunteer, I want to mark myself as "Available to Help" and see nearby help requests so that I can offer assistance efficiently.
-Test Case:	Verify availability button and request deliveries.
-Input:	Volunteer toggles status to “Available”; a help request is posted within radius.
-Expected Result:	Volunteer gets notification and can accept/decline; UI shows distance to request.
+User Story ID:	US4.3 – As a user, I want to open the community feed from the app so that I can quickly review the latest incident updates.
+Test Case:	Verify the community feed opens, refreshes, and shows recent reports.
+Input:	User opens the Community screen and pulls to refresh.
+Expected Result:	The incident list loads from Firestore, the feed refreshes, and cached data is shown when offline.
 ________________________________________
 •	Test Case 29
-Epic:	E4 — Community Coordination & Safety
+Epic:	E4 — Community Incident Feed & Chat
 Test ID:	E4US2TC2
-User Story ID:	US4.2 – As a volunteer, I want to mark myself as "Available to Help" and see nearby help requests so that I can offer assistance efficiently.
-Test Case:	Verify help request includes supply category and volunteers filter by capability.
-Input:	Help request includes “Need Water + Medical” category.
-Expected Result:	Volunteers with either "Water" OR "Medical" capability flag receive the prioritized notification.
+User Story ID:	US4.3 – As a user, I want to open the community feed from the app so that I can quickly review the latest incident updates.
+Test Case:	Verify the report entry point opens the incident form.
+Input:	User taps the add-report or notification entry point.
+Expected Result:	The incident report form opens and allows the user to create a new post.
 ________________________________________
 •	Test Case 30
-Epic:	E4 — Community Coordination & Safety
+Epic:	E4 — Community Incident Feed & Chat
 Test ID:	E4US2TC3
-User Story ID:	US4.2 – As a volunteer, I want to mark myself as "Available to Help" and see nearby help requests so that I can offer assistance efficiently.
-Test Case:	Verify help request status update to “Resolved”.
-Input:	Volunteer marks request as resolved after assisting.
-Expected Result:	Request status updated; originator and nearby users notified; request removed from active list.
+User Story ID:	US4.4 – As a user, I want to chat with online or nearby users so that I can exchange live updates and coordinate assistance.
+Test Case:	Verify a direct chat session opens from the chat list.
+Input:	User selects an online or nearby user from the chat screen.
+Expected Result:	A conversation opens with message history and the user can send new messages.
 ________________________________________
 •	Test Case 31
-Epic:	E4 — Community Coordination & Safety
+Epic:	E4 — Community Incident Feed & Chat
 Test ID:	E4US3TC1
-User Story ID:	US4.3 – As a user, I want to see the real-time locations of nearby users who have opted-in on the map so that I can coordinate with them.
-Test Case:	Verify realtime opt-in location sharing markers.
-Input:	Two users enable “Share location” and open map.
-Expected Result:	Each sees markers for the other that update periodically.
+User Story ID:	US4.4 – As a user, I want to chat with online or nearby users so that I can exchange live updates and coordinate assistance.
+Test Case:	Verify messages are sent and received in a conversation.
+Input:	User types a message and taps send.
+Expected Result:	The message is written to Firestore and appears in the chat thread with a timestamp.
 ________________________________________
 •	Test Case 32
-Epic:	E4 — Community Coordination & Safety
+Epic:	E4 — Community Incident Feed & Chat
 Test ID:	E4US3TC2
-User Story ID:	US4.3 – As a user, I want to see the real-time locations of nearby users who have opted-in on the map so that I can coordinate with them.
-Test Case:	Verify location sharing stops when user opts out.
-Input:	User disables “Share Location”.
-Expected Result:	User's marker disappears from other peers' maps immediately (or upon next refresh).
+User Story ID:	US4.4 – As a user, I want to chat with online or nearby users so that I can exchange live updates and coordinate assistance.
+Test Case:	Verify nearby and online user lists are visible in the chat area.
+Input:	User opens the chat tab and uses search.
+Expected Result:	The chat list shows online and nearby users, and the search filter narrows the list correctly.
+________________________________________
+•	Test Case 33
+Epic:	E4 — Community Incident Feed & Chat
+Test ID:	E4US1TC3
+User Story ID:	US4.1 – As a user, I want to post a local incident report with type, location, description, safety status, and optional media so that others can see what is happening around me.
+Test Case:	Verify incident submission blocks incomplete reports.
+Input:	Leave the incident type or location empty and tap Submit.
+Expected Result:	Validation prevents submission; the report is not posted until required fields are completed.
+________________________________________
+•	Test Case 34
+Epic:	E4 — Community Incident Feed & Chat
+Test ID:	E4US4TC2
+User Story ID:	US4.4 – As a user, I want to chat with online or nearby users so that I can exchange live updates and coordinate assistance.
+Test Case:	Verify message delivery and unread tracking in a direct chat.
+Input:	Send a message to an online or nearby user, then reopen the chat from the list.
+Expected Result:	The message appears in the conversation with a timestamp, and the unread badge updates correctly for the recipient.
 ________________________________________
 •	Epic 5: Maps
-•	Test Case 33
+•	Test Case 35
 Epic:	E5 — Maps
 Test ID:	E5US1TC1
 User Story ID:	US5.1 – As a user, I want to view an offline map that shows my location and hazard zones so that I can navigate safely without internet.
@@ -577,7 +592,7 @@ Test Case:	Verify offline map loads and hazard overlays display.
 Input:	Device offline; open Map screen; offline map data available.
 Expected Result:	Map renders; hazard zones shown color-coded; user location displayed.
 ________________________________________
-•	Test Case 34
+•	Test Case 36
 Epic:	E5 — Maps
 Test ID:	E5US1TC2
 User Story ID:	US5.1 – As a user, I want to view an offline map that shows my location and hazard zones so that I can navigate safely without internet.
@@ -585,7 +600,7 @@ Test Case:	Verify map panning and zoom working offline.
 Input:	User pans/zooms map offline.
 Expected Result:	Tiles loaded from local store; no placeholder tiles; smooth interaction.
 ________________________________________
-•	Test Case 35
+•	Test Case 37
 Epic:	E5 — Maps
 Test ID:	E5US1TC3
 User Story ID:	US5.1 – As a user, I want to view an offline map that shows my location and hazard zones so that I can navigate safely without internet.
@@ -593,7 +608,7 @@ Test Case:	Verify adding and sharing relief points.
 Input:	User pins a relief center and marks details, then shares.
 Expected Result:	Pin visible on local and synced maps; nearby users receive update when sync occurs.
 ________________________________________
-•	Test Case 36
+•	Test Case 38
 Epic:	E5 — Maps
 Test ID:	E5US1TC4
 User Story ID:	US5.1 – As a user, I want to view an offline map that shows my location and hazard zones so that I can navigate safely without internet.
@@ -602,7 +617,7 @@ Input:	User A and User B add the same relief point (same coordinates) simultaneo
 Expected Result:	System detects proximity overlap and merges them into one pin, or asks user to confirm if it is a duplicate.
 ________________________________________
 •	Epic 6: Safety & Preparedness Knowledge Base
-•	Test Case 37
+•	Test Case 39
 Epic:	E6 — Safety & Preparedness Knowledge Base
 Test ID:	E6US1TC1
 User Story ID:	US6.1 – As a user, I want to access specific safety guidelines for various disaster types so that I know how to react during these specific events without internet access.
@@ -610,7 +625,7 @@ Test Case:	Verify knowledge base content loads offline.
 Input:	Device offline; open “Flood Safety” content.
 Expected Result:	Content loads fully; images and steps present; no broken links.
 ________________________________________
-•	Test Case 38
+•	Test Case 40
 Epic:	E6 — Safety & Preparedness Knowledge Base
 Test ID:	E6US1TC2
 User Story ID:	US6.1 – As a user, I want to access specific safety guidelines for various disaster types so that I know how to react during these specific events without internet access.
@@ -618,7 +633,7 @@ Test Case:	Verify search within offline content.
 Input:	User searches “first aid” while offline.
 Expected Result:	Relevant local articles found and displayed.
 ________________________________________
-•	Test Case 39
+•	Test Case 41
 Epic:	E6 — Safety & Preparedness Knowledge Base
 Test ID:	E6US2TC1
 User Story ID:	US6.2 – As a user, I want to view First Aid procedures so that I can provide immediate medical assistance to injured persons.
@@ -627,7 +642,7 @@ Input:	Open “CPR” guide; step through instructions.
 Expected Result:	Steps displayed with images/icons; navigation between steps works.
 ________________________________________
 •	Epic 7: User Authentication and Account Management
-•	Test Case 40
+•	Test Case 42
 Epic:	E7 — User Authentication and Account Management
 Test ID:	E7US1TC1
 User Story ID:	US7.1 – As a new user, I want to create an account with email and password so that I can access the app.
@@ -635,7 +650,7 @@ Test Case:	Verify successful account creation with valid signup data.
 Input:	Enter first name, last name, mobile, email, password, confirm password; accept terms; tap Signup.
 Expected Result:	Firebase Auth account created; Firestore users/{uid} document created with firstName, lastName, mobile, email, role, createdAt; user routed to login screen.
 ________________________________________
-•	Test Case 41
+•	Test Case 43
 Epic:	E7 — User Authentication and Account Management
 Test ID:	E7US1TC2
 User Story ID:	US7.1 – As a new user, I want to create an account with email and password so that I can access the app.
@@ -643,7 +658,7 @@ Test Case:	Verify signup validation blocks invalid data.
 Input:	Leave required fields empty or enter mismatched passwords; tap Signup.
 Expected Result:	Validation error displayed; account not created; no navigation.
 ________________________________________
-•	Test Case 42
+•	Test Case 44
 Epic:	E7 — User Authentication and Account Management
 Test ID:	E7US1TC3
 User Story ID:	US7.1 – As a new user, I want to create an account with email and password so that I can access the app.
@@ -651,7 +666,7 @@ Test Case:	Verify signup prevents duplicate email registration.
 Input:	Attempt to signup with an email already registered in Firebase.
 Expected Result:	Error message shown: "Email already in use"; account creation blocked.
 ________________________________________
-•	Test Case 43
+•	Test Case 45
 Epic:	E7 — User Authentication and Account Management
 Test ID:	E7US2TC1
 User Story ID:	US7.2 – As a registered user, I want to log in with my email and password so that I can access my personalized dashboard.
@@ -659,7 +674,7 @@ Test Case:	Verify successful login with correct credentials.
 Input:	Enter valid email and password; tap Login.
 Expected Result:	User authenticated via Firebase Auth; mesh identity initialized; user routed to appropriate dashboard based on role.
 ________________________________________
-•	Test Case 44
+•	Test Case 46
 Epic:	E7 — User Authentication and Account Management
 Test ID:	E7US2TC2
 User Story ID:	US7.2 – As a registered user, I want to log in with my email and password so that I can access my personalized dashboard.
@@ -667,7 +682,7 @@ Test Case:	Verify login fails with incorrect password.
 Input:	Enter valid email but wrong password; tap Login.
 Expected Result:	Toast message shown: "Login Failed: Invalid credentials"; no navigation; login form remains open.
 ________________________________________
-•	Test Case 45
+•	Test Case 47
 Epic:	E7 — User Authentication and Account Management
 Test ID:	E7US3TC1
 User Story ID:	US7.3 – As an authenticated user, I want to be automatically routed to the correct dashboard based on my role.
@@ -675,7 +690,7 @@ Test Case:	Verify admin users are routed to AdminDashboardActivity.
 Input:	Login with account where role = "admin".
 Expected Result:	AdminDashboardActivity opens; user sees admin management options (Manage Users, Manage NGOs, Manage Requests).
 ________________________________________
-•	Test Case 46
+•	Test Case 48
 Epic:	E7 — User Authentication and Account Management
 Test ID:	E7US3TC2
 User Story ID:	US7.3 – As an authenticated user, I want to be automatically routed to the correct dashboard based on my role.
@@ -683,7 +698,7 @@ Test Case:	Verify ngo_admin users are routed to NgoDashboardActivity.
 Input:	Login with account where role = "ngo_admin".
 Expected Result:	NgoDashboardActivity opens; user sees NGO options (Manage Volunteers, View Volunteers, Add Camp Center, Manage Camps).
 ________________________________________
-•	Test Case 47
+•	Test Case 49
 Epic:	E7 — User Authentication and Account Management
 Test ID:	E7US3TC3
 User Story ID:	US7.3 – As an authenticated user, I want to be automatically routed to the correct dashboard based on my role.
@@ -691,7 +706,7 @@ Test Case:	Verify regular users are routed to HomePageActivity.
 Input:	Login with account where role = "user".
 Expected Result:	HomePageActivity opens; user sees home dashboard with news carousel, quick access buttons, and badges.
 ________________________________________
-•	Test Case 48
+•	Test Case 50
 Epic:	E7 — User Authentication and Account Management
 Test ID:	E7US4TC1
 User Story ID:	US7.4 – As a user who forgot their password, I want to receive a password reset email so that I can regain access.
@@ -699,7 +714,7 @@ Test Case:	Verify password reset email is sent.
 Input:	On login screen, tap "Forgot Password"; enter registered email; wait for email.
 Expected Result:	Password reset email sent to inbox; email contains reset link; user can follow link to set new password.
 ________________________________________
-•	Test Case 49
+•	Test Case 51
 Epic:	E7 — User Authentication and Account Management
 Test ID:	E7US4TC2
 User Story ID:	US7.4 – As a user who forgot their password, I want to receive a password reset email so that I can regain access.
@@ -708,7 +723,7 @@ Input:	Tap "Forgot Password"; enter non-existent email address.
 Expected Result:	System either silently succeeds (security best practice) or shows "If an account exists, reset email will be sent"; user is not informed whether email exists or not.
 ________________________________________
 •	Epic 8: User Profile and Health Information Management
-•	Test Case 50
+•	Test Case 52
 Epic:	E8 — User Profile and Health Information Management
 Test ID:	E8US1TC1
 User Story ID:	US8.1 – As a user, I want to save my basic profile information so that my details are available in the system.
@@ -716,7 +731,7 @@ Test Case:	Verify basic profile information is saved to Firestore.
 Input:	Open profile form; enter name, address, phone, age; tap Save.
 Expected Result:	Data saved to Firestore users/{uid} document; UserProfileActivity displays the saved information correctly.
 ________________________________________
-•	Test Case 51
+•	Test Case 53
 Epic:	E8 — User Profile and Health Information Management
 Test ID:	E8US1TC2
 User Story ID:	US8.1 – As a user, I want to save my basic profile information so that my details are available in the system.
@@ -724,7 +739,7 @@ Test Case:	Verify profile data persists after app close/reopen.
 Input:	Save profile data; close app; reopen and navigate to profile screen.
 Expected Result:	Previously saved data is displayed; no data loss; Firestore remains source of truth.
 ________________________________________
-•	Test Case 52
+•	Test Case 54
 Epic:	E8 — User Profile and Health Information Management
 Test ID:	E8US2TC1
 User Story ID:	US8.2 – As a user, I want to record medical information so that first responders have critical health data.
@@ -732,7 +747,7 @@ Test Case:	Verify medical data array fields (allergies, injuries) are stored as 
 Input:	Enter blood group, height, weight; add allergies (Penicillin, Shellfish); add injuries (Previous fractures); tap Save.
 Expected Result:	Data stored in Firestore; allergies and injuries stored as arrays; data retrievable and modifiable later.
 ________________________________________
-•	Test Case 53
+•	Test Case 55
 Epic:	E8 — User Profile and Health Information Management
 Test ID:	E8US2TC2
 User Story ID:	US8.2 – As a user, I want to record medical information so that first responders have critical health data.
@@ -740,7 +755,7 @@ Test Case:	Verify medical data can be updated without affecting other fields.
 Input:	Update blood group only; tap Save.
 Expected Result:	Only blood group field updated; other fields (height, weight, allergies, injuries) remain unchanged.
 ________________________________________
-•	Test Case 54
+•	Test Case 56
 Epic:	E8 — User Profile and Health Information Management
 Test ID:	E8US3TC1
 User Story ID:	US8.3 – As a user, I want to add emergency contacts so that my family and services can be notified quickly.
@@ -748,7 +763,7 @@ Test Case:	Verify emergency contacts are stored as array in Firestore.
 Input:	Add 3 emergency contacts with names and phone numbers; tap Save.
 Expected Result:	All 3 contacts stored in array field; each contact retrievable individually; array order preserved.
 ________________________________________
-•	Test Case 55
+•	Test Case 57
 Epic:	E8 — User Profile and Health Information Management
 Test ID:	E8US3TC2
 User Story ID:	US8.3 – As a user, I want to add emergency contacts so that my family and services can be notified quickly.
@@ -756,7 +771,7 @@ Test Case:	Verify emergency contact list can be modified.
 Input:	Add 2 contacts; save; reopen form; modify one contact; delete another; add a new one; save.
 Expected Result:	Final array contains 2 contacts (modified + new); deleted contact removed; order consistent.
 ________________________________________
-•	Test Case 56
+•	Test Case 58
 Epic:	E8 — User Profile and Health Information Management
 Test ID:	E8US4TC1
 User Story ID:	US8.4 – As a user, I want to upload a profile photo so that my account is personalized.
@@ -764,7 +779,7 @@ Test Case:	Verify image upload via ImageKit and URL storage.
 Input:	Select image from gallery; authenticate with ImageKit backend; tap Save.
 Expected Result:	Image uploaded successfully; profileImageUrl stored in Firestore; image displayed on profile via Glide.
 ________________________________________
-•	Test Case 57
+•	Test Case 59
 Epic:	E8 — User Profile and Health Information Management
 Test ID:	E8US4TC2
 User Story ID:	US8.4 – As a user, I want to upload a profile photo so that my account is personalized.
@@ -772,7 +787,7 @@ Test Case:	Verify image upload timeout and fallback handling.
 Input:	Attempt image upload with slow network or timeout; observe timeout behavior.
 Expected Result:	Timeout detected; user notified "Image upload failed"; able to retry or skip; profile saves without image if skipped.
 ________________________________________
-•	Test Case 58
+•	Test Case 60
 Epic:	E8 — User Profile and Health Information Management
 Test ID:	E8US4TC3
 User Story ID:	US8.4 – As a user, I want to upload a profile photo so that my account is personalized.
@@ -781,7 +796,7 @@ Input:	Upload profile image; close profile form; reopen profile form.
 Expected Result:	Image displays quickly from cache; no re-download if already cached.
 ________________________________________
 •	Epic 9: Home Dashboard and Session Management
-•	Test Case 59
+•	Test Case 61
 Epic:	E9 — Home Dashboard and Session Management
 Test ID:	E9US1TC1
 User Story ID:	US9.1 – As a user, I want the home dashboard to load my active session and badges.
@@ -789,7 +804,7 @@ Test Case:	Verify home dashboard initializes with active session and badge count
 Input:	Login and reach HomePageActivity.
 Expected Result:	User session is active; notification badges display (message count, incident count, SOS alerts); all counts are accurate.
 ________________________________________
-•	Test Case 60
+•	Test Case 62
 Epic:	E9 — Home Dashboard and Session Management
 Test ID:	E9US1TC2
 User Story ID:	US9.1 – As a user, I want the home dashboard to load my active session and badges.
@@ -797,7 +812,7 @@ Test Case:	Verify badges update in real-time when new incidents or messages arri
 Input:	Receive a new incident notification while on home screen.
 Expected Result:	Incident badge count increments immediately; visual feedback (animation or color change) shown.
 ________________________________________
-•	Test Case 61
+•	Test Case 63
 Epic:	E9 — Home Dashboard and Session Management
 Test ID:	E9US2TC1
 User Story ID:	US9.2 – As a user, I want a rotating carousel of disaster news on the home screen.
@@ -805,7 +820,7 @@ Test Case:	Verify news carousel auto-rotates and transitions smoothly.
 Input:	Open home screen and observe carousel for at least 15 seconds.
 Expected Result:	Carousel auto-advances every 5 seconds; transition is smooth; each slide displays news headline and image.
 ________________________________________
-•	Test Case 62
+•	Test Case 64
 Epic:	E9 — Home Dashboard and Session Management
 Test ID:	E9US2TC2
 User Story ID:	US9.2 – As a user, I want a rotating carousel of disaster news on the home screen.
@@ -813,7 +828,7 @@ Test Case:	Verify carousel fallback when external API fails.
 Input:	Disable internet connection; reload home screen.
 Expected Result:	Carousel displays cached or dummy news items; no crash; fallback message shown if offline.
 ________________________________________
-•	Test Case 63
+•	Test Case 65
 Epic:	E9 — Home Dashboard and Session Management
 Test ID:	E9US2TC3
 User Story ID:	US9.2 – As a user, I want a rotating carousel of disaster news on the home screen.
@@ -821,7 +836,7 @@ Test Case:	Verify tapping a carousel item opens full news story.
 Input:	Tap on a carousel news item.
 Expected Result:	NewsDetailActivity opens with full story headline, image, description, and source.
 ________________________________________
-•	Test Case 64
+•	Test Case 66
 Epic:	E9 — Home Dashboard and Session Management
 Test ID:	E9US3TC1
 User Story ID:	US9.3 – As a user, I want quick access buttons to major features.
@@ -829,7 +844,7 @@ Test Case:	Verify all feature entry point buttons are functional.
 Input:	From home screen, tap Chat, Incidents, Safety, Volunteer, Profile buttons.
 Expected Result:	Each button routes to correct activity; no crashes; navigation is instantaneous.
 ________________________________________
-•	Test Case 65
+•	Test Case 67
 Epic:	E9 — Home Dashboard and Session Management
 Test ID:	E9US4TC1
 User Story ID:	US9.4 – As a user in distress, I want prominent SOS button on home screen.
@@ -837,7 +852,7 @@ Test Case:	Verify SOS button requires 3-second press-and-hold to trigger.
 Input:	Press SOS button for 1 second (release); observe no trigger.
 Expected Result:	Button shows visual fill indicator; SOS does not trigger until 3-second threshold reached.
 ________________________________________
-•	Test Case 66
+•	Test Case 68
 Epic:	E9 — Home Dashboard and Session Management
 Test ID:	E9US4TC2
 User Story ID:	US9.4 – As a user in distress, I want prominent SOS button on home screen.
@@ -846,7 +861,7 @@ Input:	Press and hold SOS for 3 seconds; allow broadcast to complete.
 Expected Result:	SOS alert sent with user location; online path uses Firestore; offline path uses BLE/WiFi Direct; feedback shown to user.
 ________________________________________
 •	Epic 10: NGO and Volunteer Coordination
-•	Test Case 67
+•	Test Case 69
 Epic:	E10 — NGO and Volunteer Coordination
 Test ID:	E10US1TC1
 User Story ID:	US10.1 – As a volunteer, I want to complete a multi-step enrollment process.
@@ -854,7 +869,7 @@ Test Case:	Verify volunteer enrollment flow completes successfully.
 Input:	Start volunteer enrollment; complete Basic Form (NGO selection); Skills Form (select skills); Agreement (accept); finish.
 Expected Result:	Each step validates before proceeding; final submission stores volunteer application in Firestore; success screen displayed.
 ________________________________________
-•	Test Case 68
+•	Test Case 70
 Epic:	E10 — NGO and Volunteer Coordination
 Test ID:	E10US1TC2
 User Story ID:	US10.1 – As a volunteer, I want to complete a multi-step enrollment process.
@@ -862,7 +877,7 @@ Test Case:	Verify enrollment form can be saved as draft and resumed.
 Input:	Complete Basic Form; navigate away; return to volunteer module; tap "Continue Enrollment".
 Expected Result:	Previously filled data is preserved (Intent extras or SharedPreferences); user can resume from last step.
 ________________________________________
-•	Test Case 69
+•	Test Case 71
 Epic:	E10 — NGO and Volunteer Coordination
 Test ID:	E10US2TC1
 User Story ID:	US10.2 – As a volunteer, I want to indicate skills and availability.
@@ -870,7 +885,7 @@ Test Case:	Verify volunteer skills are stored and available status is toggleable
 Input:	During enrollment, select First Aid and Water Distribution; after enrollment, toggle "Available to Help" on/off.
 Expected Result:	Skills stored in volunteer application; availability toggle persists; NGO dashboard reflects current availability status.
 ________________________________________
-•	Test Case 70
+•	Test Case 72
 Epic:	E10 — NGO and Volunteer Coordination
 Test ID:	E10US3TC1
 User Story ID:	US10.3 – As an NGO admin, I want to review and approve volunteer applications.
@@ -878,7 +893,7 @@ Test Case:	Verify pending volunteer applications display and approval persists.
 Input:	Login as ngo_admin; access "Manage Volunteers"; see pending applications; approve one; reject one with reason.
 Expected Result:	Approved volunteer's status updated to "approved"; rejected volunteer notified with reason; list updates; changes persisted in Firestore.
 ________________________________________
-•	Test Case 71
+•	Test Case 73
 Epic:	E10 — NGO and Volunteer Coordination
 Test ID:	E10US3TC2
 User Story ID:	US10.3 – As an NGO admin, I want to review and approve volunteer applications.
@@ -886,7 +901,7 @@ Test Case:	Verify approved volunteers receive notification.
 Input:	Approve a pending volunteer application as NGO admin.
 Expected Result:	Notification sent to volunteer's device; volunteer can accept or decline; acceptance routed to NGO dashboard.
 ________________________________________
-•	Test Case 72
+•	Test Case 74
 Epic:	E10 — NGO and Volunteer Coordination
 Test ID:	E10US4TC1
 User Story ID:	US10.4 – As an NGO admin, I want to manage camp center locations.
@@ -894,7 +909,7 @@ Test Case:	Verify camp center creation with location picker stores all data.
 Input:	Login as ngo_admin; tap "Add Camp Center"; fill name, select location on osmdroid map, enter capacity and services; save.
 Expected Result:	Camp center document created in Firestore; location (lat/lng) stored; camp visible on NGO map; volunteers can see camp on their map.
 ________________________________________
-•	Test Case 73
+•	Test Case 75
 Epic:	E10 — NGO and Volunteer Coordination
 Test ID:	E10US4TC2
 User Story ID:	US10.4 – As an NGO admin, I want to manage camp center locations.
@@ -902,7 +917,7 @@ Test Case:	Verify camp center can be updated or deleted.
 Input:	Access camp management; modify camp capacity; delete another camp.
 Expected Result:	Modified camp reflects new capacity; deleted camp removed from Firestore and maps; changes visible to all users.
 ________________________________________
-•	Test Case 74
+•	Test Case 76
 Epic:	E10 — NGO and Volunteer Coordination
 Test ID:	E10US5TC1
 User Story ID:	US10.5 – As an NGO admin, I want to see real-time volunteer locations on a map.
@@ -910,7 +925,7 @@ Test Case:	Verify volunteer location markers update in real-time on NGO map.
 Input:	Login as ngo_admin; open volunteer network map; observe volunteer markers; move to different location as volunteer.
 Expected Result:	All active volunteers shown as markers; markers update as volunteers move; marker shows name and availability status.
 ________________________________________
-•	Test Case 75
+•	Test Case 77
 Epic:	E10 — NGO and Volunteer Coordination
 Test ID:	E10US5TC2
 User Story ID:	US10.5 – As an NGO admin, I want to see real-time volunteer locations on a map.
@@ -919,7 +934,7 @@ Input:	A volunteer toggles "Available to Help" OFF; observe map as NGO admin.
 Expected Result:	Volunteer marker disappears or shows different status; map only shows currently active volunteers.
 ________________________________________
 •	Epic 11: Administrative Control and System Governance
-•	Test Case 76
+•	Test Case 78
 Epic:	E11 — Administrative Control and System Governance
 Test ID:	E11US1TC1
 User Story ID:	US11.1 – As an admin, I want to view and manage all user accounts.
@@ -927,7 +942,7 @@ Test Case:	Verify admin can view all users with search and filter functionality.
 Input:	Login as admin; access "Manage Users"; search for a user by email; filter by role.
 Expected Result:	User list loads; search returns correct results; filter by role displays only matching users; can view user details (email, role, createdAt).
 ________________________________________
-•	Test Case 77
+•	Test Case 79
 Epic:	E11 — Administrative Control and System Governance
 Test ID:	E11US1TC2
 User Story ID:	US11.1 – As an admin, I want to view and manage all user accounts.
@@ -935,7 +950,7 @@ Test Case:	Verify admin can delete user accounts.
 Input:	Select a user and tap "Delete Account".
 Expected Result:	User removed from Firestore users collection; Firebase Auth account deleted; user can no longer login; deletion logged.
 ________________________________________
-•	Test Case 78
+•	Test Case 80
 Epic:	E11 — Administrative Control and System Governance
 Test ID:	E11US2TC1
 User Story ID:	US11.2 – As an admin, I want to view and manage all registered NGOs.
@@ -943,7 +958,7 @@ Test Case:	Verify admin can view all NGOs and their registration dates.
 Input:	Login as admin; access "Manage NGOs"; observe NGO list with names and registration dates.
 Expected Result:	All active NGOs displayed; details include name, contact email, registration date, and status (active/inactive).
 ________________________________________
-•	Test Case 79
+•	Test Case 81
 Epic:	E11 — Administrative Control and System Governance
 Test ID:	E11US2TC2
 User Story ID:	US11.2 – As an admin, I want to view and manage all registered NGOs.
@@ -951,7 +966,7 @@ Test Case:	Verify admin can remove an NGO from the platform.
 Input:	Select an NGO and tap "Remove from Platform".
 Expected Result:	NGO removed from Firestore; admin dashboard no longer shows NGO; NGO users receive notification that their organization was removed.
 ________________________________________
-•	Test Case 80
+•	Test Case 82
 Epic:	E11 — Administrative Control and System Governance
 Test ID:	E11US3TC1
 User Story ID:	US11.3 – As an admin, I want to review pending NGO registration requests.
@@ -959,7 +974,7 @@ Test Case:	Verify admin can approve NGO registration requests.
 Input:	Login as admin; access "Manage NGO Requests"; see pending request; review request details; tap "Approve".
 Expected Result:	Request status updated to "approved"; NGO user receives confirmation; request moved to approved section; decision logged with timestamp and admin name.
 ________________________________________
-•	Test Case 81
+•	Test Case 83
 Epic:	E11 — Administrative Control and System Governance
 Test ID:	E11US3TC2
 User Story ID:	US11.3 – As an admin, I want to review pending NGO registration requests.
@@ -967,7 +982,7 @@ Test Case:	Verify admin can reject NGO registration requests with reason.
 Input:	Access pending request; tap "Reject"; enter rejection reason; confirm.
 Expected Result:	Request status updated to "rejected"; rejection reason sent to applicant; request logged; applicant notified and can reapply if desired.
 ________________________________________
-•	Test Case 82
+•	Test Case 84
 Epic:	E11 — Administrative Control and System Governance
 Test ID:	E11US4TC1
 User Story ID:	US11.4 – As an admin, I want to review and moderate incidents.
