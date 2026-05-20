@@ -3,6 +3,7 @@ package com.example.hldsn.incident_report_module;
 import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -28,6 +29,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class ChatsViewModel extends AndroidViewModel {
 
+    private static final String TAG = "ChatsViewModel";
     private static final long NEARBY_PEER_MAX_AGE_MS = 600_000L;
     private static final long PEER_REFRESH_MS = 3_000L;
 
@@ -89,6 +91,8 @@ public class ChatsViewModel extends AndroidViewModel {
             return;
         }
 
+        Log.d(TAG, "startDataStreams: starting streams for user " + currentUid);
+
         streamsRunning = true;
         startOnlineUsersListener();
         handler.removeCallbacks(nearbyRefreshRunnable);
@@ -96,6 +100,7 @@ public class ChatsViewModel extends AndroidViewModel {
     }
 
     public void stopDataStreams() {
+        Log.d(TAG, "stopDataStreams: stopping streams");
         streamsRunning = false;
         handler.removeCallbacks(nearbyRefreshRunnable);
         if (usersRegistration != null) {
@@ -106,31 +111,58 @@ public class ChatsViewModel extends AndroidViewModel {
 
     private void startOnlineUsersListener() {
         if (usersRegistration != null || currentUid == null) {
+            Log.w(TAG, "startOnlineUsersListener: already registered or no current user");
             return;
         }
 
+        Log.d(TAG, "startOnlineUsersListener: starting listener for users collection");
         usersRegistration = db.collection("users")
                 .addSnapshotListener((snapshots, e) -> {
-                    if (e != null || snapshots == null) {
+                    if (e != null) {
+                        Log.e(TAG, "startOnlineUsersListener: error in listener", e);
+                        return;
+                    }
+
+                    if (snapshots == null) {
+                        Log.w(TAG, "startOnlineUsersListener: snapshots is null");
                         return;
                     }
 
                     long version = onlineVersion.incrementAndGet();
                     List<ChatUser> users = new ArrayList<>();
+                    Log.d(TAG, "startOnlineUsersListener: got " + snapshots.size() + " documents");
+
                     for (DocumentSnapshot doc : snapshots.getDocuments()) {
                         String uid = safeTrim(doc.getId());
+                        Log.d(TAG, "Processing user: " + uid);
+
                         if (uid.isEmpty() || uid.equals(currentUid)) {
+                            Log.d(TAG, "Skipping user: " + uid);
                             continue;
                         }
 
-                        ChatUser chatUser = new ChatUser(uid, resolveDisplayName(doc),
+                        String displayName = resolveDisplayName(doc);
+                        Log.d(TAG, "User " + uid + " name: " + displayName);
+
+                        ChatUser chatUser = new ChatUser(uid, displayName,
                                 doc.getString("profileImageUrl"), null, null, 0);
                         chatUser.setMeshUserId(safeTrim(doc.getString("user_id")));
                         chatUser.setMeshPublicKey(safeTrim(doc.getString("public_key")));
                         chatUser.setMeshDeviceName(safeTrim(doc.getString("device_name")));
+
+                        // Track presence for display purposes
+                        Boolean isOnline = doc.getBoolean("isOnline");
+                        chatUser.setOnline(isOnline != null && isOnline);
+
+                        Timestamp lastSeenTime = doc.getTimestamp("lastSeenTime");
+                        if (lastSeenTime != null) {
+                            chatUser.setLastSeenTime(lastSeenTime);
+                        }
+
                         users.add(chatUser);
                     }
 
+                    Log.d(TAG, "startOnlineUsersListener: posting " + users.size() + " users");
                     // Push base list immediately, then enrich with last-message metadata.
                     postSortedOnlineUsers(users, version);
                     enrichWithChatMeta(users, version, true);

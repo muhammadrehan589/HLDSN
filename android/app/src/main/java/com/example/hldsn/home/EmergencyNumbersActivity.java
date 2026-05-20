@@ -155,7 +155,7 @@ public class EmergencyNumbersActivity extends AppCompatActivity {
 
     private void setupProvinceFilters() {
         provinceChipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
-            if (checkedIds == null || checkedIds.isEmpty()) {
+            if (checkedIds.isEmpty()) {
                 return;
             }
             int checkedId = checkedIds.get(0);
@@ -223,9 +223,14 @@ public class EmergencyNumbersActivity extends AppCompatActivity {
         String normalizedQueryNumbers = normalizeNumberSearch(query);
 
         for (EmergencyContact contact : allContacts) {
-            boolean provinceAllowed = contact.isDefault()
-                    || PROVINCE_ALL.equals(selectedProvince)
+            boolean provinceAllowed = PROVINCE_ALL.equals(selectedProvince)
                     || selectedProvince.equalsIgnoreCase(contact.getProvince());
+
+            // Keep the national emergency numbers visible only in the All view so
+            // province taps clearly narrow the list to related contacts.
+            if (!PROVINCE_ALL.equals(selectedProvince) && contact.isDefault()) {
+                continue;
+            }
 
             if (!provinceAllowed) {
                 continue;

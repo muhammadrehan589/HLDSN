@@ -214,17 +214,24 @@
                     app:iconTint="#065c53"
                     app:strokeColor="#1A000000"
                     app:strokeWidth="1dp" />
+            </LinearLayout>
 
-                <!-- Hospital -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <!-- Chats -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_contact_hospital"
+                    android:id="@+id/btn_service_chats"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="6dp"
                     android:minHeight="120dp"
-                    android:text="@string/hospital"
+                    android:text="@string/chats"
                     android:textAllCaps="false"
                     android:textColor="#0A1F1F"
                     android:textSize="11sp"
@@ -237,7 +244,7 @@
                     android:ellipsize="none"
                     app:backgroundTint="#FFFFFFFF"
                     app:cornerRadius="22dp"
-                    app:icon="@drawable/ic_hospital"
+                    app:icon="@drawable/ic_chat"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
@@ -245,16 +252,16 @@
                     app:strokeColor="#1A000000"
                     app:strokeWidth="1dp" />
 
-                <!-- Police -->
+                <!-- Community Chat -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_contact_police"
+                    android:id="@+id/btn_info_community_chat"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="6dp"
                     android:minHeight="120dp"
-                    android:text="@string/police"
+                    android:text="@string/community_chat"
                     android:textAllCaps="false"
                     android:textColor="#0A1F1F"
                     android:textSize="11sp"
@@ -267,7 +274,7 @@
                     android:ellipsize="none"
                     app:backgroundTint="#FFFFFFFF"
                     app:cornerRadius="22dp"
-                    app:icon="@drawable/ic_police"
+                    app:icon="@drawable/ic_chat"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
@@ -400,36 +407,6 @@
                     app:strokeColor="#1A000000"
                     app:strokeWidth="1dp" />
 
-                <!-- Chats -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_service_chats"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_margin="6dp"
-                    android:minHeight="120dp"
-                    android:text="@string/chats"
-                    android:textAllCaps="false"
-                    android:textColor="#0A1F1F"
-                    android:textSize="11sp"
-                    android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="8sp"
-                    android:autoSizeMaxTextSize="11sp"
-                    android:autoSizeStepGranularity="1sp"
-                    android:textAlignment="center"
-                    android:maxLines="2"
-                    android:ellipsize="none"
-                    app:backgroundTint="#FFFFFFFF"
-                    app:cornerRadius="22dp"
-                    app:icon="@drawable/ic_chat"
-                    app:iconGravity="textTop"
-                    app:iconPadding="4dp"
-                    app:iconSize="44dp"
-                    app:iconTint="@null"
-                    app:strokeColor="#1A000000"
-                    app:strokeWidth="1dp" />
-
             </LinearLayout>
         </LinearLayout>
 
@@ -468,9 +445,8 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_info_safety"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="0dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_margin="6dp"
                     android:minHeight="120dp"
                     android:text="@string/safety_tips"
@@ -495,42 +471,12 @@
                     app:strokeWidth="1dp" />
 
                 <!-- Community Chat -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_info_community_chat"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_margin="6dp"
-                    android:minHeight="120dp"
-                    android:text="@string/community_chat"
-                    android:textAllCaps="false"
-                    android:textColor="#0A1F1F"
-                    android:textSize="11sp"
-                    android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="8sp"
-                    android:autoSizeMaxTextSize="11sp"
-                    android:autoSizeStepGranularity="1sp"
-                    android:textAlignment="center"
-                    android:maxLines="2"
-                    android:ellipsize="none"
-                    app:backgroundTint="#FFFFFFFF"
-                    app:cornerRadius="22dp"
-                    app:icon="@drawable/ic_chat"
-                    app:iconGravity="textTop"
-                    app:iconPadding="4dp"
-                    app:iconSize="44dp"
-                    app:iconTint="@null"
-                    app:strokeColor="#1A000000"
-                    app:strokeWidth="1dp" />
-
                 <!-- First Aid Tips -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_info_first_aid"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="0dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_margin="6dp"
                     android:minHeight="120dp"
                     android:text="@string/emergency_first_aid_card"
@@ -554,13 +500,20 @@
                     app:strokeColor="#1A000000"
                     app:strokeWidth="1dp" />
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
                 <!-- News -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_info_news"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="0dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_margin="6dp"
                     android:minHeight="120dp"
                     android:text="@string/news"

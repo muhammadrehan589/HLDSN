@@ -2,6 +2,7 @@ package com.example.hldsn.incident_report_module;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OnlineUsersFragment extends Fragment {
+    private static final String TAG = "OnlineUsersFragment";
 
     private ChatListAdapter adapter;
     private TextView emptyState;
@@ -39,7 +41,7 @@ public class OnlineUsersFragment extends Fragment {
 
         RecyclerView recyclerView = view.findViewById(R.id.chatListRecyclerView);
         emptyState = view.findViewById(R.id.chatsEmptyState);
-        emptyState.setText("No online users");
+        emptyState.setText("No users available");
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new ChatListAdapter(requireContext(), new ArrayList<>(), this::openConversation);
@@ -47,6 +49,7 @@ public class OnlineUsersFragment extends Fragment {
 
         ChatsViewModel viewModel = new ViewModelProvider(requireActivity()).get(ChatsViewModel.class);
         viewModel.getOnlineUsers().observe(getViewLifecycleOwner(), users -> {
+            Log.d(TAG, "onlineUsers observer: received " + (users == null ? "null" : users.size() + " users"));
             latestUsers = users == null ? new ArrayList<>() : users;
             render();
         });
@@ -58,6 +61,7 @@ public class OnlineUsersFragment extends Fragment {
 
     private void render() {
         List<ChatUser> filtered = filterUsers(latestUsers, latestQuery);
+        Log.d(TAG, "render: filtered to " + filtered.size() + " users (from " + latestUsers.size() + " users)");
         adapter.updateList(filtered);
         emptyState.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);
     }

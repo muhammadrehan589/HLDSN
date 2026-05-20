@@ -9,7 +9,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#D32F2F"
+        android:background="@color/app_theme_green"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="14dp">
@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                         android:text="@string/emergency_first_aid_subtitle"
-                android:textColor="#FFEBEE"
+                        android:textColor="#E0F2EF"
                 android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
@@ -68,7 +68,7 @@
                 android:layout_height="20dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_search"
-                app:tint="#B71C1C" />
+                app:tint="#065c53" />
 
             <EditText
                 android:id="@+id/first_aid_search"

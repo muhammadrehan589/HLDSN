@@ -9,7 +9,7 @@
     app:cardCornerRadius="20dp"
     app:cardElevation="2dp"
     app:strokeWidth="1dp"
-    app:strokeColor="#F0D0D0"
+    app:strokeColor="#CDE7E3"
     app:cardBackgroundColor="#FFFFFF">
 
     <LinearLayout
@@ -21,7 +21,7 @@
             android:id="@+id/contact_accent"
             android:layout_width="match_parent"
             android:layout_height="4dp"
-            android:background="#E53935" />
+            android:background="@color/app_theme_green" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -41,7 +41,7 @@
                     android:layout_height="28dp"
                     android:layout_gravity="center"
                     android:contentDescription="@string/contact_icon_desc"
-                    android:tint="#C62828" />
+                    app:tint="@color/app_theme_green" />
             </FrameLayout>
 
             <LinearLayout
@@ -73,7 +73,7 @@
                         android:background="@drawable/call_button_bg"
                         android:paddingHorizontal="10dp"
                         android:paddingVertical="4dp"
-                        android:text="Pakistan"
+                        android:text="@string/contact_badge_pakistan"
                         android:textColor="#FFFFFF"
                         android:textSize="11sp"
                         android:textStyle="bold"
@@ -85,7 +85,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:textColor="#C62828"
+                    android:textColor="@color/app_theme_green"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -118,7 +118,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:background="@drawable/bg_tip_chip"
-                        android:textColor="#C62828"
+                        android:textColor="@color/app_theme_green"
                         android:textSize="12sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -133,7 +133,7 @@
                 android:text="@string/call"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                android:backgroundTint="#C62828"
+                android:backgroundTint="#065c53"
                 android:background="@drawable/call_button_bg" />
         </LinearLayout>
     </LinearLayout>

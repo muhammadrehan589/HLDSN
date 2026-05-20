@@ -68,7 +68,7 @@ public class ChatsActivity extends AppCompatActivity {
         usersViewPager.setCurrentItem(0, false);
 
         new TabLayoutMediator(usersTabLayout, usersViewPager,
-                (tab, position) -> tab.setText(position == 0 ? "Online Users" : "Nearby Users"))
+                (tab, position) -> tab.setText(position == 0 ? "All Users" : "Nearby Users"))
                 .attach();
     }
 }

@@ -15,7 +15,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#D32F2F"
+            android:background="@color/app_theme_green"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:padding="14dp">
@@ -57,7 +57,7 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:contentDescription="@null"
-                    android:tint="#B71C1C" />
+                    android:tint="@color/app_theme_green" />
 
                 <TextView
                     android:id="@+id/first_aid_detail_title"
@@ -110,7 +110,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:text="Do NOT"
-                    android:textColor="#B71C1C"
+                    android:textColor="@color/app_theme_green"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -128,7 +128,7 @@
                     android:text="Call Rescue 1122"
                     android:textAllCaps="false"
                     android:textColor="#FFFFFF"
-                    app:backgroundTint="#D32F2F"
+                    app:backgroundTint="#065c53"
                     app:cornerRadius="14dp" />
 
                 <TextView
@@ -155,7 +155,7 @@
                         android:textColor="#666666"
                         app:backgroundTint="#FFFFFF"
                         app:cornerRadius="14dp"
-                        app:strokeColor="#2E7D32"
+                        app:strokeColor="@color/app_theme_green"
                         app:strokeWidth="1dp" />
 
                     <com.google.android.material.button.MaterialButton
@@ -168,7 +168,7 @@
                         android:textColor="#666666"
                         app:backgroundTint="#FFFFFF"
                         app:cornerRadius="14dp"
-                        app:strokeColor="#D32F2F"
+                        app:strokeColor="@color/app_theme_green"
                         app:strokeWidth="1dp" />
                 </LinearLayout>
             </LinearLayout>

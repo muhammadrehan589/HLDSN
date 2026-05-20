@@ -20,7 +20,7 @@
             android:layout_width="42dp"
             android:layout_height="42dp"
             android:contentDescription="@null"
-            android:tint="#B71C1C" />
+            app:tint="@color/app_theme_green" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -77,10 +77,10 @@
             android:id="@+id/tip_view_steps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="View Steps"
+            android:text="@string/view_steps"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
-            app:backgroundTint="#D32F2F"
+            app:backgroundTint="#065c53"
             app:cornerRadius="14dp" />
     </LinearLayout>
 
