@@ -55,6 +55,7 @@ import com.example.hldsn.notification_module.NotificationAdapter;
 import com.example.hldsn.notification_module.NotificationItem;
 import com.example.hldsn.notification_module.SosAlertRecord;
 import com.example.hldsn.notification_module.SosAlertStore;
+import com.example.hldsn.notification_module.UserNotificationStore;
 import com.example.hldsn.hazard_module.HazardAlertMapActivity;
 import com.example.hldsn.services.news.NewsActivity;
 import com.example.hldsn.services.safety_tips.SafetyTipsActivity;
@@ -133,6 +134,7 @@ public class HomePageActivity extends AppCompatActivity {
 
     // Firestore listener
     private ListenerRegistration incidentsListener;
+    private ListenerRegistration userNotificationsListener;
 
     // Track seen incidents
     private Set<String> seenIncidentIds = new HashSet<>();
@@ -140,6 +142,8 @@ public class HomePageActivity extends AppCompatActivity {
     private View emptyStateLayout;
     List<IncidentModel> unreadIncidents = new ArrayList<>();
     private final List<SosAlertRecord> sosAlerts = new ArrayList<>();
+    private final List<NotificationItem> userNotifications = new ArrayList<>();
+    private int userNotificationCount = 0;
 
     // Carousel fields
     private ViewPager2 newsViewPager;
@@ -256,6 +260,7 @@ public class HomePageActivity extends AppCompatActivity {
         initListeners();
         loadSeenIncidentIds();
         loadSosAlerts();
+        listenForUserNotifications();
 
         checkAndRequestPermissions();
         handleLaunchIntent(getIntent());
@@ -314,6 +319,8 @@ public class HomePageActivity extends AppCompatActivity {
 
         if (itemToClear.isSosAlert()) {
             SosAlertStore.removeAlertById(this, itemToClear.getId());
+        } else if (itemToClear.isUserNotification()) {
+            UserNotificationStore.deleteNotificationById(db, itemToClear.getId());
         } else {
             seenIncidentIds.add(itemToClear.getId());
             saveSeenIncidentIds();
@@ -547,6 +554,7 @@ public class HomePageActivity extends AppCompatActivity {
         for (IncidentModel incident : unreadIncidents) {
             items.add(NotificationItem.fromIncident(incident));
         }
+        items.addAll(userNotifications);
         items.sort((left, right) -> Long.compare(right.getTimestampMs(), left.getTimestampMs()));
         return items;
     }
@@ -568,7 +576,7 @@ public class HomePageActivity extends AppCompatActivity {
 
         List<NotificationItem> items = buildNotificationItems();
         notificationAdapter.updateList(items);
-        updateNotificationBadge(unreadIncidents.size() + getUnseenSosCount());
+        updateNotificationBadge(unreadIncidents.size() + getUnseenSosCount() + userNotificationCount);
 
         if (items.isEmpty()) {
             notificationRecyclerView.setVisibility(View.GONE);
@@ -590,6 +598,35 @@ public class HomePageActivity extends AppCompatActivity {
             refreshNotificationContent();
             drawerLayout.openDrawer(GravityCompat.END);
         });
+    }
+
+    private void listenForUserNotifications() {
+        if (currentUserId == null || currentUserId.trim().isEmpty()) {
+            return;
+        }
+
+        if (userNotificationsListener != null) {
+            userNotificationsListener.remove();
+        }
+
+        userNotificationsListener = UserNotificationStore.observeNotificationsForUser(
+                db,
+                currentUserId,
+                (snapshot, error) -> {
+                    if (error != null) {
+                        return;
+                    }
+
+                    userNotifications.clear();
+                    if (snapshot != null) {
+                        for (com.google.firebase.firestore.DocumentSnapshot documentSnapshot : snapshot.getDocuments()) {
+                            userNotifications.add(NotificationItem.fromUserNotification(documentSnapshot));
+                        }
+                    }
+                    userNotificationCount = userNotifications.size();
+                    refreshNotificationContent();
+                }
+        );
     }
 
     private void setupNewsCarousel() {
@@ -1097,6 +1134,10 @@ public class HomePageActivity extends AppCompatActivity {
         if (incidentsListener != null) {
             incidentsListener.remove();
             incidentsListener = null;
+        }
+        if (userNotificationsListener != null) {
+            userNotificationsListener.remove();
+            userNotificationsListener = null;
         }
         hasShownNetworkError = false;
         try {

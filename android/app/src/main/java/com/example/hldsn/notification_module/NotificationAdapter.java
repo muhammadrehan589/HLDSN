@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hldsn.R;
 import com.example.hldsn.incident_report_module.DisplayReportActivity;
+import com.example.hldsn.notification_module.NotificationDetailActivity;
 import com.example.hldsn.sos.SosDetailActivity;
 
 import org.json.JSONException;
@@ -53,9 +54,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     }
 
     public void updateList(List<NotificationItem> newList) {
-        Log.d("NotificationAdapter", "updateList called with " + newList.size() + " items");
+        int size = newList == null ? 0 : newList.size();
+        Log.d("NotificationAdapter", "updateList called with " + size + " items");
         items.clear();
-        items.addAll(newList);
+        if (newList != null) {
+            items.addAll(newList);
+        }
         swipedPosition = RecyclerView.NO_POSITION;
         notifyDataSetChanged();
     }
@@ -116,6 +120,15 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 } else {
                     Toast.makeText(context, "Unable to open SOS location", Toast.LENGTH_SHORT).show();
                 }
+                return;
+            }
+            if (item.isUserNotification()) {
+                Intent intent = new Intent(context, NotificationDetailActivity.class);
+                intent.putExtra(NotificationDetailActivity.EXTRA_TITLE, item.getTitle());
+                intent.putExtra(NotificationDetailActivity.EXTRA_SUBTITLE, item.getSubtitle());
+                intent.putExtra(NotificationDetailActivity.EXTRA_DETAIL_LABEL, item.getDetailLabel());
+                intent.putExtra(NotificationDetailActivity.EXTRA_TIMESTAMP_MS, item.getTimestampMs());
+                context.startActivity(intent);
                 return;
             }
             Intent intent = new Intent(context, DisplayReportActivity.class);

@@ -120,6 +120,7 @@
         <activity android:name=".services.news.NewsDetailActivity" android:exported="false" />
         <activity android:name=".login_module.SaveUserProfileActivity" android:exported="false" />
         <activity android:name=".login_module.UserProfileActivity" android:exported="false" />
+        <activity android:name=".notification_module.NotificationDetailActivity" android:exported="false" />
         <activity android:name=".volunteer.VolunteerBasicFormActivity" android:exported="false" />
         <activity android:name=".volunteer.VolunteerSkillsFormActivity" android:exported="false" />
         <activity android:name=".volunteer.VolunteerAgreementActivity" android:exported="false" />

@@ -1,6 +1,8 @@
 package com.example.hldsn.notification_module;
 
 import com.example.hldsn.incident_report_module.IncidentModel;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import org.json.JSONException;
 
@@ -8,6 +10,7 @@ public class NotificationItem {
 
     public static final String TYPE_INCIDENT = "incident";
     public static final String TYPE_SOS = "sos";
+    public static final String TYPE_USER_NOTIFICATION = "user_notification";
 
     private final String id;
     private final String type;
@@ -65,6 +68,20 @@ public class NotificationItem {
         );
     }
 
+    public static NotificationItem fromUserNotification(DocumentSnapshot documentSnapshot) {
+        Timestamp createdAt = documentSnapshot.getTimestamp("createdAt");
+        long timestamp = createdAt != null ? createdAt.toDate().getTime() : 0L;
+
+        return new NotificationItem(
+                documentSnapshot.getId(),
+                TYPE_USER_NOTIFICATION,
+                firstNonBlank(documentSnapshot.getString("title"), "Notification"),
+                firstNonBlank(documentSnapshot.getString("subtitle"), ""),
+                firstNonBlank(documentSnapshot.getString("detailLabel"), "View Details"),
+                timestamp
+        );
+    }
+
     public String getId() { return id; }
     public String getType() { return type; }
     public String getTitle() { return title; }
@@ -73,4 +90,9 @@ public class NotificationItem {
     public long getTimestampMs() { return timestampMs; }
     public String getSosAlertJson() { return sosAlertJson; }
     public boolean isSosAlert() { return TYPE_SOS.equals(type); }
+    public boolean isUserNotification() { return TYPE_USER_NOTIFICATION.equals(type); }
+
+    private static String firstNonBlank(String value, String fallback) {
+        return value == null || value.trim().isEmpty() ? fallback : value.trim();
+    }
 }

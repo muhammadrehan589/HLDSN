@@ -10,20 +10,30 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.hldsn.R;
 import com.example.hldsn.login_module.LoginActivity;
 import com.example.hldsn.notification_module.SosAlertStore;
+import com.example.hldsn.notification_module.UserNotificationStore;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 public class NgoDashboardActivity extends AppCompatActivity {
 
     private TextView ngoNameText;
     private TextView notificationCountText;
+    private FirebaseFirestore db;
+    private FirebaseAuth auth;
+    private String currentUserId = "";
+    private int userNotificationCount = 0;
+    private ListenerRegistration userNotificationListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ngo_dashboard);
+
+        db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
 
         ImageView backButton = findViewById(R.id.backButton);
         ImageView notificationIcon = findViewById(R.id.notificationIcon);
@@ -74,6 +84,12 @@ public class NgoDashboardActivity extends AppCompatActivity {
             });
         }
 
+        FirebaseUser user = auth.getCurrentUser();
+        if (user != null) {
+            currentUserId = user.getUid();
+            listenForUserNotifications();
+        }
+
         loadNgoName();
         updateNotificationBadge();
     }
@@ -82,6 +98,15 @@ public class NgoDashboardActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateNotificationBadge();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (userNotificationListener != null) {
+            userNotificationListener.remove();
+            userNotificationListener = null;
+        }
     }
 
     private void loadNgoName() {
@@ -111,7 +136,7 @@ public class NgoDashboardActivity extends AppCompatActivity {
             return;
         }
 
-        int count = SosAlertStore.getUnseenCount(this);
+        int count = SosAlertStore.getUnseenCount(this) + userNotificationCount;
         if (count <= 0) {
             notificationCountText.setVisibility(android.view.View.GONE);
         } else if (count >= 10) {
@@ -121,5 +146,27 @@ public class NgoDashboardActivity extends AppCompatActivity {
             notificationCountText.setText(String.valueOf(count));
             notificationCountText.setVisibility(android.view.View.VISIBLE);
         }
+    }
+
+    private void listenForUserNotifications() {
+        if (currentUserId.isEmpty()) {
+            return;
+        }
+
+        if (userNotificationListener != null) {
+            userNotificationListener.remove();
+        }
+
+        userNotificationListener = UserNotificationStore.observeNotificationsForUser(
+                db,
+                currentUserId,
+                (snapshot, error) -> {
+                    if (error != null) {
+                        return;
+                    }
+                    userNotificationCount = snapshot == null ? 0 : snapshot.size();
+                    updateNotificationBadge();
+                }
+        );
     }
 }
