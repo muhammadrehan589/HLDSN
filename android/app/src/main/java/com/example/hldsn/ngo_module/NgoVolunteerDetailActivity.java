@@ -9,7 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hldsn.R;
-import com.example.hldsn.incident_report_module.ConversationActivity;
+import com.example.hldsn.ngo_module.NgoTaskCreationActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -48,7 +48,8 @@ public class NgoVolunteerDetailActivity extends AppCompatActivity {
 
         MaterialButton assignTaskButton = findViewById(R.id.assignTaskButton);
         if (assignTaskButton != null) {
-            assignTaskButton.setOnClickListener(v -> openChatWithVolunteer());
+            assignTaskButton.setText("Assign Task");
+            assignTaskButton.setOnClickListener(v -> openTaskCreation());
         }
 
         loadVolunteerDetails();
@@ -120,15 +121,15 @@ public class NgoVolunteerDetailActivity extends AppCompatActivity {
         }
     }
 
-    private void openChatWithVolunteer() {
+    private void openTaskCreation() {
         if (volunteerUid == null || volunteerUid.isEmpty()) {
-            Toast.makeText(this, "Cannot open chat: volunteer UID missing", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Cannot open task creation: volunteer UID missing", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Intent intent = new Intent(this, ConversationActivity.class);
-        intent.putExtra(ConversationActivity.EXTRA_USER_ID, volunteerUid);
-        intent.putExtra(ConversationActivity.EXTRA_USER_NAME, safe(volunteerName));
+        Intent intent = new Intent(this, NgoTaskCreationActivity.class);
+        intent.putExtra(NgoTaskCreationActivity.EXTRA_VOLUNTEER_UID, volunteerUid);
+        intent.putExtra(NgoTaskCreationActivity.EXTRA_VOLUNTEER_NAME, safe(volunteerName));
         startActivity(intent);
     }
 

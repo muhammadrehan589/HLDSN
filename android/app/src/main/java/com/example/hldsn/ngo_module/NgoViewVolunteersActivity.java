@@ -48,11 +48,10 @@ public class NgoViewVolunteersActivity extends AppCompatActivity {
         }
 
         adapter = new NgoViewVolunteersAdapter(documentSnapshot -> {
-            Intent intent = new Intent(NgoViewVolunteersActivity.this, NgoVolunteerDetailActivity.class);
-            intent.putExtra(NgoVolunteerDetailActivity.EXTRA_VOLUNTEER_ID, documentSnapshot.getId());
-            intent.putExtra(NgoVolunteerDetailActivity.EXTRA_VOLUNTEER_UID, documentSnapshot.getString("uid"));
-            intent.putExtra(NgoVolunteerDetailActivity.EXTRA_VOLUNTEER_NAME, 
-                    safe(documentSnapshot.getString("firstName")) + " " + safe(documentSnapshot.getString("surname")));
+            Intent intent = new Intent(NgoViewVolunteersActivity.this, NgoTaskCreationActivity.class);
+            intent.putExtra(NgoTaskCreationActivity.EXTRA_VOLUNTEER_UID, documentSnapshot.getString("uid"));
+            intent.putExtra(NgoTaskCreationActivity.EXTRA_VOLUNTEER_NAME,
+                safe(documentSnapshot.getString("firstName")) + " " + safe(documentSnapshot.getString("surname")));
             startActivity(intent);
         });
 

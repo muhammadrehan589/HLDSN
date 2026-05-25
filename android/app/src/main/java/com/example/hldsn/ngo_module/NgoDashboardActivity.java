@@ -41,6 +41,10 @@ public class NgoDashboardActivity extends AppCompatActivity {
         ngoNameText = findViewById(R.id.ngoDashboardNameText);
         MaterialButton manageVolunteersButton = findViewById(R.id.manageVolunteerRequestsButton);
         MaterialButton viewVolunteersButton = findViewById(R.id.viewVolunteersButton);
+        MaterialButton createTaskButton = findViewById(R.id.createTaskButton);
+        MaterialButton viewAssignedTasksButton = findViewById(R.id.viewAssignedTasksButton);
+        MaterialButton addResourceButton = findViewById(R.id.addResourceButton);
+        MaterialButton viewResourcesButton = findViewById(R.id.viewResourcesButton);
         MaterialButton addCampCenterButton = findViewById(R.id.addCampCenterButton);
         MaterialButton manageCampCenterButton = findViewById(R.id.manageCampCenterButton);
         MaterialButton logoutButton = findViewById(R.id.ngoLogoutButton);
@@ -62,6 +66,26 @@ public class NgoDashboardActivity extends AppCompatActivity {
         if (viewVolunteersButton != null) {
             viewVolunteersButton.setOnClickListener(v ->
                     startActivity(new Intent(this, NgoViewVolunteersActivity.class)));
+        }
+
+        if (createTaskButton != null) {
+            createTaskButton.setOnClickListener(v ->
+                startActivity(new Intent(this, NgoTaskCreationActivity.class)));
+        }
+
+        if (viewAssignedTasksButton != null) {
+            viewAssignedTasksButton.setOnClickListener(v ->
+                startActivity(new Intent(this, NgoTaskListActivity.class)));
+        }
+
+        if (addResourceButton != null) {
+            addResourceButton.setOnClickListener(v ->
+                    startActivity(new Intent(this, NgoResourceCreationActivity.class)));
+        }
+
+        if (viewResourcesButton != null) {
+            viewResourcesButton.setOnClickListener(v ->
+                    startActivity(new Intent(this, NgoResourceListActivity.class)));
         }
 
         if (addCampCenterButton != null) {

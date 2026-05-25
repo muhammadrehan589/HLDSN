@@ -38,19 +38,30 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     private final List<NotificationItem> items = new ArrayList<>();
     private final Context context;
     private final OnNotificationClearListener clearListener;
+    private final OnTaskActionListener taskActionListener;
     private int swipedPosition = RecyclerView.NO_POSITION;
 
     public interface OnNotificationClearListener {
         void onNotificationClear(NotificationItem item);
     }
 
+    public interface OnTaskActionListener {
+        void onAccept(NotificationItem item);
+        void onReject(NotificationItem item);
+    }
+
     public NotificationAdapter(Context context) {
-        this(context, null);
+        this(context, null, null);
     }
 
     public NotificationAdapter(Context context, OnNotificationClearListener clearListener) {
+        this(context, clearListener, null);
+    }
+
+    public NotificationAdapter(Context context, OnNotificationClearListener clearListener, OnTaskActionListener taskActionListener) {
         this.context = context;
         this.clearListener = clearListener;
+        this.taskActionListener = taskActionListener;
     }
 
     public void updateList(List<NotificationItem> newList) {
@@ -90,10 +101,20 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             holder.cardView.setCardBackgroundColor(COLOR_CARD_SOS);
             holder.tvIncidentType.setTextColor(COLOR_TITLE_SOS);
             holder.tvSosUrgencyBadge.setVisibility(View.VISIBLE);
+            holder.taskActionRow.setVisibility(View.GONE);
+            holder.btnDetail.setVisibility(View.VISIBLE);
+        } else if (item.isTaskAssignment()) {
+            holder.cardView.setCardBackgroundColor(COLOR_CARD_NORMAL);
+            holder.tvIncidentType.setTextColor(COLOR_TITLE_NORMAL);
+            holder.tvSosUrgencyBadge.setVisibility(View.GONE);
+            holder.btnDetail.setVisibility(View.GONE);
+            holder.taskActionRow.setVisibility(View.VISIBLE);
         } else {
             holder.cardView.setCardBackgroundColor(COLOR_CARD_NORMAL);
             holder.tvIncidentType.setTextColor(COLOR_TITLE_NORMAL);
             holder.tvSosUrgencyBadge.setVisibility(View.GONE);
+            holder.taskActionRow.setVisibility(View.GONE);
+            holder.btnDetail.setVisibility(View.VISIBLE);
         }
 
         float translationX = position == swipedPosition ? -dpToPx(CLEAR_REVEAL_DP) : 0f;
@@ -133,6 +154,18 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             }
             Intent intent = new Intent(context, DisplayReportActivity.class);
             context.startActivity(intent);
+        });
+
+        holder.btnTaskAccept.setOnClickListener(v -> {
+            if (taskActionListener != null) {
+                taskActionListener.onAccept(item);
+            }
+        });
+
+        holder.btnTaskReject.setOnClickListener(v -> {
+            if (taskActionListener != null) {
+                taskActionListener.onReject(item);
+            }
         });
     }
 
@@ -200,6 +233,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     static class ViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
         TextView tvIncidentType, tvIncidentLocation, btnDetail, tvSosUrgencyBadge, btnClear;
+        View taskActionRow;
+        androidx.appcompat.widget.AppCompatButton btnTaskAccept, btnTaskReject;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -209,6 +244,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             btnDetail = itemView.findViewById(R.id.btnDetail);
             tvSosUrgencyBadge = itemView.findViewById(R.id.tvSosUrgencyBadge);
             btnClear = itemView.findViewById(R.id.btnClear);
+            taskActionRow = itemView.findViewById(R.id.taskActionRow);
+            btnTaskAccept = itemView.findViewById(R.id.btnTaskAccept);
+            btnTaskReject = itemView.findViewById(R.id.btnTaskReject);
         }
     }
 }

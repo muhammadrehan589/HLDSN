@@ -95,6 +95,39 @@
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
+        <LinearLayout
+            android:id="@+id/taskActionRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTaskAccept"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="✓ Accept"
+                android:textAllCaps="false"
+                app:cornerRadius="12dp"
+                app:backgroundTint="#2DD09E"
+                android:textColor="#0A1A18" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTaskReject"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:text="✕ Reject"
+                android:textAllCaps="false"
+                app:cornerRadius="12dp"
+                app:backgroundTint="#D64343"
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>

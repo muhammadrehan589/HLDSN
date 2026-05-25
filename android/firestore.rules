@@ -106,6 +106,59 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    match /ngo_tasks/{taskId} {
+      allow create: if isNgoAdmin()
+        && request.resource.data.ngoId == myNgoId()
+        && request.resource.data.createdByUid == request.auth.uid
+        && request.resource.data.status == "pending";
+
+      allow read: if isAdmin()
+        || (isNgoAdmin() && resource.data.ngoId == myNgoId())
+        || (signedIn() && resource.data.volunteerUid == request.auth.uid)
+        || (signedIn() && resource.data.createdByUid == request.auth.uid);
+
+      allow update: if isAdmin()
+        || (
+          isNgoAdmin()
+          && resource.data.ngoId == myNgoId()
+        )
+        || (
+          signedIn()
+          && resource.data.volunteerUid == request.auth.uid
+          && resource.data.status == "ongoing"
+          && request.resource.data.volunteerUid == resource.data.volunteerUid
+          && request.resource.data.ngoId == resource.data.ngoId
+          && request.resource.data.createdByUid == resource.data.createdByUid
+          && request.resource.data.completedByUid == request.auth.uid
+          && request.resource.data.status == "completed"
+        );
+
+      allow delete: if isAdmin();
+    }
+
+    match /ngo_resources/{resourceId} {
+      allow create: if isNgoAdmin()
+        && request.resource.data.ngoId == myNgoId()
+        && request.resource.data.createdByUid == request.auth.uid
+        ;
+
+      allow read: if isAdmin()
+        || (isNgoAdmin() && resource.data.ngoId == myNgoId())
+        || (signedIn() && resource.data.createdByUid == request.auth.uid);
+
+      allow update, delete: if isNgoAdmin() && resource.data.ngoId == myNgoId();
+    }
+
+    match /user_notifications/{notificationId} {
+      allow create: if signedIn();
+
+      allow read: if isAdmin()
+        || (signedIn() && resource.data.recipientUid == request.auth.uid);
+
+      allow delete: if isAdmin()
+        || (signedIn() && resource.data.recipientUid == request.auth.uid);
+    }
+
     match /incidents/{incidentId} {
       allow read, create: if signedIn();
       allow update, delete: if isAdmin();

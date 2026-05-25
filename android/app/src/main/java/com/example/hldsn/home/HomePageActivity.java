@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.URLUtil;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -56,6 +57,8 @@ import com.example.hldsn.notification_module.NotificationItem;
 import com.example.hldsn.notification_module.SosAlertRecord;
 import com.example.hldsn.notification_module.SosAlertStore;
 import com.example.hldsn.notification_module.UserNotificationStore;
+import com.example.hldsn.volunteer_module.VolunteerAssignedTasksActivity;
+import com.example.hldsn.notification_module.VolunteerNotificationsActivity;
 import com.example.hldsn.hazard_module.HazardAlertMapActivity;
 import com.example.hldsn.services.news.NewsActivity;
 import com.example.hldsn.services.safety_tips.SafetyTipsActivity;
@@ -127,6 +130,7 @@ public class HomePageActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     private String currentUserId;
+    private String currentUserRole = "";
 
     // Notification drawer
     private RecyclerView notificationRecyclerView;
@@ -254,6 +258,7 @@ public class HomePageActivity extends AppCompatActivity {
         setupNewsCarousel();
 
         currentUserId = auth.getCurrentUser().getUid();
+        loadCurrentUserRole();
 
         initViews();
         initNotificationDrawer();
@@ -289,7 +294,17 @@ public class HomePageActivity extends AppCompatActivity {
         if (notificationRecyclerView == null) return;
 
         notificationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        notificationAdapter = new NotificationAdapter(this, this::handleNotificationCleared);
+        notificationAdapter = new NotificationAdapter(this, this::handleNotificationCleared, new NotificationAdapter.OnTaskActionListener() {
+            @Override
+            public void onAccept(NotificationItem item) {
+                handleTaskAccept(item);
+            }
+
+            @Override
+            public void onReject(NotificationItem item) {
+                showTaskRejectReasonDialog(item);
+            }
+        });
         notificationRecyclerView.setAdapter(notificationAdapter);
 
         ItemTouchHelper.SimpleCallback swipeCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
@@ -319,7 +334,7 @@ public class HomePageActivity extends AppCompatActivity {
 
         if (itemToClear.isSosAlert()) {
             SosAlertStore.removeAlertById(this, itemToClear.getId());
-        } else if (itemToClear.isUserNotification()) {
+        } else if (itemToClear.isUserNotification() || itemToClear.isTaskAssignment()) {
             UserNotificationStore.deleteNotificationById(db, itemToClear.getId());
         } else {
             seenIncidentIds.add(itemToClear.getId());
@@ -330,6 +345,79 @@ public class HomePageActivity extends AppCompatActivity {
         loadSosAlerts();
         refreshNotificationContent();
         Toast.makeText(this, "Notification cleared", Toast.LENGTH_SHORT).show();
+    }
+
+    private void handleTaskAccept(NotificationItem taskItem) {
+        if (taskItem == null || !taskItem.isTaskAssignment() || taskItem.getTaskId().isEmpty()) {
+            Toast.makeText(this, "Task details missing", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        UserNotificationStore.respondToTaskAssignment(
+                db,
+                taskItem.getId(),
+                taskItem.getTaskId(),
+                currentUserId,
+                true,
+                ""
+        );
+        Toast.makeText(this, "Task accepted", Toast.LENGTH_SHORT).show();
+    }
+
+    private void showTaskRejectReasonDialog(NotificationItem taskItem) {
+        if (taskItem == null || !taskItem.isTaskAssignment() || taskItem.getTaskId().isEmpty()) {
+            Toast.makeText(this, "Task details missing", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        EditText reasonField = new EditText(this);
+        reasonField.setMinLines(3);
+        reasonField.setHint("Reason for rejecting");
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Reject Task")
+                .setMessage("Please provide a reason for rejecting this task")
+                .setView(reasonField)
+                .setPositiveButton("Reject", null)
+                .setNegativeButton("Cancel", null)
+                .create();
+
+        dialog.setOnShowListener(dialogInterface -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String reason = reasonField.getText() == null ? "" : reasonField.getText().toString().trim();
+            if (reason.isEmpty()) {
+                reasonField.setError("Required");
+                reasonField.requestFocus();
+                return;
+            }
+
+            UserNotificationStore.respondToTaskAssignment(
+                    db,
+                    taskItem.getId(),
+                    taskItem.getTaskId(),
+                    currentUserId,
+                    false,
+                    reason
+            );
+            Toast.makeText(this, "Task rejected", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        }));
+
+        dialog.show();
+    }
+
+    private void loadCurrentUserRole() {
+        if (currentUserId == null || currentUserId.trim().isEmpty()) {
+            return;
+        }
+
+        db.collection("users")
+                .document(currentUserId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> currentUserRole = safe(documentSnapshot.getString("role")));
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value.trim();
     }
 
     private void initListeners() {
@@ -350,6 +438,10 @@ public class HomePageActivity extends AppCompatActivity {
             notificationIcon.setOnClickListener(v -> {
                 try {
                     CrashDebugger.logButtonClick("notificationIcon", "Toggle notifications drawer");
+                    if ("volunteer".equalsIgnoreCase(currentUserRole)) {
+                        startActivity(new Intent(this, VolunteerNotificationsActivity.class));
+                        return;
+                    }
                     if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
                         drawerLayout.closeDrawer(GravityCompat.END);
                         markCurrentNotificationsAsSeen();
@@ -376,7 +468,6 @@ public class HomePageActivity extends AppCompatActivity {
             if (communityChatBtn != null) {
                 communityChatBtn.setOnClickListener(v -> startActivity(new Intent(this, DisplayReportActivity.class)));
             }
-
             View campLocationsBtn = findViewById(R.id.btn_service_camp);
             if (campLocationsBtn != null) {
                 campLocationsBtn.setOnClickListener(v -> startActivity(new Intent(this, CampLocationsMapActivity.class)));
@@ -459,6 +550,14 @@ public class HomePageActivity extends AppCompatActivity {
                 homeMenuItem.setOnClickListener(v -> {
                     drawerLayout.closeDrawer(GravityCompat.START);
                     Toast.makeText(this, "Already on Home", Toast.LENGTH_SHORT).show();
+                });
+            }
+
+            View assignedTasksMenuItem = findViewById(R.id.assignedTasksMenuItem);
+            if (assignedTasksMenuItem != null) {
+                assignedTasksMenuItem.setOnClickListener(v -> {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    startActivity(new Intent(this, VolunteerAssignedTasksActivity.class));
                 });
             }
 

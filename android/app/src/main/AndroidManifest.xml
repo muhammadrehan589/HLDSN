@@ -121,6 +121,12 @@
         <activity android:name=".login_module.SaveUserProfileActivity" android:exported="false" />
         <activity android:name=".login_module.UserProfileActivity" android:exported="false" />
         <activity android:name=".notification_module.NotificationDetailActivity" android:exported="false" />
+        <activity android:name=".notification_module.VolunteerNotificationsActivity" android:exported="false" />
+        <activity android:name=".volunteer_module.VolunteerAssignedTasksActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoTaskCreationActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoTaskListActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoResourceCreationActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoResourceListActivity" android:exported="false" />
         <activity android:name=".volunteer.VolunteerBasicFormActivity" android:exported="false" />
         <activity android:name=".volunteer.VolunteerSkillsFormActivity" android:exported="false" />
         <activity android:name=".volunteer.VolunteerAgreementActivity" android:exported="false" />

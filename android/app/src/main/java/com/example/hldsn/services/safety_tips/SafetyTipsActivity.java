@@ -19,6 +19,7 @@ import com.example.hldsn.login_module.LoginActivity;
 import com.example.hldsn.login_module.SaveUserProfileActivity;
 import com.example.hldsn.login_module.UserProfileActivity;
 import com.example.hldsn.ngo_module.NgoRegistrationRequestActivity;
+import com.example.hldsn.volunteer_module.VolunteerAssignedTasksActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class SafetyTipsActivity extends AppCompatActivity {
@@ -92,6 +93,14 @@ public class SafetyTipsActivity extends AppCompatActivity {
                 drawerLayout.closeDrawer(GravityCompat.START);
                 startActivity(new Intent(this, HomePageActivity.class));
                 finish();
+            });
+        }
+
+        View assignedTasksMenuItem = menuDrawerContainer.findViewById(R.id.assignedTasksMenuItem);
+        if (assignedTasksMenuItem != null) {
+            assignedTasksMenuItem.setOnClickListener(v -> {
+                drawerLayout.closeDrawer(GravityCompat.START);
+                startActivity(new Intent(this, VolunteerAssignedTasksActivity.class));
             });
         }
 
