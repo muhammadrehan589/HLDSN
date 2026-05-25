@@ -71,7 +71,28 @@ public final class RoleBasedNavigator {
         if (role == null) {
             return ROLE_USER;
         }
-        return role.trim().toLowerCase(Locale.US);
+
+        String normalized = role.trim().toLowerCase(Locale.US)
+                .replace('-', '_')
+                .replace(' ', '_');
+
+        if ("ngoadmin".equals(normalized)) {
+            return ROLE_NGO_ADMIN;
+        }
+
+        if ("admin".equals(normalized)) {
+            return ROLE_ADMIN;
+        }
+
+        if ("volunteer".equals(normalized)) {
+            return ROLE_VOLUNTEER;
+        }
+
+        if ("user".equals(normalized)) {
+            return ROLE_USER;
+        }
+
+        return normalized;
     }
 
     private static void routeTo(AppCompatActivity activity, Class<?> destination) {

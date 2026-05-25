@@ -1,19 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    app:cardCornerRadius="14dp"
-    app:cardElevation="6dp"
-    app:cardBackgroundColor="#0F1F1D">
+    android:layout_marginBottom="12dp">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/btnClear"
+        android:layout_width="96dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:background="#D64343"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="Clear"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/notificationCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        app:cardCornerRadius="14dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="#0F1F1D">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
         <!-- SOS urgency badge (only visible for SOS alerts) -->
         <TextView
@@ -57,24 +77,59 @@
             android:fontFamily="sans-serif"/>
 
         <!-- Detail Button -->
-        <TextView
-            android:id="@+id/btnDetail"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/btnDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginLeft="100dp"
+                android:background="@drawable/bg_detail_button"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingStart="14dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="14dp"
+                android:paddingBottom="6dp"
+                android:text="Detail"
+                android:textColor="#0F1F1D"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/taskActionRow"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:paddingTop="6dp"
-            android:paddingBottom="6dp"
-            android:layout_marginLeft="100dp"
-            android:text="Detail"
-            android:textColor="#0F1F1D"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:background="@drawable/bg_detail_button"
-            android:clickable="true"
-            android:focusable="true"/>
+            android:orientation="horizontal"
+            android:visibility="gone">
 
-    </LinearLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTaskAccept"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="✓ Accept"
+                android:textAllCaps="false"
+                app:cornerRadius="12dp"
+                app:backgroundTint="#2DD09E"
+                android:textColor="#0A1A18" />
 
-</androidx.cardview.widget.CardView>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTaskReject"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:text="✕ Reject"
+                android:textAllCaps="false"
+                app:cornerRadius="12dp"
+                app:backgroundTint="#D64343"
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>

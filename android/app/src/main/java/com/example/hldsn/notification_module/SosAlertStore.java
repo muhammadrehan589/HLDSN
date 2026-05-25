@@ -133,6 +133,21 @@ public final class SosAlertStore {
         persist(context, updated);
     }
 
+    /**
+     * Removes a specific SOS alert from the local store by its ID.
+     */
+    public static synchronized void removeAlertById(Context context, String messageId) {
+        // 1. Get the current list of alerts
+        List<SosAlertRecord> alerts = getAlerts(context);
+
+        // 2. Remove the alert that matches the ID
+        // Note: removeIf requires Java 8+ (which your project is using)
+        alerts.removeIf(alert -> alert.getMessageId().equals(messageId));
+
+        // 3. Save the filtered list back to SharedPreferences
+        persist(context, alerts);
+    }
+
     private static void persist(Context context, List<SosAlertRecord> alerts) {
         JSONArray array = new JSONArray();
         for (SosAlertRecord alert : alerts) {

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- Top Row: Icon and Name -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/nearby_resource_icon"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:contentDescription="@null"
+                android:scaleType="centerInside"
+                app:tint="#065c53" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/nearby_resource_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="#212121"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <!-- Verified Badge -->
+                    <TextView
+                        android:id="@+id/nearby_verified_badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/call_button_bg"
+                        android:backgroundTint="#4CAF50"
+                        android:paddingHorizontal="6dp"
+                        android:paddingVertical="2dp"
+                        android:text="Verified Local"
+                        android:textColor="#FFFFFF"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:orientation="horizontal">
+
+                    <!-- Category Badge -->
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/nearby_resource_category"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:textSize="11sp"
+                        app:chipBackgroundColor="#FFF3E0"
+                        app:chipStrokeColor="#FFB74D"
+                        app:chipStrokeWidth="1dp" />
+
+                    <!-- Distance -->
+                    <TextView
+                        android:id="@+id/nearby_resource_distance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:gravity="center_vertical"
+                        android:textColor="#666666"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Address -->
+        <TextView
+            android:id="@+id/nearby_resource_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="#666666"
+            android:textSize="12sp" />
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/nearby_directions_btn"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginEnd="8dp"
+                android:paddingHorizontal="12dp"
+                android:text="@string/nearby_help_directions"
+                android:textAllCaps="false"
+                android:textSize="12sp"
+                app:strokeColor="#065c53" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/nearby_call_btn"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:paddingHorizontal="12dp"
+                android:text="@string/nearby_help_call"
+                android:textAllCaps="false"
+                android:textSize="12sp"
+                app:strokeColor="#D32F2F" />
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

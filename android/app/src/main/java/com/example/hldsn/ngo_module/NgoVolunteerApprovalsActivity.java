@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hldsn.R;
 import com.example.hldsn.ngo_module.adapter.NgoVolunteerApplicationAdapter;
+import com.example.hldsn.notification_module.UserNotificationStore;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FieldValue;
@@ -37,6 +38,7 @@ public class NgoVolunteerApprovalsActivity extends AppCompatActivity {
 
     private String currentUid = "";
     private String currentNgoId = "";
+    private String currentNgoName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +131,7 @@ public class NgoVolunteerApprovalsActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     currentNgoId = safe(documentSnapshot.getString("ngoId"));
+                    currentNgoName = firstNonBlank(documentSnapshot.getString("ngoName"), documentSnapshot.getString("name"));
                     if (currentNgoId.isEmpty()) {
                         Toast.makeText(this, "No NGO assigned to this account", Toast.LENGTH_LONG).show();
                         finish();
@@ -188,6 +191,7 @@ public class NgoVolunteerApprovalsActivity extends AppCompatActivity {
                             .set(updates, SetOptions.merge())
                             .addOnSuccessListener(unused -> {
                                 String applicantUid = safe(snapshot.getString("uid"));
+                                String applicantName = buildVolunteerName(snapshot);
                                 if (!applicantUid.isEmpty()) {
                                     Map<String, Object> userUpdates = new HashMap<>();
                                     userUpdates.put("role", "volunteer");
@@ -195,6 +199,17 @@ public class NgoVolunteerApprovalsActivity extends AppCompatActivity {
                                     userUpdates.put("volunteerNgoId", currentNgoId);
                                     db.collection("users").document(applicantUid)
                                             .set(userUpdates, SetOptions.merge());
+
+                                    UserNotificationStore.createVolunteerDecisionNotification(
+                                            db,
+                                            applicantUid,
+                                            currentNgoId,
+                                            firstNonBlank(currentNgoName, "Your NGO"),
+                                            applicantName,
+                                            "approved",
+                                            "",
+                                            snapshot.getId()
+                                    );
                                 }
                                 Toast.makeText(this, "Volunteer approved", Toast.LENGTH_SHORT).show();
                             })
@@ -249,11 +264,23 @@ public class NgoVolunteerApprovalsActivity extends AppCompatActivity {
                 .set(updates, SetOptions.merge())
                 .addOnSuccessListener(unused -> {
                     String applicantUid = safe(snapshot.getString("uid"));
+                    String applicantName = buildVolunteerName(snapshot);
                     if (!applicantUid.isEmpty()) {
                         Map<String, Object> userUpdates = new HashMap<>();
                         userUpdates.put("volunteerStatus", "rejected");
                         db.collection("users").document(applicantUid)
                                 .set(userUpdates, SetOptions.merge());
+
+                    UserNotificationStore.createVolunteerDecisionNotification(
+                        db,
+                        applicantUid,
+                        currentNgoId,
+                        firstNonBlank(currentNgoName, "Your NGO"),
+                        applicantName,
+                        "rejected",
+                        reason,
+                        snapshot.getId()
+                    );
                     }
                     Toast.makeText(this, "Volunteer request rejected", Toast.LENGTH_SHORT).show();
                 })
@@ -263,6 +290,17 @@ public class NgoVolunteerApprovalsActivity extends AppCompatActivity {
 
     private String safe(String value) {
         return value == null ? "" : value.trim();
+    }
+
+    private String firstNonBlank(String primary, String fallback) {
+        return safe(primary).isEmpty() ? safe(fallback) : safe(primary);
+    }
+
+    private String buildVolunteerName(com.google.firebase.firestore.DocumentSnapshot snapshot) {
+        String firstName = safe(snapshot.getString("firstName"));
+        String surname = safe(snapshot.getString("surname"));
+        String fullName = (firstName + " " + surname).trim();
+        return fullName.isEmpty() ? "Volunteer" : fullName;
     }
 
     @Override

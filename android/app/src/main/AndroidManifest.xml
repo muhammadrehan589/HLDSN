@@ -101,9 +101,13 @@
         <activity android:name=".login_module.LoginActivity" android:exported="false" />
         <activity android:name=".login_module.SignupActivity" android:exported="false" />
         <activity android:name=".home.Main" android:exported="false" />
-        <activity android:name=".OtpVerificationActivity" android:exported="false" />
         <activity android:name=".home.HomePageActivity" android:exported="false" />
+        <activity android:name=".volunteer_module.CampLocationsMapActivity" android:exported="false" />
+        <activity android:name=".home.EmergencyNumbersActivity" android:exported="false" />
+        <activity android:name=".firstaid.EmergencyFirstAidActivity" android:exported="false" />
+        <activity android:name=".firstaid.FirstAidDetailActivity" android:exported="false" />
         <activity android:name=".volunteer_module.VolunteerNetworkMapActivity" android:exported="false" />
+        <activity android:name=".hazard_module.HazardAlertMapActivity" android:exported="false" />
         <activity android:name=".volunteer_module.VolunteerBasicFormActivity" android:exported="false" />
         <activity android:name=".volunteer_module.VolunteerSkillsFormActivity" android:exported="false" />
         <activity android:name=".volunteer_module.VolunteerAgreementActivity" android:exported="false" />
@@ -116,6 +120,17 @@
         <activity android:name=".services.news.NewsDetailActivity" android:exported="false" />
         <activity android:name=".login_module.SaveUserProfileActivity" android:exported="false" />
         <activity android:name=".login_module.UserProfileActivity" android:exported="false" />
+        <activity android:name=".notification_module.NotificationDetailActivity" android:exported="false" />
+        <activity android:name=".notification_module.VolunteerNotificationsActivity" android:exported="false" />
+        <activity android:name=".volunteer_module.VolunteerAssignedTasksActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoTaskCreationActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoTaskListActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoResourceCreationActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoResourceListActivity" android:exported="false" />
+        <activity android:name=".volunteer.VolunteerBasicFormActivity" android:exported="false" />
+        <activity android:name=".volunteer.VolunteerSkillsFormActivity" android:exported="false" />
+        <activity android:name=".volunteer.VolunteerAgreementActivity" android:exported="false" />
+        <activity android:name=".volunteer.VolunteerSuccessActivity" android:exported="false" />
         <activity android:name=".incident_report_module.DisplayReportActivity" android:exported="false"/>
         <activity android:name=".services.safety_tips.SafetyTypeActivity" android:exported="false"/>
         <activity android:name=".sos.SosDetailActivity" android:exported="false"/>
@@ -124,8 +139,16 @@
         <activity android:name=".admin_module.AdminUsersManagementActivity" android:exported="false" />
         <activity android:name=".admin_module.AdminNgoRequestsActivity" android:exported="false" />
         <activity android:name=".ngo_module.NgoDashboardActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoNotificationsActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoCampCenterFormActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoCampCenterMapPickerActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoCampCenterManagementActivity" android:exported="false" />
         <activity android:name=".ngo_module.NgoVolunteerApprovalsActivity" android:exported="false" />
         <activity android:name=".ngo_module.NgoRegistrationRequestActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoViewVolunteersActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoVolunteerDetailActivity" android:exported="false" />
+         <activity android:name=".ngo_module.NgoRegistrationRequestActivity" android:exported="false" />
+         <activity android:name=".nearby.NearbyHelpActivity" android:exported="false" />
 
         <service
             android:name=".sos.SosForegroundService"

@@ -12,6 +12,8 @@ public class ChatUser {
     private String lastMessage;
     private Timestamp lastMessageTime;
     private int unreadCount;
+    private boolean isOnline;
+    private Timestamp lastSeenTime;
 
     // Required empty constructor for Firestore deserialization
     public ChatUser() {}
@@ -24,6 +26,8 @@ public class ChatUser {
         this.lastMessage     = lastMessage;
         this.lastMessageTime = lastMessageTime;
         this.unreadCount     = unreadCount;
+        this.isOnline        = false;
+        this.lastSeenTime    = null;
     }
 
     public String    getUid()             { return uid;             }
@@ -35,6 +39,8 @@ public class ChatUser {
     public String    getLastMessage()     { return lastMessage;     }
     public Timestamp getLastMessageTime() { return lastMessageTime; }
     public int       getUnreadCount()     { return unreadCount;     }
+    public boolean   isOnline()           { return isOnline;        }
+    public Timestamp getLastSeenTime()    { return lastSeenTime;    }
 
     public void setUid(String v)              { uid             = v; }
     public void setName(String v)             { name            = v; }
@@ -45,4 +51,6 @@ public class ChatUser {
     public void setLastMessage(String v)      { lastMessage     = v; }
     public void setLastMessageTime(Timestamp v){ lastMessageTime = v; }
     public void setUnreadCount(int v)         { unreadCount     = v; }
+    public void setOnline(boolean v)          { isOnline        = v; }
+    public void setLastSeenTime(Timestamp v)  { lastSeenTime    = v; }
 }

@@ -30,6 +30,8 @@ import androidx.core.content.ContextCompat;
 
 import com.example.hldsn.NetworkUtils;
 import com.example.hldsn.R;
+import com.example.hldsn.incident_report_module.DisplayReportActivity;
+import com.example.hldsn.debug.CrashDebugger;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
@@ -67,6 +69,7 @@ public class ReportIncidentActivity extends AppCompatActivity {
     private Button uploadButton, safeButton, submitReportButton;
     private ImageView imagePreview;
     private ProgressBar uploadProgress;
+    private ImageView backButton, notificationIcon;
 
     private Uri selectedMediaUri;
     private boolean isSafe = false;
@@ -111,6 +114,8 @@ public class ReportIncidentActivity extends AppCompatActivity {
         safeButton = findViewById(R.id.safeButton);
         imagePreview = findViewById(R.id.imagePreview);
         uploadProgress = findViewById(R.id.uploadProgress);
+        backButton = findViewById(R.id.backButton);
+        notificationIcon = findViewById(R.id.notificationIcon);
     }
 
     private void initFirebase() {
@@ -168,28 +173,78 @@ public class ReportIncidentActivity extends AppCompatActivity {
 
 
     private void initListeners() {
+        try {
+            CrashDebugger.logActivityEvent("ReportIncidentActivity", "initListeners() START");
 
-        safeColor = ContextCompat.getColor(this, R.color.safe_green);
-        unsafeColor = ContextCompat.getColor(this, R.color.lightred);
+            if (backButton != null) {
+                backButton.setOnClickListener(v -> finish());
+            }
 
-        // INITIAL UI STATE
-        setupSafeButtonUI();
+            if (notificationIcon != null) {
+                notificationIcon.setOnClickListener(v -> {
+                    startActivity(new Intent(this, DisplayReportActivity.class));
+                    finish();
+                });
+            }
 
-        uploadButton.setOnClickListener(v -> showMediaDialog());
+            safeColor = ContextCompat.getColor(this, R.color.safe_green);
+            unsafeColor = ContextCompat.getColor(this, R.color.lightred);
 
-        safeButton.setOnClickListener(v -> {
-            isSafe = !isSafe; // toggle
-
+            // INITIAL UI STATE
             setupSafeButtonUI();
 
-            Toast.makeText(
-                    this,
-                    isSafe ? "Marked as Safe" : "Marked as NOT Safe",
-                    Toast.LENGTH_SHORT
-            ).show();
-        });
+            // upload button opens media chooser
+            if (uploadButton != null) {
+                uploadButton.setOnClickListener(v -> {
+                    try {
+                        CrashDebugger.logButtonClick("uploadButton", "Show media dialog");
+                        showMediaDialog();
+                    } catch (Exception e) {
+                        CrashDebugger.logButtonClickError("uploadButton", e);
+                        Toast.makeText(ReportIncidentActivity.this, "Error selecting media", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                CrashDebugger.logNullPointerDebug("ReportIncidentActivity", "uploadButton");
+            }
 
-        submitReportButton.setOnClickListener(v -> submitIncident());
+            // safe button toggles safety state
+            if (safeButton != null) {
+                safeButton.setOnClickListener(v -> {
+                    try {
+                        CrashDebugger.logButtonClick("safeButton", "Toggle safety status");
+                        isSafe = !isSafe; // toggle
+                        setupSafeButtonUI();
+                        Toast.makeText(ReportIncidentActivity.this,
+                                isSafe ? "Marked as Safe" : "Marked as NOT Safe",
+                                Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        CrashDebugger.logButtonClickError("safeButton", e);
+                    }
+                });
+            } else {
+                CrashDebugger.logNullPointerDebug("ReportIncidentActivity", "safeButton");
+            }
+
+            // submit report
+            if (submitReportButton != null) {
+                submitReportButton.setOnClickListener(v -> {
+                    try {
+                        CrashDebugger.logButtonClick("submitReportButton", "Submit incident report");
+                        submitIncident();
+                    } catch (Exception e) {
+                        CrashDebugger.logButtonClickError("submitReportButton", e);
+                        Toast.makeText(ReportIncidentActivity.this, "Error submitting report: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+            } else {
+                CrashDebugger.logNullPointerDebug("ReportIncidentActivity", "submitReportButton");
+            }
+
+            CrashDebugger.logActivityEvent("ReportIncidentActivity", "initListeners() SUCCESS");
+        } catch (Exception e) {
+            CrashDebugger.logActivityError("ReportIncidentActivity", "initListeners()", e);
+        }
     }
 
 
@@ -332,64 +387,90 @@ public class ReportIncidentActivity extends AppCompatActivity {
 
     // ================= SUBMIT =================
     private void submitIncident() {
-        String type = typeField.getText().toString().trim();
-        String locationText = locationField.getText().toString().trim();
-        String description = descriptionField.getText().toString().trim();
+        try {
+            CrashDebugger.logActivityEvent("ReportIncidentActivity", "submitIncident() START");
 
-        if (type.isEmpty() || locationText.isEmpty()) {
-            Toast.makeText(this, "Incident type and location are required", Toast.LENGTH_SHORT).show();
-            return;
-        }
+            String type = typeField.getText().toString().trim();
+            String locationText = locationField.getText().toString().trim();
+            String description = descriptionField.getText().toString().trim();
 
-        uploadProgress.setVisibility(View.VISIBLE);
+            CrashDebugger.logActivityEvent("ReportIncidentActivity",
+                "submitIncident() - type=" + type + ", location=" + locationText);
 
-        if (selectedMediaUri != null && NetworkUtils.isOnline(this)) {
-            // Online with media → full upload flow.
-            uploadMediaAndSave(type, locationText, description);
-        } else {
-            if (selectedMediaUri != null) {
-                // Offline but user attached a photo – skip the upload and warn them.
-                Toast.makeText(this,
-                        "No internet — photo skipped. Report saved and will sync when online.",
-                        Toast.LENGTH_LONG).show();
+            if (type.isEmpty() || locationText.isEmpty()) {
+                Toast.makeText(this, "Incident type and location are required", Toast.LENGTH_SHORT).show();
+                return;
             }
-            // Firestore queues writes offline and syncs automatically.
-            saveToFirestore(null, type, locationText, description);
+
+            uploadProgress.setVisibility(View.VISIBLE);
+
+            if (selectedMediaUri != null && NetworkUtils.isOnline(this)) {
+                // Online with media → full upload flow.
+                CrashDebugger.logActivityEvent("ReportIncidentActivity", "submitIncident() - uploading media");
+                uploadMediaAndSave(type, locationText, description);
+            } else {
+                if (selectedMediaUri != null) {
+                    // Offline but user attached a photo – skip the upload and warn them.
+                    Toast.makeText(this,
+                            "No internet — photo skipped. Report saved and will sync when online.",
+                            Toast.LENGTH_LONG).show();
+                }
+                // Firestore queues writes offline and syncs automatically.
+                CrashDebugger.logActivityEvent("ReportIncidentActivity", "submitIncident() - saving to firestore without media");
+                saveToFirestore(null, type, locationText, description);
+            }
+
+            CrashDebugger.logActivityEvent("ReportIncidentActivity", "submitIncident() END");
+        } catch (Exception e) {
+            CrashDebugger.logActivityError("ReportIncidentActivity", "submitIncident()", e);
+            uploadProgress.setVisibility(View.GONE);
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
     private void uploadMediaAndSave(String type, String locationText, String description) {
-        Request request = new Request.Builder()
-                .url("https://save-image.up.railway.app/api/imagekit/auth")
-                .build();
+        try {
+            CrashDebugger.logActivityEvent("ReportIncidentActivity", "uploadMediaAndSave() START");
 
-        new OkHttpClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull java.io.IOException e) {
-                runOnUiThread(() -> {
-                    uploadProgress.setVisibility(View.GONE);
-                    Toast.makeText(ReportIncidentActivity.this, "Network error", Toast.LENGTH_SHORT).show();
-                });
-            }
+            Request request = new Request.Builder()
+                    .url("https://save-image.up.railway.app/api/imagekit/auth")
+                    .build();
 
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) {
-                try {
-                    if (response.body() == null) {
-                        throw new IOException("Empty auth response body");
-                    }
-                    JSONObject json = new JSONObject(response.body().string());
-                    String token = json.getString("token");
-                    String signature = json.getString("signature");
-                    long expire = json.getLong("expire");
-
-                    uploadToImageKit(token, signature, expire, type, locationText, description);
-                } catch (Exception e) {
-                    Log.e(TAG, "Auth parse error", e);
-                    runOnUiThread(() -> uploadProgress.setVisibility(View.GONE));
+            new OkHttpClient().newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull java.io.IOException e) {
+                    CrashDebugger.logNetworkError("uploadMediaAndSave::onFailure", e);
+                    runOnUiThread(() -> {
+                        uploadProgress.setVisibility(View.GONE);
+                        Toast.makeText(ReportIncidentActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                    });
                 }
-            }
-        });
+
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) {
+                    try {
+                        CrashDebugger.logActivityEvent("ReportIncidentActivity", "uploadMediaAndSave() - auth response received");
+
+                        if (response.body() == null) {
+                            throw new IOException("Empty auth response body");
+                        }
+                        JSONObject json = new JSONObject(response.body().string());
+                        String token = json.getString("token");
+                        String signature = json.getString("signature");
+                        long expire = json.getLong("expire");
+
+                        uploadToImageKit(token, signature, expire, type, locationText, description);
+                    } catch (Exception e) {
+                        CrashDebugger.logCrash("uploadMediaAndSave::onResponse", "Auth parse error", e);
+                        Log.e(TAG, "Auth parse error", e);
+                        runOnUiThread(() -> uploadProgress.setVisibility(View.GONE));
+                    }
+                }
+            });
+        } catch (Exception e) {
+            CrashDebugger.logActivityError("ReportIncidentActivity", "uploadMediaAndSave()", e);
+            uploadProgress.setVisibility(View.GONE);
+        }
     }
 
     private void uploadToImageKit(String token, String signature, long expire,
@@ -444,35 +525,45 @@ public class ReportIncidentActivity extends AppCompatActivity {
     }
 
     private void saveToFirestore(String mediaUrl, String type, String locationText, String description) {
+        try {
+            CrashDebugger.logActivityEvent("ReportIncidentActivity", "saveToFirestore() START - mediaUrl=" + mediaUrl);
 
-        IncidentModel incident = new IncidentModel(
-                auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : "anonymous",
-                type,
-                locationText,
-                description,
-                isSafe,
-                mediaUrl,
-                currentLatitude,     // may be null
-                currentLongitude
-        );
+            IncidentModel incident = new IncidentModel(
+                    auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : "anonymous",
+                    type,
+                    locationText,
+                    description,
+                    isSafe,
+                    mediaUrl,
+                    currentLatitude,     // may be null
+                    currentLongitude
+            );
 
-        firestore.collection("incidents")
-                .add(incident)
-                .addOnSuccessListener(documentReference -> {
+            firestore.collection("incidents")
+                    .add(incident)
+                    .addOnSuccessListener(documentReference -> {
 
-                    // 🔥 SET SERVER TIMESTAMP FOR TTL
-                    documentReference.update("createdAt", FieldValue.serverTimestamp());
+                        // 🔥 SET SERVER TIMESTAMP FOR TTL
+                        documentReference.update("createdAt", FieldValue.serverTimestamp());
 
-                    runOnUiThread(() -> {
-                        uploadProgress.setVisibility(View.GONE);
-                        Toast.makeText(this, "Incident reported successfully!", Toast.LENGTH_LONG).show();
-                        finish();
+                        CrashDebugger.logActivityEvent("ReportIncidentActivity", "saveToFirestore() SUCCESS");
+                        runOnUiThread(() -> {
+                            uploadProgress.setVisibility(View.GONE);
+                            Toast.makeText(ReportIncidentActivity.this, "Incident reported successfully!", Toast.LENGTH_LONG).show();
+                            finish();
+                        });
+                    })
+                    .addOnFailureListener(e -> {
+                        CrashDebugger.logFirebaseError("saveToFirestore", e);
+                        runOnUiThread(() -> {
+                            uploadProgress.setVisibility(View.GONE);
+                            Toast.makeText(ReportIncidentActivity.this, "Failed to save report", Toast.LENGTH_SHORT).show();
+                        });
                     });
-                })
-                .addOnFailureListener(e -> runOnUiThread(() -> {
-                    uploadProgress.setVisibility(View.GONE);
-                    Toast.makeText(this, "Failed to save report", Toast.LENGTH_SHORT).show();
-                }));
+        } catch (Exception e) {
+            CrashDebugger.logActivityError("ReportIncidentActivity", "saveToFirestore()", e);
+            uploadProgress.setVisibility(View.GONE);
+        }
     }
 
 

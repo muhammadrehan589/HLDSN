@@ -29,8 +29,9 @@ public class ChatsActivity extends AppCompatActivity {
         if (me == null) { finish(); return; }
         chatsViewModel = new ViewModelProvider(this).get(ChatsViewModel.class);
 
-        // Header buttons
-        ImageView backIcon = findViewById(R.id.chatBackIcon);
+
+        // ── Header buttons ───────────────────────────────────────────────────
+        ImageView backIcon = findViewById(R.id.backButton);
         if (backIcon != null) backIcon.setOnClickListener(v -> finish());
 
         setupTabs();
@@ -67,7 +68,7 @@ public class ChatsActivity extends AppCompatActivity {
         usersViewPager.setCurrentItem(0, false);
 
         new TabLayoutMediator(usersTabLayout, usersViewPager,
-                (tab, position) -> tab.setText(position == 0 ? "Online Users" : "Nearby Users"))
+                (tab, position) -> tab.setText(position == 0 ? "All Users" : "Nearby Users"))
                 .attach();
     }
 }

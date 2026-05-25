@@ -100,10 +100,10 @@ public class VolunteerNetworkMapActivity extends AppCompatActivity {
         mapView.setVerticalMapRepetitionEnabled(false);
         mapView.setScrollableAreaLimitDouble(PAKISTAN_BOUNDS);
         mapView.setMinZoomLevel(5.0);
-        mapView.setMaxZoomLevel(11.0);
+        mapView.setMaxZoomLevel(18.0);
 
         IMapController mapController = mapView.getController();
-        mapController.setZoom(5.6);
+        mapController.setZoom(14.0);
         mapController.setCenter(PAKISTAN_CENTER);
 
         mapView.post(() -> mapView.zoomToBoundingBox(PAKISTAN_BOUNDS, true));

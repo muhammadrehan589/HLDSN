@@ -38,6 +38,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.hldsn.NetworkUtils;
 import com.example.hldsn.mesh.MeshMessagingCoordinator;
 import com.example.hldsn.mesh.model.MeshIdentity;
 import com.example.hldsn.mesh.model.MeshMessage;
@@ -50,9 +51,11 @@ import com.example.hldsn.notification_module.SosAlertStore;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.SetOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -65,8 +68,11 @@ import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public class SosForegroundService extends Service {
 
@@ -107,6 +113,16 @@ public class SosForegroundService extends Service {
     private static final long GPS_MAX_STALE_MS = 600_000L; // 10 minutes
     private static final float GPS_MAX_ACCURACY_METERS = 500f; 
     private static final long GPS_SINGLE_FIX_TIMEOUT_MS = 10_000L;
+    private static final long PRESENCE_HEARTBEAT_MS = 60_000L;
+    private static final long ACTIVE_WINDOW_MS = 10 * 60_000L;
+    private static final double ONLINE_RADIUS_METERS = 3_000d;
+    private static final int MAX_NEARBY_VOLUNTEERS = 3;
+    private static final int MAX_NEARBY_NGO = 1;
+    private static final String ROLE_USER = "user";
+    private static final String ROLE_VOLUNTEER = "volunteer";
+    private static final String ROLE_NGO_ADMIN = "ngo_admin";
+    private static final String SOS_INBOX_COLLECTION = "sos_alert_inbox";
+    private static final String USERS_COLLECTION = "users";
     private static final String SOS_PREFS = "sos_sender_profile";
     private static final String KEY_CACHED_SENDER_NAME = "cached_sender_name";
 
@@ -136,6 +152,16 @@ public class SosForegroundService extends Service {
     private LocationManager activeSingleFixManager;
     private LocationListener activeSingleFixListener;
     private Runnable activeSingleFixTimeout;
+    private ListenerRegistration remoteSosInboxListener;
+    private final Set<String> processedRemoteInboxDocs = new HashSet<>();
+
+    private final Runnable presenceHeartbeat = new Runnable() {
+        @Override
+        public void run() {
+            publishPresenceBestEffort();
+            handler.postDelayed(this, PRESENCE_HEARTBEAT_MS);
+        }
+    };
 
     private final Runnable meshTick = new Runnable() {
         @Override
@@ -253,6 +279,12 @@ public class SosForegroundService extends Service {
     public void onDestroy() {
         Log.i(TAG, "Service destroy requested. Stopping mesh transports.");
         handler.removeCallbacksAndMessages(null);
+        handler.removeCallbacks(presenceHeartbeat);
+        if (remoteSosInboxListener != null) {
+            remoteSosInboxListener.remove();
+            remoteSosInboxListener = null;
+        }
+        markPresenceInactive();
         clearSingleFixRequest();
         stopScanning();
         stopActiveAdvertiser();
@@ -343,6 +375,8 @@ public class SosForegroundService extends Service {
         nextIdentityBroadcastAtMs = 0L;
         identityBroadcastPending = true;
         handler.post(meshTick);
+        startPresenceHeartbeat();
+        startRemoteSosInboxListener();
         sendStatus("HLDSN SOS mesh ready");
     }
 
@@ -883,6 +917,11 @@ public class SosForegroundService extends Service {
                 + " lon=" + lon
                 + " epoch=" + nowEpoch
                 + " refined=" + (existingPacketId != -1L));
+
+        if (existingPacketId == -1L && NetworkUtils.isOnline(this)) {
+            dispatchOnlineSosRecipients(packet);
+        }
+
         updateNotification("Broadcasting SOS " + packet.shortId());
         sendStatus(existingPacketId != -1L ? "SOS location refined" : "SOS broadcast started");
         return packet.messageId;
@@ -1325,6 +1364,350 @@ public class SosForegroundService extends Service {
         return value == null ? "" : value.trim();
     }
 
+    private void dispatchOnlineSosRecipients(SosPacket packet) {
+        FirebaseUser sender = FirebaseAuth.getInstance().getCurrentUser();
+        if (sender == null) {
+            return;
+        }
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection(USERS_COLLECTION)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    java.util.List<RecipientCandidate> volunteers = new java.util.ArrayList<>();
+                    java.util.List<RecipientCandidate> nearbyUsers = new java.util.ArrayList<>();
+                    java.util.List<RecipientCandidate> nearbyNgos = new java.util.ArrayList<>();
+
+                    double originLat = packet.getLatMilli() / 1000.0d;
+                    double originLon = packet.getLonMilli() / 1000.0d;
+                    boolean hasOriginLocation = packet.getLatMilli() != 0 || packet.getLonMilli() != 0;
+
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        String uid = doc.getId();
+                        if (uid == null || uid.isEmpty() || uid.equals(sender.getUid())) {
+                            continue;
+                        }
+
+                        String role = normalizeRole(doc.getString("role"));
+                        if (!isCandidateActive(doc)) {
+                            continue;
+                        }
+
+                        Double lat = readCoordinate(doc, "latitude", "lat", "locationLat", "lastKnownLatitude");
+                        Double lon = readCoordinate(doc, "longitude", "lon", "locationLon", "lastKnownLongitude");
+                        if (lat == null || lon == null) {
+                            continue;
+                        }
+
+                        double distance = hasOriginLocation
+                                ? distanceMeters(originLat, originLon, lat, lon)
+                                : Double.MAX_VALUE;
+
+                        RecipientCandidate candidate = new RecipientCandidate(uid, role, lat, lon, distance);
+                        if (ROLE_VOLUNTEER.equals(role)) {
+                            volunteers.add(candidate);
+                        } else if (ROLE_USER.equals(role)) {
+                            if (distance <= ONLINE_RADIUS_METERS) {
+                                nearbyUsers.add(candidate);
+                            }
+                        } else if (ROLE_NGO_ADMIN.equals(role)) {
+                            if (distance <= ONLINE_RADIUS_METERS) {
+                                nearbyNgos.add(candidate);
+                            }
+                        }
+                    }
+
+                    volunteers.sort((a, b) -> Double.compare(a.distanceMeters, b.distanceMeters));
+                    nearbyUsers.sort((a, b) -> Double.compare(a.distanceMeters, b.distanceMeters));
+                    nearbyNgos.sort((a, b) -> Double.compare(a.distanceMeters, b.distanceMeters));
+
+                    Set<String> targets = new HashSet<>();
+                    pickRecipients(volunteers, MAX_NEARBY_VOLUNTEERS, targets);
+                    pickRecipients(nearbyUsers, Integer.MAX_VALUE, targets);
+                    pickRecipients(nearbyNgos, MAX_NEARBY_NGO, targets);
+
+                    if (targets.isEmpty()) {
+                        sendStatus("SOS sent online: no nearby active recipients found");
+                        return;
+                    }
+
+                    String senderName = packet.getSenderName().isEmpty() ? "HLDSN User" : packet.getSenderName();
+                    String subtitle = (packet.getLatMilli() != 0 || packet.getLonMilli() != 0)
+                            ? String.format(Locale.US, "Location: %.6f, %.6f", packet.getLatMilli() / 1000.0d, packet.getLonMilli() / 1000.0d)
+                            : "Location unavailable";
+
+                    for (String targetUid : targets) {
+                        String inboxDocId = String.format(Locale.US, "%d_%s", packet.messageId, targetUid);
+                        Map<String, Object> payload = new HashMap<>();
+                        payload.put("messageIdLong", packet.messageId);
+                        payload.put("messageId", packet.shortId());
+                        payload.put("senderUid", sender.getUid());
+                        payload.put("senderName", senderName);
+                        payload.put("recipientUid", targetUid);
+                        payload.put("latMilli", packet.getLatMilli());
+                        payload.put("lonMilli", packet.getLonMilli());
+                        payload.put("epochSeconds", packet.getEpochSeconds());
+                        payload.put("title", senderName.isEmpty() ? "Nearby SOS Alert" : "SOS from " + senderName);
+                        payload.put("subtitle", subtitle);
+                        payload.put("status", "pending");
+                        payload.put("createdAt", FieldValue.serverTimestamp());
+
+                        db.collection(SOS_INBOX_COLLECTION)
+                                .document(inboxDocId)
+                                .set(payload, SetOptions.merge());
+                    }
+
+                    sendStatus("SOS sent online to " + targets.size() + " nearby active recipients");
+                })
+                .addOnFailureListener(error -> Log.w(TAG, "Online SOS routing failed", error));
+    }
+
+    private void pickRecipients(java.util.List<RecipientCandidate> candidates, int limit, Set<String> targets) {
+        int added = 0;
+        for (RecipientCandidate candidate : candidates) {
+            if (added >= limit) {
+                break;
+            }
+            if (targets.add(candidate.uid)) {
+                added++;
+            }
+        }
+    }
+
+    private String normalizeRole(@Nullable String rawRole) {
+        if (rawRole == null) {
+            return ROLE_USER;
+        }
+        String normalized = rawRole.trim().toLowerCase(Locale.US).replace('-', '_').replace(' ', '_');
+        if ("ngoadmin".equals(normalized)) {
+            return ROLE_NGO_ADMIN;
+        }
+        if (ROLE_VOLUNTEER.equals(normalized)) {
+            return ROLE_VOLUNTEER;
+        }
+        if (ROLE_NGO_ADMIN.equals(normalized)) {
+            return ROLE_NGO_ADMIN;
+        }
+        return ROLE_USER;
+    }
+
+    private boolean isCandidateActive(DocumentSnapshot doc) {
+        Boolean isActive = doc.getBoolean("isActive");
+        if (Boolean.TRUE.equals(isActive)) {
+            return true;
+        }
+        Long ageMs = activeAgeMs(doc, "lastActiveAt", "lastSeen", "updated_at", "mesh_synced_at");
+        if (ageMs != null) {
+            return ageMs <= ACTIVE_WINDOW_MS;
+        }
+        return isActive == null;
+    }
+
+    @Nullable
+    private Long activeAgeMs(DocumentSnapshot doc, String... keys) {
+        long now = System.currentTimeMillis();
+        for (String key : keys) {
+            Object value = doc.get(key);
+            Long timestampMs = toTimestampMs(value);
+            if (timestampMs != null) {
+                return Math.max(0L, now - timestampMs);
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    private Long toTimestampMs(@Nullable Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Timestamp) {
+            return ((Timestamp) value).toDate().getTime();
+        }
+        if (value instanceof Long) {
+            return (Long) value;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+        return null;
+    }
+
+    @Nullable
+    private Double readCoordinate(DocumentSnapshot doc, String... keys) {
+        for (String key : keys) {
+            Object value = doc.get(key);
+            Double parsed = toDouble(value);
+            if (parsed != null) {
+                return parsed;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    private Double toDouble(@Nullable Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).doubleValue();
+        }
+        if (value instanceof String) {
+            try {
+                return Double.parseDouble(((String) value).trim());
+            } catch (NumberFormatException ignored) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    private double distanceMeters(double lat1, double lon1, double lat2, double lon2) {
+        final double earthRadius = 6_371_000d;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return earthRadius * c;
+    }
+
+    private void startPresenceHeartbeat() {
+        handler.removeCallbacks(presenceHeartbeat);
+        publishPresenceBestEffort();
+        handler.postDelayed(presenceHeartbeat, PRESENCE_HEARTBEAT_MS);
+    }
+
+    private void publishPresenceBestEffort() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            return;
+        }
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Map<String, Object> patch = new HashMap<>();
+        patch.put("isActive", true);
+        patch.put("lastActiveAt", FieldValue.serverTimestamp());
+
+        db.collection(USERS_COLLECTION)
+                .document(user.getUid())
+                .set(patch, SetOptions.merge());
+
+        if (!hasLocationPermission()) {
+            return;
+        }
+
+        try {
+            @SuppressLint("MissingPermission")
+            com.google.android.gms.tasks.Task<Location> task = locationClient.getLastLocation();
+            task.addOnSuccessListener(location -> {
+                if (!isValidSosLocation(location)) {
+                    return;
+                }
+                Map<String, Object> locationPatch = new HashMap<>();
+                locationPatch.put("latitude", location.getLatitude());
+                locationPatch.put("longitude", location.getLongitude());
+                locationPatch.put("lastLocationAt", FieldValue.serverTimestamp());
+                db.collection(USERS_COLLECTION)
+                        .document(user.getUid())
+                        .set(locationPatch, SetOptions.merge());
+            });
+        } catch (Exception ignored) {
+            // Presence update is best-effort only.
+        }
+    }
+
+    private void markPresenceInactive() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            return;
+        }
+        Map<String, Object> patch = new HashMap<>();
+        patch.put("isActive", false);
+        patch.put("lastInactiveAt", FieldValue.serverTimestamp());
+        FirebaseFirestore.getInstance()
+                .collection(USERS_COLLECTION)
+                .document(user.getUid())
+                .set(patch, SetOptions.merge());
+    }
+
+    private void startRemoteSosInboxListener() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            return;
+        }
+        if (remoteSosInboxListener != null) {
+            remoteSosInboxListener.remove();
+            remoteSosInboxListener = null;
+        }
+
+        remoteSosInboxListener = FirebaseFirestore.getInstance()
+                .collection(SOS_INBOX_COLLECTION)
+                .whereEqualTo("recipientUid", user.getUid())
+                .whereEqualTo("status", "pending")
+                .addSnapshotListener((snapshot, error) -> {
+                    if (error != null || snapshot == null) {
+                        return;
+                    }
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        String docId = doc.getId();
+                        if (docId == null || docId.isEmpty() || processedRemoteInboxDocs.contains(docId)) {
+                            continue;
+                        }
+                        processedRemoteInboxDocs.add(docId);
+                        processRemoteSosInboxDocument(doc);
+                        if (processedRemoteInboxDocs.size() > 512) {
+                            processedRemoteInboxDocs.clear();
+                        }
+                    }
+                });
+    }
+
+    private void processRemoteSosInboxDocument(DocumentSnapshot doc) {
+        Long messageIdLong = doc.getLong("messageIdLong");
+        if (messageIdLong == null) {
+            return;
+        }
+
+        int latMilli = toInt(doc.get("latMilli"));
+        int lonMilli = toInt(doc.get("lonMilli"));
+        int epochSeconds = toInt(doc.get("epochSeconds"));
+        String senderName = safeTrim(doc.getString("senderName"));
+
+        SosPacket packet = SosPacket.createSos(
+                messageIdLong,
+                latMilli / 1000.0d,
+                lonMilli / 1000.0d,
+                epochSeconds > 0 ? epochSeconds : (int) Instant.now().getEpochSecond(),
+                senderName
+        );
+
+        SosAlertRecord alertRecord = SosAlertStore.saveOrUpdateAlert(this, packet, true);
+        notifyAlertListUpdated();
+        showReceivedSosNotification(packet, alertRecord);
+
+        Map<String, Object> deliveredPatch = new HashMap<>();
+        deliveredPatch.put("status", "delivered");
+        deliveredPatch.put("deliveredAt", FieldValue.serverTimestamp());
+        doc.getReference().set(deliveredPatch, SetOptions.merge());
+    }
+
+    private int toInt(@Nullable Object value) {
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        if (value instanceof String) {
+            try {
+                return Integer.parseInt(((String) value).trim());
+            } catch (NumberFormatException ignored) {
+                return 0;
+            }
+        }
+        return 0;
+    }
+
     private void updateNotification(String text) {
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (manager == null) {
@@ -1526,6 +1909,22 @@ public class SosForegroundService extends Service {
         }
         int value = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
         return value > 0 ? value : 100;
+    }
+
+    private static final class RecipientCandidate {
+        final String uid;
+        final String role;
+        final double lat;
+        final double lon;
+        final double distanceMeters;
+
+        RecipientCandidate(String uid, String role, double lat, double lon, double distanceMeters) {
+            this.uid = uid;
+            this.role = role;
+            this.lat = lat;
+            this.lon = lon;
+            this.distanceMeters = distanceMeters;
+        }
     }
 
     private static final class QueuedPacket {

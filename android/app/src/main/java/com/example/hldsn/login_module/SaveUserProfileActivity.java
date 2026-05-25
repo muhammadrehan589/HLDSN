@@ -13,6 +13,7 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -25,6 +26,7 @@ import androidx.core.content.ContextCompat;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.hldsn.R;
+import com.example.hldsn.volunteer.VolunteerBasicFormActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -58,6 +60,7 @@ public class SaveUserProfileActivity extends AppCompatActivity {
     private ImageView profileImg;
     private ImageView backButton;
     private Button saveButton;
+    private TextView volunteerClickHereText;
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -106,6 +109,7 @@ public class SaveUserProfileActivity extends AppCompatActivity {
         profileImg = findViewById(R.id.profileImage);
         backButton = findViewById(R.id.backButton);
         saveButton = findViewById(R.id.saveButton);
+        volunteerClickHereText = findViewById(R.id.volunteerClickHereText);
 
         // Set click listener for profile image
         profileImg.setOnClickListener(v -> showImageDialog());
@@ -115,6 +119,13 @@ public class SaveUserProfileActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, UserProfileActivity.class);
                 startActivity(intent);
                 finish();
+            });
+        }
+
+        if (volunteerClickHereText != null) {
+            volunteerClickHereText.setOnClickListener(v -> {
+                Intent intent = new Intent(this, VolunteerBasicFormActivity.class);
+                startActivity(intent);
             });
         }
     }

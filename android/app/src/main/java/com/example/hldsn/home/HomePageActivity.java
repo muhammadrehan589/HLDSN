@@ -22,11 +22,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.URLUtil;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
@@ -34,12 +36,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.hldsn.R;
+import com.example.hldsn.debug.CrashDebugger;
+import com.example.hldsn.firstaid.EmergencyFirstAidActivity;
+import com.example.hldsn.nearby.NearbyHelpActivity;
 import com.example.hldsn.incident_report_module.ChatsActivity;
+import com.example.hldsn.incident_report_module.DisplayReportActivity;
 import com.example.hldsn.incident_report_module.IncidentModel;
 import com.example.hldsn.login_module.LoginActivity;
 import com.example.hldsn.login_module.SaveUserProfileActivity;
@@ -49,9 +56,14 @@ import com.example.hldsn.notification_module.NotificationAdapter;
 import com.example.hldsn.notification_module.NotificationItem;
 import com.example.hldsn.notification_module.SosAlertRecord;
 import com.example.hldsn.notification_module.SosAlertStore;
+import com.example.hldsn.notification_module.UserNotificationStore;
+import com.example.hldsn.volunteer_module.VolunteerAssignedTasksActivity;
+import com.example.hldsn.notification_module.VolunteerNotificationsActivity;
+import com.example.hldsn.hazard_module.HazardAlertMapActivity;
 import com.example.hldsn.services.news.NewsActivity;
 import com.example.hldsn.services.safety_tips.SafetyTipsActivity;
 import com.example.hldsn.sos.SosListenerService;
+import com.example.hldsn.volunteer_module.CampLocationsMapActivity;
 import com.example.hldsn.volunteer_module.VolunteerNetworkMapActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -85,9 +97,6 @@ import com.example.hldsn.services.news.ApiNewsRepository;
 import com.example.hldsn.services.news.NewsDetailActivity;
 import com.example.hldsn.services.news.NewsItem;
 import com.example.hldsn.services.news.NewsRepository;
-import androidx.viewpager2.widget.ViewPager2;
-import android.os.Handler;
-import android.os.Looper;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -107,35 +116,21 @@ public class HomePageActivity extends AppCompatActivity {
     private static final String EXTRA_MESH_TEXT = "extra_mesh_text";
     private static final String PREFS_PERMISSION_GATE = "home_permission_gate";
     private static final String PREF_KEY_ALL_PERMISSIONS_PREFIX = "all_permissions_prompted_";
-    private static final String NEWS_DEFAULT_HEADLINE = "Disaster update in Pakistan";
-        private static final String DISASTER_NEWS_API_URL =
-            "https://api.gdeltproject.org/api/v2/doc/doc?query=%28Pakistan%20AND%20%28disaster%20OR%20flood%20OR%20earthquake%20OR%20landslide%20OR%20cyclone%29%29&mode=ArtList&maxrecords=20&sort=DateDesc&format=json";
-        private static final int NEWS_HTTP_TIMEOUT_MS = 10000;
-    private static final int NEWS_FETCH_LIMIT = 12;
-    private static final long NEWS_SLIDE_INTERVAL_MS = 5000L;
-        private static final int[] NEWS_FALLBACK_IMAGES = new int[] {
-            R.drawable.flood_banner,
-            R.drawable.ic_launcher_background_flood_alltips_screen,
-            R.drawable.ic_launcher_background_earthquake_alltips_screen,
-            R.drawable.ic_launcher_background_landslide_alltips_screen
-        };
 
     private DrawerLayout drawerLayout;
     private ImageView menuIcon, notificationIcon;
     private TextView tvNotificationCount;
-    private MaterialButton chatBtn, tipsBtn, newsBtn;
+    private MaterialButton chatBtn, tipsBtn, newsBtn, communityChatBtn;
+    private MaterialButton hazardAlertBtn;
     private View emergencyBtn;
-    private ViewPager2 newsSlider;
-    private LinearLayout newsSliderDots;
-    private NewsSliderAdapter newsSliderAdapter;
-    private final Handler newsSliderHandler = new Handler(Looper.getMainLooper());
-    private final ExecutorService newsApiExecutor = Executors.newSingleThreadExecutor();
-    private Runnable newsSliderRunnable;
-    private boolean isNewsSliderCallbackRegistered;
+    private MaterialButton emergencyNumbersBtn;
+    private MaterialButton emergencyFirstAidBtn;
+    private MaterialButton nearbyHelpBtn;
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     private String currentUserId;
+    private String currentUserRole = "";
 
     // Notification drawer
     private RecyclerView notificationRecyclerView;
@@ -143,15 +138,16 @@ public class HomePageActivity extends AppCompatActivity {
 
     // Firestore listener
     private ListenerRegistration incidentsListener;
+    private ListenerRegistration userNotificationsListener;
 
     // Track seen incidents
     private Set<String> seenIncidentIds = new HashSet<>();
 
-    // Badge counter
-    private int unreadCount = 0;
     private View emptyStateLayout;
     List<IncidentModel> unreadIncidents = new ArrayList<>();
     private final List<SosAlertRecord> sosAlerts = new ArrayList<>();
+    private final List<NotificationItem> userNotifications = new ArrayList<>();
+    private int userNotificationCount = 0;
 
     // Carousel fields
     private ViewPager2 newsViewPager;
@@ -262,13 +258,14 @@ public class HomePageActivity extends AppCompatActivity {
         setupNewsCarousel();
 
         currentUserId = auth.getCurrentUser().getUid();
+        loadCurrentUserRole();
 
         initViews();
-        initNewsSlider();
         initNotificationDrawer();
         initListeners();
         loadSeenIncidentIds();
         loadSosAlerts();
+        listenForUserNotifications();
 
         checkAndRequestPermissions();
         handleLaunchIntent(getIntent());
@@ -281,333 +278,349 @@ public class HomePageActivity extends AppCompatActivity {
         tvNotificationCount = findViewById(R.id.tv_notification_count);
         chatBtn = findViewById(R.id.btn_service_chats);
         tipsBtn = findViewById(R.id.btn_info_safety);
+        communityChatBtn = findViewById(R.id.btn_info_community_chat);
         newsBtn = findViewById(R.id.btn_info_news);
+        hazardAlertBtn = findViewById(R.id.btn_service_alert);
         emergencyBtn = findViewById(R.id.btn_emergency);
-        newsSlider = findViewById(R.id.news_slider);
-        newsSliderDots = findViewById(R.id.news_slider_dots);
-    }
-
-    private void initNewsSlider() {
-        if (newsSlider == null || newsSliderDots == null) {
-            return;
-        }
-
-        newsSliderAdapter = new NewsSliderAdapter(this::openNewsArticleInBrowser);
-        newsSlider.setAdapter(newsSliderAdapter);
-        showNewsSlides(buildFallbackNewsSlides());
-
-        newsSliderRunnable = () -> {
-            int itemCount = newsSliderAdapter != null ? newsSliderAdapter.getItemCount() : 0;
-            if (newsSlider == null || itemCount <= 1) {
-                return;
-            }
-            int nextItem = (newsSlider.getCurrentItem() + 1) % itemCount;
-            newsSlider.setCurrentItem(nextItem, true);
-        };
-
-        if (!isNewsSliderCallbackRegistered) {
-            newsSlider.registerOnPageChangeCallback(newsSliderPageChangeCallback);
-            isNewsSliderCallbackRegistered = true;
-        }
-    }
-
-    private List<NewsSliderAdapter.NewsSlideItem> buildFallbackNewsSlides() {
-        return Arrays.asList(
-                new NewsSliderAdapter.NewsSlideItem(
-                        "2025 Floods in Peshawar: Rescue operations continue",
-                        null,
-                null,
-                        R.drawable.flood_banner
-                ),
-                new NewsSliderAdapter.NewsSlideItem(
-                        "Flood preparedness: Monsoon awareness across KP",
-                        null,
-                null,
-                        R.drawable.ic_launcher_background_flood_alltips_screen
-                ),
-                new NewsSliderAdapter.NewsSlideItem(
-                        "Earthquake safety updates for northern regions",
-                        null,
-                null,
-                        R.drawable.ic_launcher_background_earthquake_alltips_screen
-                ),
-                new NewsSliderAdapter.NewsSlideItem(
-                        "Landslide risk alerts for hilly districts",
-                        null,
-                null,
-                        R.drawable.ic_launcher_background_landslide_alltips_screen
-                )
-        );
-    }
-
-    private void showNewsSlides(List<NewsSliderAdapter.NewsSlideItem> slides) {
-        if (newsSliderAdapter == null || newsSlider == null) {
-            return;
-        }
-
-        List<NewsSliderAdapter.NewsSlideItem> effectiveSlides = slides;
-        if (effectiveSlides == null || effectiveSlides.isEmpty()) {
-            effectiveSlides = buildFallbackNewsSlides();
-        }
-
-        int currentPosition = Math.max(0, newsSlider.getCurrentItem());
-        int newCount = effectiveSlides.size();
-        int targetPosition = Math.min(currentPosition, Math.max(0, newCount - 1));
-
-        newsSliderAdapter.submitItems(effectiveSlides);
-        setupNewsDots(newCount);
-        newsSlider.setCurrentItem(targetPosition, false);
-        updateNewsDots(targetPosition);
-        restartNewsAutoSlide();
-    }
-
-    private void refreshNewsFromExternalApi() {
-        newsApiExecutor.execute(() -> {
-            List<NewsSliderAdapter.NewsSlideItem> apiSlides = fetchDisasterNewsFromApi();
-            runOnUiThread(() -> {
-                if (isFinishing() || isDestroyed()) {
-                    return;
-                }
-                showNewsSlides(apiSlides);
-            });
-        });
-    }
-
-    private List<NewsSliderAdapter.NewsSlideItem> fetchDisasterNewsFromApi() {
-        HttpURLConnection connection = null;
-        try {
-            URL url = new URL(DISASTER_NEWS_API_URL);
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setConnectTimeout(NEWS_HTTP_TIMEOUT_MS);
-            connection.setReadTimeout(NEWS_HTTP_TIMEOUT_MS);
-            connection.setRequestProperty("Accept", "application/json");
-
-            int statusCode = connection.getResponseCode();
-            if (statusCode != HttpURLConnection.HTTP_OK) {
-                Log.w(TAG, "Disaster API returned status code: " + statusCode);
-                return new ArrayList<>();
-            }
-
-            String responseJson = readResponseBody(connection.getInputStream());
-            return parseDisasterApiResponse(responseJson);
-        } catch (Exception e) {
-            Log.w(TAG, "External disaster API fetch failed", e);
-            return new ArrayList<>();
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
-    }
-
-    private List<NewsSliderAdapter.NewsSlideItem> parseDisasterApiResponse(String responseJson) {
-        List<NewsSliderAdapter.NewsSlideItem> slides = new ArrayList<>();
-        try {
-            JSONObject root = new JSONObject(responseJson);
-            JSONArray articles = root.optJSONArray("articles");
-            if (articles == null) {
-                return slides;
-            }
-
-            for (int i = 0; i < articles.length() && slides.size() < NEWS_FETCH_LIMIT; i++) {
-                JSONObject article = articles.optJSONObject(i);
-                if (article == null) {
-                    continue;
-                }
-
-                String headline = normalizeHeadline(article.optString("title"));
-                String imageUrl = sanitizeUrl(article.optString("socialimage"));
-                String articleUrl = sanitizeUrl(article.optString("url"));
-
-                if (TextUtils.isEmpty(articleUrl)) {
-                    continue;
-                }
-
-                slides.add(new NewsSliderAdapter.NewsSlideItem(
-                        headline,
-                        imageUrl,
-                        articleUrl,
-                        getFallbackImageForIndex(slides.size())
-                ));
-            }
-        } catch (Exception e) {
-            Log.w(TAG, "Failed to parse disaster API response", e);
-        }
-        return slides;
-    }
-
-    private String readResponseBody(InputStream stream) throws IOException {
-        StringBuilder builder = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(stream, StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line);
-            }
-        }
-        return builder.toString();
-    }
-
-    private int getFallbackImageForIndex(int index) {
-        if (NEWS_FALLBACK_IMAGES.length == 0) {
-            return R.drawable.flood_banner;
-        }
-        return NEWS_FALLBACK_IMAGES[index % NEWS_FALLBACK_IMAGES.length];
-    }
-
-    private String sanitizeUrl(String value) {
-        if (value == null) {
-            return null;
-        }
-        String trimmed = value.trim();
-        if (trimmed.isEmpty()) {
-            return null;
-        }
-        return URLUtil.isValidUrl(trimmed) ? trimmed : null;
-    }
-
-    private void openNewsArticleInBrowser(NewsSliderAdapter.NewsSlideItem item) {
-        if (item == null || TextUtils.isEmpty(item.getArticleUrl())) {
-            Toast.makeText(this, "News link is unavailable", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        try {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(item.getArticleUrl()));
-            startActivity(browserIntent);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, "No browser app found", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private String normalizeHeadline(String title) {
-        if (title == null) {
-            return NEWS_DEFAULT_HEADLINE;
-        }
-
-        String trimmed = title.trim();
-        return trimmed.isEmpty() ? NEWS_DEFAULT_HEADLINE : trimmed;
-    }
-
-    private void setupNewsDots(int count) {
-        newsSliderDots.removeAllViews();
-
-        int dotSize = dpToPx(8);
-        int dotMargin = dpToPx(2);
-
-        for (int i = 0; i < count; i++) {
-            View dot = new View(this);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dotSize, dotSize);
-            params.setMargins(dotMargin, dotMargin, dotMargin, dotMargin);
-            dot.setLayoutParams(params);
-            dot.setBackgroundResource(R.drawable.dot_inactive);
-            newsSliderDots.addView(dot);
-        }
-    }
-
-    private void updateNewsDots(int activePosition) {
-        if (newsSliderDots == null) {
-            return;
-        }
-
-        int dotCount = newsSliderDots.getChildCount();
-        for (int i = 0; i < dotCount; i++) {
-            View dot = newsSliderDots.getChildAt(i);
-            dot.setBackgroundResource(i == activePosition ? R.drawable.dot_active : R.drawable.dot_inactive);
-        }
-    }
-
-    private int dpToPx(int dp) {
-        float density = getResources().getDisplayMetrics().density;
-        return Math.round(dp * density);
-    }
-
-    private void startNewsAutoSlide() {
-        int itemCount = newsSliderAdapter != null ? newsSliderAdapter.getItemCount() : 0;
-        if (newsSliderRunnable == null || itemCount <= 1) {
-            return;
-        }
-        newsSliderHandler.removeCallbacks(newsSliderRunnable);
-        newsSliderHandler.postDelayed(newsSliderRunnable, NEWS_SLIDE_INTERVAL_MS);
-    }
-
-    private void stopNewsAutoSlide() {
-        if (newsSliderRunnable != null) {
-            newsSliderHandler.removeCallbacks(newsSliderRunnable);
-        }
-    }
-
-    private void restartNewsAutoSlide() {
-        stopNewsAutoSlide();
-        startNewsAutoSlide();
+        emergencyNumbersBtn = findViewById(R.id.btn_emergency_numbers);
+        emergencyFirstAidBtn = findViewById(R.id.btn_info_first_aid);
+        nearbyHelpBtn = findViewById(R.id.btn_nearby_help);
     }
 
     private void initNotificationDrawer() {
         notificationRecyclerView = findViewById(R.id.notificationRecyclerView);
         emptyStateLayout = findViewById(R.id.empty_state_layout);
-        if (notificationRecyclerView == null) {
-            Log.e(TAG, "notificationRecyclerView not found in layout!");
+
+        if (notificationRecyclerView == null) return;
+
+        notificationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        notificationAdapter = new NotificationAdapter(this, this::handleNotificationCleared, new NotificationAdapter.OnTaskActionListener() {
+            @Override
+            public void onAccept(NotificationItem item) {
+                handleTaskAccept(item);
+            }
+
+            @Override
+            public void onReject(NotificationItem item) {
+                showTaskRejectReasonDialog(item);
+            }
+        });
+        notificationRecyclerView.setAdapter(notificationAdapter);
+
+        ItemTouchHelper.SimpleCallback swipeCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView rv, @NonNull RecyclerView.ViewHolder vh, @NonNull RecyclerView.ViewHolder t) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                if (notificationAdapter != null && position != RecyclerView.NO_POSITION) {
+                    notificationAdapter.setSwipedPosition(position);
+                }
+            }
+        };
+
+        new ItemTouchHelper(swipeCallback).attachToRecyclerView(notificationRecyclerView);
+
+        refreshNotificationContent();
+    }
+
+    private void handleNotificationCleared(NotificationItem itemToClear) {
+        if (itemToClear == null) {
             return;
         }
 
-        // TEMP: Force red background to see if RecyclerView is visible
+        if (itemToClear.isSosAlert()) {
+            SosAlertStore.removeAlertById(this, itemToClear.getId());
+        } else if (itemToClear.isUserNotification() || itemToClear.isTaskAssignment()) {
+            UserNotificationStore.deleteNotificationById(db, itemToClear.getId());
+        } else {
+            seenIncidentIds.add(itemToClear.getId());
+            saveSeenIncidentIds();
+            unreadIncidents.removeIf(incident -> incident.getId().equals(itemToClear.getId()));
+        }
 
-        notificationRecyclerView.setVisibility(View.VISIBLE);
-
-        notificationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        notificationAdapter = new NotificationAdapter(this);
-        notificationRecyclerView.setAdapter(notificationAdapter);
+        loadSosAlerts();
         refreshNotificationContent();
+        Toast.makeText(this, "Notification cleared", Toast.LENGTH_SHORT).show();
+    }
 
+    private void handleTaskAccept(NotificationItem taskItem) {
+        if (taskItem == null || !taskItem.isTaskAssignment() || taskItem.getTaskId().isEmpty()) {
+            Toast.makeText(this, "Task details missing", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        UserNotificationStore.respondToTaskAssignment(
+                db,
+                taskItem.getId(),
+                taskItem.getTaskId(),
+                currentUserId,
+                true,
+                ""
+        );
+        Toast.makeText(this, "Task accepted", Toast.LENGTH_SHORT).show();
+    }
+
+    private void showTaskRejectReasonDialog(NotificationItem taskItem) {
+        if (taskItem == null || !taskItem.isTaskAssignment() || taskItem.getTaskId().isEmpty()) {
+            Toast.makeText(this, "Task details missing", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        EditText reasonField = new EditText(this);
+        reasonField.setMinLines(3);
+        reasonField.setHint("Reason for rejecting");
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Reject Task")
+                .setMessage("Please provide a reason for rejecting this task")
+                .setView(reasonField)
+                .setPositiveButton("Reject", null)
+                .setNegativeButton("Cancel", null)
+                .create();
+
+        dialog.setOnShowListener(dialogInterface -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String reason = reasonField.getText() == null ? "" : reasonField.getText().toString().trim();
+            if (reason.isEmpty()) {
+                reasonField.setError("Required");
+                reasonField.requestFocus();
+                return;
+            }
+
+            UserNotificationStore.respondToTaskAssignment(
+                    db,
+                    taskItem.getId(),
+                    taskItem.getTaskId(),
+                    currentUserId,
+                    false,
+                    reason
+            );
+            Toast.makeText(this, "Task rejected", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        }));
+
+        dialog.show();
+    }
+
+    private void loadCurrentUserRole() {
+        if (currentUserId == null || currentUserId.trim().isEmpty()) {
+            return;
+        }
+
+        db.collection("users")
+                .document(currentUserId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> currentUserRole = safe(documentSnapshot.getString("role")));
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value.trim();
     }
 
     private void initListeners() {
-        menuIcon.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
+        try {
+            CrashDebugger.logActivityEvent("HomePageActivity", "initListeners() START");
 
-        notificationIcon.setOnClickListener(v -> {
-            if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
-                drawerLayout.closeDrawer(GravityCompat.END);
-                markCurrentNotificationsAsSeen();
-            } else {
-                drawerLayout.openDrawer(GravityCompat.END);
-                updateNotificationBadge(0);
+            // Menu button
+            menuIcon.setOnClickListener(v -> {
+                try {
+                    CrashDebugger.logButtonClick("menuIcon", "Open drawer");
+                    drawerLayout.openDrawer(GravityCompat.START);
+                } catch (Exception e) {
+                    CrashDebugger.logButtonClickError("menuIcon", e);
+                }
+            });
 
+            // Notification icon
+            notificationIcon.setOnClickListener(v -> {
+                try {
+                    CrashDebugger.logButtonClick("notificationIcon", "Toggle notifications drawer");
+                    if ("volunteer".equalsIgnoreCase(currentUserRole)) {
+                        startActivity(new Intent(this, VolunteerNotificationsActivity.class));
+                        return;
+                    }
+                    if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
+                        drawerLayout.closeDrawer(GravityCompat.END);
+                        markCurrentNotificationsAsSeen();
+                        if (notificationAdapter != null) {
+                            notificationAdapter.clearSwipedPosition();
+                        }
+                    } else {
+                        drawerLayout.openDrawer(GravityCompat.END);
+                        updateNotificationBadge(0);
+                        if (notificationAdapter != null) {
+                            notificationAdapter.clearSwipedPosition();
+                        }
+                    }
+                } catch (Exception e) {
+                    CrashDebugger.logButtonClickError("notificationIcon", e);
+                }
+            });
+
+            chatBtn.setOnClickListener(v -> startActivity(new Intent(this, ChatsActivity.class)));
+            tipsBtn.setOnClickListener(v -> startActivity(new Intent(this, SafetyTipsActivity.class)));
+            if (hazardAlertBtn != null) {
+                hazardAlertBtn.setOnClickListener(v -> startActivity(new Intent(this, HazardAlertMapActivity.class)));
             }
-        });
+            if (communityChatBtn != null) {
+                communityChatBtn.setOnClickListener(v -> startActivity(new Intent(this, DisplayReportActivity.class)));
+            }
+            View campLocationsBtn = findViewById(R.id.btn_service_camp);
+            if (campLocationsBtn != null) {
+                campLocationsBtn.setOnClickListener(v -> startActivity(new Intent(this, CampLocationsMapActivity.class)));
+            }
 
-        chatBtn.setOnClickListener(v -> startActivity(new Intent(this, ChatsActivity.class)));
-        tipsBtn.setOnClickListener(v -> startActivity(new Intent(this, SafetyTipsActivity.class)));
-        newsBtn.setOnClickListener(v -> startActivity(new Intent(this, NewsActivity.class)));
-        emergencyBtn.setOnClickListener(v -> triggerSos());
+            View volunteerNetworkBtn = findViewById(R.id.btn_service_volunteer);
+            if (volunteerNetworkBtn != null) {
+                volunteerNetworkBtn.setOnClickListener(v -> startActivity(new Intent(this, VolunteerNetworkMapActivity.class)));
+            }
 
-        // Profile menu example
-        findViewById(R.id.profileMenuItem).setOnClickListener(v -> {
-            Intent intent = new Intent(this,
-                    auth.getCurrentUser() != null ? UserProfileActivity.class : SaveUserProfileActivity.class);
-            startActivity(intent);
-            drawerLayout.closeDrawer(GravityCompat.START);
-        });
+            newsBtn.setOnClickListener(v -> startActivity(new Intent(this, NewsActivity.class)));
+            emergencyBtn.setOnClickListener(v -> showSosConfirmDialog());
 
-        View ngoRegistrationItem = findViewById(R.id.ngoRegistrationMenuItem);
-        if (ngoRegistrationItem != null) {
-            ngoRegistrationItem.setOnClickListener(v -> {
-                startActivity(new Intent(this, NgoRegistrationRequestActivity.class));
+            // Emergency numbers button
+            if (emergencyNumbersBtn != null) {
+                emergencyNumbersBtn.setOnClickListener(v -> {
+                    try {
+                        CrashDebugger.logButtonClick("emergencyNumbersBtn", "Open EmergencyNumbersActivity");
+                        startActivity(new Intent(HomePageActivity.this, EmergencyNumbersActivity.class));
+                    } catch (Exception e) {
+                        CrashDebugger.logButtonClickError("emergencyNumbersBtn", e);
+                        Toast.makeText(HomePageActivity.this, "Error opening emergency numbers", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            // Emergency first aid button
+            if (emergencyFirstAidBtn != null) {
+                emergencyFirstAidBtn.setOnClickListener(v -> {
+                    try {
+                        CrashDebugger.logButtonClick("emergencyFirstAidBtn", "Open EmergencyFirstAidActivity");
+                        startActivity(new Intent(HomePageActivity.this, EmergencyFirstAidActivity.class));
+                    } catch (Exception e) {
+                        CrashDebugger.logButtonClickError("emergencyFirstAidBtn", e);
+                        Toast.makeText(HomePageActivity.this, "Error opening first aid", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            // Nearby help button
+            if (nearbyHelpBtn != null) {
+                nearbyHelpBtn.setOnClickListener(v -> {
+                    try {
+                        CrashDebugger.logButtonClick("nearbyHelpBtn", "Open NearbyHelpActivity");
+                        startActivity(new Intent(HomePageActivity.this, NearbyHelpActivity.class));
+                    } catch (Exception e) {
+                        CrashDebugger.logButtonClickError("nearbyHelpBtn", e);
+                        Toast.makeText(HomePageActivity.this, "Error opening nearby help", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            // Profile menu example
+            findViewById(R.id.profileMenuItem).setOnClickListener(v -> {
+                Intent intent = new Intent(this, auth.getCurrentUser() != null ? UserProfileActivity.class : SaveUserProfileActivity.class);
+                startActivity(intent);
                 drawerLayout.closeDrawer(GravityCompat.START);
             });
-        }
 
-        findViewById(R.id.logoutMenuItem).setOnClickListener(v -> {
-            auth.signOut();
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
+            View ngoRegistrationItem = findViewById(R.id.ngoRegistrationMenuItem);
+            if (ngoRegistrationItem != null) {
+                ngoRegistrationItem.setOnClickListener(v -> {
+                    startActivity(new Intent(this, NgoRegistrationRequestActivity.class));
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                });
+            }
+
+            View logoutMenuItem = findViewById(R.id.logoutMenuItem);
+            if (logoutMenuItem != null) {
+                logoutMenuItem.setOnClickListener(v -> {
+                    auth.signOut();
+                    startActivity(new Intent(this, LoginActivity.class));
+                    finish();
+                });
+            }
+
+            // Home menu item - return to home page
+            View homeMenuItem = findViewById(R.id.homeMenuItem);
+            if (homeMenuItem != null) {
+                homeMenuItem.setOnClickListener(v -> {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    Toast.makeText(this, "Already on Home", Toast.LENGTH_SHORT).show();
+                });
+            }
+
+            View assignedTasksMenuItem = findViewById(R.id.assignedTasksMenuItem);
+            if (assignedTasksMenuItem != null) {
+                assignedTasksMenuItem.setOnClickListener(v -> {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    startActivity(new Intent(this, VolunteerAssignedTasksActivity.class));
+                });
+            }
+
+            // Back button
+            ImageView backButton = findViewById(R.id.backButton);
+            if (backButton != null) {
+                backButton.setOnClickListener(v -> {
+                    if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                    } else {
+                        onBackPressed();
+                    }
+                });
+            }
+
+            // About Us menu item
+            View aboutMenuItem = findViewById(R.id.aboutMenuItem);
+            if (aboutMenuItem != null) {
+                aboutMenuItem.setOnClickListener(v -> showAboutUsDialog());
+            }
+
+            CrashDebugger.logActivityEvent("HomePageActivity", "initListeners() SUCCESS");
+        } catch (Exception e) {
+            CrashDebugger.logActivityError("HomePageActivity", "initListeners()", e);
+        }
+    }
+
+    private void showAboutUsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog);
+        
+        // Inflate custom layout for the dialog
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.dialog_about_us, null);
+        
+        builder.setView(dialogView);
+        
+        AlertDialog dialog = builder.create();
+        
+        // Handle close button
+        Button closeButton = dialogView.findViewById(R.id.closeButton);
+        closeButton.setOnClickListener(v -> {
+            dialog.dismiss();
+            drawerLayout.closeDrawer(GravityCompat.START);
         });
+        
+        dialog.show();
+        
+        // Set dialog window properties for better styling
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(R.drawable.login_gradient);
+            dialog.getWindow().setLayout((int)(getResources().getDisplayMetrics().widthPixels * 0.85), 
+                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
     }
 
     private void loadSeenIncidentIds() {
         SharedPreferences prefs = getSharedPreferences("notification_prefs", MODE_PRIVATE);
-        seenIncidentIds = new HashSet<>(prefs.getStringSet("seen_incident_ids", new HashSet<>()));
+        Set<String> stored = prefs.getStringSet("seen_incident_ids", null);
+        if (stored != null) {
+            seenIncidentIds = new HashSet<>(stored);
+        } else {
+            seenIncidentIds = new HashSet<>();
+        }
         Log.d(TAG, "Loaded " + seenIncidentIds.size() + " seen incident IDs");
     }
 
@@ -640,6 +653,7 @@ public class HomePageActivity extends AppCompatActivity {
         for (IncidentModel incident : unreadIncidents) {
             items.add(NotificationItem.fromIncident(incident));
         }
+        items.addAll(userNotifications);
         items.sort((left, right) -> Long.compare(right.getTimestampMs(), left.getTimestampMs()));
         return items;
     }
@@ -661,7 +675,7 @@ public class HomePageActivity extends AppCompatActivity {
 
         List<NotificationItem> items = buildNotificationItems();
         notificationAdapter.updateList(items);
-        updateNotificationBadge(unreadIncidents.size() + getUnseenSosCount());
+        updateNotificationBadge(unreadIncidents.size() + getUnseenSosCount() + userNotificationCount);
 
         if (items.isEmpty()) {
             notificationRecyclerView.setVisibility(View.GONE);
@@ -683,6 +697,35 @@ public class HomePageActivity extends AppCompatActivity {
             refreshNotificationContent();
             drawerLayout.openDrawer(GravityCompat.END);
         });
+    }
+
+    private void listenForUserNotifications() {
+        if (currentUserId == null || currentUserId.trim().isEmpty()) {
+            return;
+        }
+
+        if (userNotificationsListener != null) {
+            userNotificationsListener.remove();
+        }
+
+        userNotificationsListener = UserNotificationStore.observeNotificationsForUser(
+                db,
+                currentUserId,
+                (snapshot, error) -> {
+                    if (error != null) {
+                        return;
+                    }
+
+                    userNotifications.clear();
+                    if (snapshot != null) {
+                        for (com.google.firebase.firestore.DocumentSnapshot documentSnapshot : snapshot.getDocuments()) {
+                            userNotifications.add(NotificationItem.fromUserNotification(documentSnapshot));
+                        }
+                    }
+                    userNotificationCount = userNotifications.size();
+                    refreshNotificationContent();
+                }
+        );
     }
 
     private void setupNewsCarousel() {
@@ -772,14 +815,6 @@ public class HomePageActivity extends AppCompatActivity {
         intent.putExtra(NewsDetailActivity.EXTRA_IMAGE_URL, item.getImageUrl());
         intent.putExtra(NewsDetailActivity.EXTRA_IMAGE_RES_ID, item.getImageResId());
         startActivity(intent);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (carouselTimer != null) {
-            carouselTimer.cancel();
-        }
     }
 
     private void startListeningToIncidents() {
@@ -988,7 +1023,7 @@ public class HomePageActivity extends AppCompatActivity {
 
     private void showSosConfirmDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("🊘 Send SOS Alert?")
+                .setTitle(" Send SOS Alert?")
                 .setMessage("This will IMMEDIATELY alert all your contacts with your "
                         + "current location.\n\nOnly use in a real emergency.")
                 .setPositiveButton("YES, SEND SOS", (dialog, which) -> triggerSos())
@@ -1168,7 +1203,6 @@ public class HomePageActivity extends AppCompatActivity {
         super.onStart();
         loadSosAlerts();
         startListeningToIncidents();
-        refreshNewsFromExternalApi();
         ContextCompat.registerReceiver(
                 this,
                 sosStatusReceiver,
@@ -1177,7 +1211,6 @@ public class HomePageActivity extends AppCompatActivity {
         );
         startMeshServiceIfReady();
         handleLaunchIntent(getIntent());
-        startNewsAutoSlide();
     }
 
     private IntentFilter buildNotificationIntentFilter() {
@@ -1196,11 +1229,14 @@ public class HomePageActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        stopNewsAutoSlide();
         super.onStop();
         if (incidentsListener != null) {
             incidentsListener.remove();
             incidentsListener = null;
+        }
+        if (userNotificationsListener != null) {
+            userNotificationsListener.remove();
+            userNotificationsListener = null;
         }
         hasShownNetworkError = false;
         try {
@@ -1208,16 +1244,5 @@ public class HomePageActivity extends AppCompatActivity {
         } catch (IllegalArgumentException ignored) {
             // Receiver may already be unregistered.
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (newsSlider != null && isNewsSliderCallbackRegistered) {
-            newsSlider.unregisterOnPageChangeCallback(newsSliderPageChangeCallback);
-            isNewsSliderCallbackRegistered = false;
-        }
-        stopNewsAutoSlide();
-        newsApiExecutor.shutdownNow();
-        super.onDestroy();
     }
 }

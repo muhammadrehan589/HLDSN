@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="14dp"
+    android:paddingBottom="8dp">
+
+    <TextView
+        android:id="@+id/section_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/call_button_bg"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="8dp"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:text="Section" />
+
+    <TextView
+        android:id="@+id/section_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="#7A7A7A"
+        android:textSize="12sp"
+        android:text="" />
+</LinearLayout>
+

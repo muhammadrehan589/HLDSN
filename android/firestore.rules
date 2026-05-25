@@ -1,0 +1,197 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /hazard_alert_zones/{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function hasUserProfile() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function isAdmin() {
+      return hasUserProfile()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+    }
+
+    function isNgoAdmin() {
+      return hasUserProfile()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "ngo_admin";
+    }
+
+    function myNgoId() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.ngoId;
+    }
+
+    match /users/{uid} {
+      allow create: if isOwner(uid);
+
+      // Chat screen needs to show all users in real time.
+      // Any signed-in user can read the users collection,
+      // while only owners/admins can change or delete profiles.
+      allow read: if signedIn();
+      allow delete: if isOwner(uid) || isAdmin();
+
+      allow update: if isOwner(uid)
+        || isAdmin()
+        || (
+          isNgoAdmin()
+          && (
+            (
+              request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly(["role", "volunteerStatus", "volunteerNgoId"])
+              && request.resource.data.role == "volunteer"
+              && request.resource.data.volunteerStatus == "approved"
+              && request.resource.data.volunteerNgoId == myNgoId()
+            )
+            ||
+            (
+              request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly(["volunteerStatus"])
+              && request.resource.data.volunteerStatus == "rejected"
+            )
+          )
+        );
+    }
+
+    match /ngo_requests/{docId} {
+      allow create: if signedIn()
+        && request.resource.data.requesterUid == request.auth.uid
+        && request.resource.data.status == "pending";
+
+      allow read: if isAdmin()
+        || (signedIn() && resource.data.requesterUid == request.auth.uid);
+
+      allow update, delete: if isAdmin();
+    }
+
+    match /ngos/{ngoId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /volunteer_locations/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /volunteer_applications/{docId} {
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+
+      allow read: if (signedIn() && resource.data.uid == request.auth.uid)
+        || isAdmin()
+        || (isNgoAdmin() && resource.data.ngoId == myNgoId());
+
+      allow update: if isAdmin()
+        || (
+          isNgoAdmin()
+          && resource.data.ngoId == myNgoId()
+          && resource.data.status == "pending"
+          && request.resource.data.uid == resource.data.uid
+          && request.resource.data.ngoId == resource.data.ngoId
+          && request.resource.data.ngoReviewedBy == request.auth.uid
+          && request.resource.data.status in ["approved", "rejected"]
+        );
+
+      allow delete: if isAdmin();
+    }
+
+    match /ngo_tasks/{taskId} {
+      allow create: if isNgoAdmin()
+        && request.resource.data.ngoId == myNgoId()
+        && request.resource.data.createdByUid == request.auth.uid
+        && request.resource.data.status == "pending";
+
+      allow read: if isAdmin()
+        || (isNgoAdmin() && resource.data.ngoId == myNgoId())
+        || (signedIn() && resource.data.volunteerUid == request.auth.uid)
+        || (signedIn() && resource.data.createdByUid == request.auth.uid);
+
+      allow update: if isAdmin()
+        || (
+          isNgoAdmin()
+          && resource.data.ngoId == myNgoId()
+        )
+        || (
+          signedIn()
+          && resource.data.volunteerUid == request.auth.uid
+          && resource.data.status == "ongoing"
+          && request.resource.data.volunteerUid == resource.data.volunteerUid
+          && request.resource.data.ngoId == resource.data.ngoId
+          && request.resource.data.createdByUid == resource.data.createdByUid
+          && request.resource.data.completedByUid == request.auth.uid
+          && request.resource.data.status == "completed"
+        );
+
+      allow delete: if isAdmin();
+    }
+
+    match /ngo_resources/{resourceId} {
+      allow create: if isNgoAdmin()
+        && request.resource.data.ngoId == myNgoId()
+        && request.resource.data.createdByUid == request.auth.uid
+        ;
+
+      allow read: if isAdmin()
+        || (isNgoAdmin() && resource.data.ngoId == myNgoId())
+        || (signedIn() && resource.data.createdByUid == request.auth.uid);
+
+      allow update, delete: if isNgoAdmin() && resource.data.ngoId == myNgoId();
+    }
+
+    match /user_notifications/{notificationId} {
+      allow create: if signedIn();
+
+      allow read: if isAdmin()
+        || (signedIn() && resource.data.recipientUid == request.auth.uid);
+
+      allow delete: if isAdmin()
+        || (signedIn() && resource.data.recipientUid == request.auth.uid);
+    }
+
+    match /incidents/{incidentId} {
+      allow read, create: if signedIn();
+      allow update, delete: if isAdmin();
+
+      match /comments/{commentId} {
+        allow read, create: if signedIn();
+        allow update, delete: if isAdmin();
+      }
+
+      match /votes/{voteId} {
+        allow read, create, update, delete: if signedIn();
+      }
+    }
+
+    match /chats/{chatId} {
+      allow read, create, update, delete: if signedIn();
+
+      match /messages/{messageId} {
+        allow read, create, update, delete: if signedIn();
+      }
+    }
+
+    match /camp_center_locations/{docId} {
+      allow read: if true;
+      allow create: if isNgoAdmin()
+        && request.resource.data.ngoId == myNgoId();
+      allow update, delete: if isNgoAdmin()
+        && resource.data.ngoId == myNgoId();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
