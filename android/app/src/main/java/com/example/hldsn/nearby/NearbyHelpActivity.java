@@ -123,7 +123,9 @@ public class NearbyHelpActivity extends AppCompatActivity implements LocationLis
         searchLargerAreaBtn = new MaterialButton(this);
         searchLargerAreaBtn.setText(R.string.nearby_help_search_larger);
         searchLargerAreaBtn.setVisibility(View.GONE);
-        emptyLayout.addView(searchLargerAreaBtn);
+                if (emptyLayout != null) {
+                    emptyLayout.addView(searchLargerAreaBtn);
+                }
 
         adapter = new NearbyResourceAdapter(this, filteredResources);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -212,6 +214,11 @@ public class NearbyHelpActivity extends AppCompatActivity implements LocationLis
 
     private void fetchUserLocation() {
         try {
+            if (locationManager == null) {
+                Log.w(TAG, "LocationManager unavailable");
+                return;
+            }
+
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 if (location == null) location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -219,9 +226,21 @@ public class NearbyHelpActivity extends AppCompatActivity implements LocationLis
                     userLatitude = location.getLatitude();
                     userLongitude = location.getLongitude();
                 }
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, this);
+
+                String provider = null;
+                if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    provider = LocationManager.GPS_PROVIDER;
+                } else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                    provider = LocationManager.NETWORK_PROVIDER;
+                }
+
+                if (provider != null) {
+                    locationManager.requestLocationUpdates(provider, 5000, 10, this);
+                } else {
+                    Log.w(TAG, "No location provider enabled; using fallback coordinates");
+                }
             }
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | SecurityException e) {
             Log.e(TAG, "Error getting location: " + e.getMessage());
         }
     }

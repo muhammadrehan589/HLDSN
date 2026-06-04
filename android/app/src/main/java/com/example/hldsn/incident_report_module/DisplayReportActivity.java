@@ -162,7 +162,11 @@ public class DisplayReportActivity extends AppCompatActivity implements OnIncide
             incidentsCollectionListener.remove();
         }
 
+        // Only show incidents created within the last 48 hours.
+        java.util.Date cutoff48h = new java.util.Date(System.currentTimeMillis() - 48L * 60 * 60 * 1000);
+
         incidentsCollectionListener = firestore.collection("incidents")
+                .whereGreaterThan("createdAt", cutoff48h)
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .addSnapshotListener((querySnapshot, error) -> {
                     if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);

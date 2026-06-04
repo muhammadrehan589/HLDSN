@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Full-screen map -->
     <org.osmdroid.views.MapView
         android:id="@+id/volunteerMapView"
         android:layout_width="0dp"
@@ -15,15 +16,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Top gradient scrim -->
     <View
         android:layout_width="0dp"
         android:layout_height="150dp"
-        android:background="@drawable/homepage_appbar_background"
         android:alpha="0.75"
+        android:background="@drawable/homepage_appbar_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Back button -->
     <ImageView
         android:id="@+id/backButton"
         android:layout_width="36dp"
@@ -37,6 +40,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Info card -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/joinPromptCard"
         android:layout_width="0dp"
@@ -92,5 +96,21 @@
                 android:textStyle="bold" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
+
+    <!-- "My Location" FAB — bottom right -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/myLocationFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="24dp"
+        android:contentDescription="My Location"
+        android:src="@drawable/ic_location"
+        app:backgroundTint="#1565C0"
+        app:fabSize="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:rippleColor="#42A5F5"
+        app:tint="#FFFFFF" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

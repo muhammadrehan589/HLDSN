@@ -138,6 +138,7 @@
         <activity android:name=".admin_module.AdminNgoManagementActivity" android:exported="false" />
         <activity android:name=".admin_module.AdminUsersManagementActivity" android:exported="false" />
         <activity android:name=".admin_module.AdminNgoRequestsActivity" android:exported="false" />
+        <activity android:name=".admin_module.AdminIncidentReportsActivity" android:exported="false" />
         <activity android:name=".ngo_module.NgoDashboardActivity" android:exported="false" />
         <activity android:name=".ngo_module.NgoNotificationsActivity" android:exported="false" />
         <activity android:name=".ngo_module.NgoCampCenterFormActivity" android:exported="false" />

@@ -22,6 +22,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         MaterialButton manageNgosButton = findViewById(R.id.manageNgosButton);
         MaterialButton manageUsersButton = findViewById(R.id.manageUsersButton);
         MaterialButton manageNgoRequestsButton = findViewById(R.id.manageNgoRequestsButton);
+        MaterialButton manageIncidentReportsButton = findViewById(R.id.manageIncidentReportsButton);
         MaterialButton logoutButton = findViewById(R.id.adminLogoutButton);
 
         if (backButton != null) {
@@ -41,6 +42,11 @@ public class AdminDashboardActivity extends AppCompatActivity {
         if (manageNgoRequestsButton != null) {
             manageNgoRequestsButton.setOnClickListener(v ->
                     startActivity(new Intent(this, AdminNgoRequestsActivity.class)));
+        }
+
+        if (manageIncidentReportsButton != null) {
+            manageIncidentReportsButton.setOnClickListener(v ->
+                    startActivity(new Intent(this, AdminIncidentReportsActivity.class)));
         }
 
         if (logoutButton != null) {
