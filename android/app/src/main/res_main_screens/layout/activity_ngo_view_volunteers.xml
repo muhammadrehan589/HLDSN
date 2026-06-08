@@ -48,7 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:background="@drawable/volunteer_input_field_bg"
-            android:hint="Search volunteers"
+            android:hint="Search by name or location"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
             android:textColor="#1F1F1F"

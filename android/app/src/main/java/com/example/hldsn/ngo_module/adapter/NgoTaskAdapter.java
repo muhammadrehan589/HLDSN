@@ -87,6 +87,7 @@ public class NgoTaskAdapter extends RecyclerView.Adapter<NgoTaskAdapter.TaskView
         private final TextView taskStatusText;
         private final TextView taskDescriptionText;
         private final TextView taskCreatedAtText;
+        private final TextView taskDeadlineText;
         private final MaterialButton completeButton;
 
         TaskViewHolder(@NonNull View itemView) {
@@ -96,6 +97,7 @@ public class NgoTaskAdapter extends RecyclerView.Adapter<NgoTaskAdapter.TaskView
             taskStatusText = itemView.findViewById(R.id.taskStatusText);
             taskDescriptionText = itemView.findViewById(R.id.taskDescriptionText);
             taskCreatedAtText = itemView.findViewById(R.id.taskCreatedAtText);
+            taskDeadlineText = itemView.findViewById(R.id.taskDeadlineText);
             completeButton = itemView.findViewById(R.id.completeTaskButton);
         }
 
@@ -106,6 +108,18 @@ public class NgoTaskAdapter extends RecyclerView.Adapter<NgoTaskAdapter.TaskView
             taskStatusText.setText("Status: " + status);
             taskDescriptionText.setText(firstNonBlank(task.getString("taskDescription"), "-"));
             taskCreatedAtText.setText("Created: " + formatDate(task.getTimestamp("createdAt")));
+
+            Timestamp deadline = task.getTimestamp("deadline");
+            if (deadline != null && taskDeadlineText != null) {
+                taskDeadlineText.setVisibility(View.VISIBLE);
+                String deadlineStr = "Deadline: " + formatDate(deadline);
+                taskDeadlineText.setText(deadlineStr);
+                boolean overdue = deadline.toDate().before(new java.util.Date())
+                        && !"completed".equalsIgnoreCase(status);
+                taskDeadlineText.setTextColor(overdue ? 0xFFCC0000 : 0xFFCC5500);
+            } else if (taskDeadlineText != null) {
+                taskDeadlineText.setVisibility(View.GONE);
+            }
 
             boolean canComplete = "ongoing".equalsIgnoreCase(status);
             completeButton.setVisibility(canComplete ? View.VISIBLE : View.GONE);

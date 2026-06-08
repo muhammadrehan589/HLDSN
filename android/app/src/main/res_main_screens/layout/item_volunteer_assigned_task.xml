@@ -53,6 +53,15 @@
             android:textColor="#777777"
             android:textSize="12sp" />
 
+        <TextView
+            android:id="@+id/taskDeadlineText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="#CC5500"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/completeTaskButton"
             android:layout_width="wrap_content"

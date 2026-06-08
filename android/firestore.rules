@@ -125,6 +125,15 @@ service cloud.firestore {
         || (
           signedIn()
           && resource.data.volunteerUid == request.auth.uid
+          && resource.data.status == "pending"
+          && request.resource.data.volunteerUid == resource.data.volunteerUid
+          && request.resource.data.ngoId == resource.data.ngoId
+          && request.resource.data.createdByUid == resource.data.createdByUid
+          && request.resource.data.status in ["ongoing", "rejected"]
+        )
+        || (
+          signedIn()
+          && resource.data.volunteerUid == request.auth.uid
           && resource.data.status == "ongoing"
           && request.resource.data.volunteerUid == resource.data.volunteerUid
           && request.resource.data.ngoId == resource.data.ngoId

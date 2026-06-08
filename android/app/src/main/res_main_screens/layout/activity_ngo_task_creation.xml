@@ -73,17 +73,53 @@
                 android:textColor="#1F1F1F"
                 android:textColorHint="#575757" />
 
-            <AutoCompleteTextView
+            <TextView
                 android:id="@+id/volunteerSelector"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginBottom="12dp"
                 android:background="@drawable/volunteer_input_field_bg"
-                android:hint="Assign to volunteer"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:hint="Tap to select volunteers"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
                 android:textColor="#1F1F1F"
                 android:textColorHint="#575757" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/volunteer_input_field_bg"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="4dp"
+                android:paddingEnd="12dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/deadlinePickerButton"
+                    style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Set Deadline"
+                    android:textAllCaps="false"
+                    android:textColor="#575757"
+                    app:icon="@android:drawable/ic_menu_my_calendar"
+                    app:iconTint="#575757"
+                    app:rippleColor="#22000000" />
+
+                <TextView
+                    android:id="@+id/deadlineDateText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:text="No deadline set"
+                    android:textColor="#999999"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/submitTaskButton"

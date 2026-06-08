@@ -47,13 +47,25 @@ public class NgoViewVolunteersActivity extends AppCompatActivity {
             backButton.setOnClickListener(v -> finish());
         }
 
-        adapter = new NgoViewVolunteersAdapter(documentSnapshot -> {
-            Intent intent = new Intent(NgoViewVolunteersActivity.this, NgoTaskCreationActivity.class);
-            intent.putExtra(NgoTaskCreationActivity.EXTRA_VOLUNTEER_UID, documentSnapshot.getString("uid"));
-            intent.putExtra(NgoTaskCreationActivity.EXTRA_VOLUNTEER_NAME,
-                safe(documentSnapshot.getString("firstName")) + " " + safe(documentSnapshot.getString("surname")));
-            startActivity(intent);
-        });
+        adapter = new NgoViewVolunteersAdapter(
+                // Assign Task button click
+                documentSnapshot -> {
+                    Intent intent = new Intent(NgoViewVolunteersActivity.this, NgoTaskCreationActivity.class);
+                    intent.putExtra(NgoTaskCreationActivity.EXTRA_VOLUNTEER_UID, documentSnapshot.getString("uid"));
+                    intent.putExtra(NgoTaskCreationActivity.EXTRA_VOLUNTEER_NAME,
+                        safe(documentSnapshot.getString("firstName")) + " " + safe(documentSnapshot.getString("surname")));
+                    startActivity(intent);
+                },
+                // Card / name click → open volunteer detail
+                documentSnapshot -> {
+                    Intent intent = new Intent(NgoViewVolunteersActivity.this, NgoVolunteerDetailActivity.class);
+                    intent.putExtra(NgoVolunteerDetailActivity.EXTRA_VOLUNTEER_ID, documentSnapshot.getId());
+                    intent.putExtra(NgoVolunteerDetailActivity.EXTRA_VOLUNTEER_UID, documentSnapshot.getString("uid"));
+                    intent.putExtra(NgoVolunteerDetailActivity.EXTRA_VOLUNTEER_NAME,
+                        safe(documentSnapshot.getString("firstName")) + " " + safe(documentSnapshot.getString("surname")));
+                    startActivity(intent);
+                }
+        );
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);

@@ -4,6 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
     app:cardCornerRadius="12dp"
     app:cardElevation="2dp">
 
@@ -34,6 +37,15 @@
                 android:layout_marginTop="4dp"
                 android:textColor="#555555"
                 android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/volunteerLocationText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:drawablePadding="4dp"
+                android:textColor="#777777"
+                android:textSize="12sp" />
 
         </LinearLayout>
 
