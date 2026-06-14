@@ -14,6 +14,14 @@
     <string name="hazard_alert_subtitle">Color-coded prediction zones show likely and ongoing hazards. Tap a ring to see timing and impact details.</string>
     <string name="hazard_legend_title">Hazard legend</string>
     <string name="hazard_selected_title">Selected zone</string>
+    <string name="hazard_loading">Loading hazard data…</string>
+    <string name="hazard_error_title">Unable to load hazards</string>
+    <string name="hazard_error_message">Could not reach hazard data sources. Please check your internet connection and try again.</string>
+    <string name="hazard_retry">Retry</string>
+    <string name="hazard_my_location">My Location</string>
+    <string name="hazard_notification_channel">Hazard Alerts</string>
+    <string name="hazard_notification_title">New Hazard Alert</string>
+    <string name="hazard_collapsed_title">Hazard Alert</string>
     <string name="chats">Chats</string>
     <string name="information">Information</string>
     <string name="safety_tips">Safety Tips</string>
