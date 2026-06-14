@@ -211,7 +211,7 @@
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
-                    app:iconTint="#065c53"
+                    app:iconTint="@null"
                     app:strokeColor="#1A000000"
                     app:strokeWidth="1dp" />
             </LinearLayout>
@@ -274,7 +274,7 @@
                     android:ellipsize="none"
                     app:backgroundTint="#FFFFFFFF"
                     app:cornerRadius="22dp"
-                    app:icon="@drawable/ic_chat"
+                    app:icon="@drawable/ic_community_chat"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
