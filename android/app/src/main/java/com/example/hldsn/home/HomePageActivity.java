@@ -413,7 +413,24 @@ public class HomePageActivity extends AppCompatActivity {
         db.collection("users")
                 .document(currentUserId)
                 .get()
-                .addOnSuccessListener(documentSnapshot -> currentUserRole = safe(documentSnapshot.getString("role")));
+                .addOnSuccessListener(documentSnapshot -> {
+                    currentUserRole = safe(documentSnapshot.getString("role"));
+                    applyRoleBasedUI();
+                });
+    }
+
+    /**
+     * Hides/shows UI elements that are role-specific.
+     * Called once the user role has been fetched from Firestore.
+     */
+    private void applyRoleBasedUI() {
+        boolean isVolunteerOrNgo = "volunteer".equalsIgnoreCase(currentUserRole)
+                || "ngo".equalsIgnoreCase(currentUserRole);
+
+        View assignedTasksMenuItem = findViewById(R.id.assignedTasksMenuItem);
+        if (assignedTasksMenuItem != null) {
+            assignedTasksMenuItem.setVisibility(isVolunteerOrNgo ? View.VISIBLE : View.GONE);
+        }
     }
 
     private String safe(String value) {
@@ -437,24 +454,9 @@ public class HomePageActivity extends AppCompatActivity {
             // Notification icon
             notificationIcon.setOnClickListener(v -> {
                 try {
-                    CrashDebugger.logButtonClick("notificationIcon", "Toggle notifications drawer");
-                    if ("volunteer".equalsIgnoreCase(currentUserRole)) {
-                        startActivity(new Intent(this, VolunteerNotificationsActivity.class));
-                        return;
-                    }
-                    if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
-                        drawerLayout.closeDrawer(GravityCompat.END);
-                        markCurrentNotificationsAsSeen();
-                        if (notificationAdapter != null) {
-                            notificationAdapter.clearSwipedPosition();
-                        }
-                    } else {
-                        drawerLayout.openDrawer(GravityCompat.END);
-                        updateNotificationBadge(0);
-                        if (notificationAdapter != null) {
-                            notificationAdapter.clearSwipedPosition();
-                        }
-                    }
+                    CrashDebugger.logButtonClick("notificationIcon", "Open notifications screen");
+                    // All roles get the full-screen notification activity
+                    startActivity(new Intent(this, VolunteerNotificationsActivity.class));
                 } catch (Exception e) {
                     CrashDebugger.logButtonClickError("notificationIcon", e);
                 }
@@ -555,6 +557,8 @@ public class HomePageActivity extends AppCompatActivity {
 
             View assignedTasksMenuItem = findViewById(R.id.assignedTasksMenuItem);
             if (assignedTasksMenuItem != null) {
+                // Hidden by default; applyRoleBasedUI() will show it for volunteer/ngo
+                assignedTasksMenuItem.setVisibility(View.GONE);
                 assignedTasksMenuItem.setOnClickListener(v -> {
                     drawerLayout.closeDrawer(GravityCompat.START);
                     startActivity(new Intent(this, VolunteerAssignedTasksActivity.class));

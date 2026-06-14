@@ -1,11 +1,13 @@
 package com.example.hldsn.notification_module;
 
+import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.view.View;
+import android.view.ViewTreeObserver;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,6 +42,7 @@ public class VolunteerNotificationsActivity extends AppCompatActivity {
     private String currentUserId = "";
     private String currentTab = "community";
     private View emptyStateLayout;
+    private View tabIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +58,7 @@ public class VolunteerNotificationsActivity extends AppCompatActivity {
         MaterialButton tabRecommended = findViewById(R.id.tabRecommended);
         notificationRecyclerView = findViewById(R.id.notificationRecyclerView);
         emptyStateLayout = findViewById(R.id.empty_state_layout);
+        tabIndicator = findViewById(R.id.tabIndicator);
 
         if (screenTitle != null) {
             screenTitle.setText("Notifications");
@@ -84,6 +88,7 @@ public class VolunteerNotificationsActivity extends AppCompatActivity {
             tabGeneral.setOnClickListener(v -> {
                 currentTab = "community";
                 updateTabStyles(tabGeneral, tabRecommended);
+                moveIndicatorToTab(tabGeneral);
                 refreshList();
             });
         }
@@ -93,11 +98,23 @@ public class VolunteerNotificationsActivity extends AppCompatActivity {
             tabRecommended.setOnClickListener(v -> {
                 currentTab = "recommended";
                 updateTabStyles(tabGeneral, tabRecommended);
+                moveIndicatorToTab(tabRecommended);
                 refreshList();
             });
         }
 
         updateTabStyles(tabGeneral, tabRecommended);
+        // Position indicator under the initially-selected (community) tab once laid out
+        if (tabGeneral != null) {
+            tabGeneral.getViewTreeObserver().addOnGlobalLayoutListener(
+                    new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            tabGeneral.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                            moveIndicatorToTab(tabGeneral);
+                        }
+                    });
+        }
         loadCurrentUser();
     }
 
@@ -150,11 +167,9 @@ public class VolunteerNotificationsActivity extends AppCompatActivity {
                     if (snapshot != null) {
                         for (com.google.firebase.firestore.DocumentSnapshot documentSnapshot : snapshot.getDocuments()) {
                             NotificationItem item = NotificationItem.fromUserNotification(documentSnapshot);
-                            if (item.isTaskAssignment()) {
-                                recommendedNotifications.add(item);
-                            } else {
-                                communityNotifications.add(item);
-                            }
+                            // All Firestore user notifications go to Recommended tab
+                            // (community tab only shows local SOS alerts and incident reports)
+                            recommendedNotifications.add(item);
                         }
                     }
 
@@ -269,5 +284,20 @@ public class VolunteerNotificationsActivity extends AppCompatActivity {
         boolean communitySelected = "community".equals(currentTab);
         tabGeneral.setTextColor(communitySelected ? 0xFFFFFFFF : 0xFF9EDCC6);
         tabRecommended.setTextColor(communitySelected ? 0xFF9EDCC6 : 0xFFFFFFFF);
+    }
+
+    /**
+     * Animates the tab indicator to slide beneath the given tab button.
+     * The indicator is centred horizontally under the tab.
+     */
+    private void moveIndicatorToTab(View tab) {
+        if (tabIndicator == null || tab == null) return;
+
+        // Target X = tab's left edge + centre offset so the indicator is centred
+        float targetX = tab.getLeft() + (tab.getWidth() / 2f) - (tabIndicator.getWidth() / 2f);
+
+        ObjectAnimator animator = ObjectAnimator.ofFloat(tabIndicator, "translationX", targetX);
+        animator.setDuration(220);
+        animator.start();
     }
 }
