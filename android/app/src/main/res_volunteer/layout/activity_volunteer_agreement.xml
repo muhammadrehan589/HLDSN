@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:text="Volunteer Basic Form"
-                android:textColor="#FFFFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -41,7 +41,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:text="Volunteer Agreement"
-                android:textColor="#E5FFFFFF"
+                android:textColor="@color/text_tertiary"
                 android:textSize="14sp" />
 
             <ImageView
@@ -58,7 +58,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                app:cardBackgroundColor="#EDBFC2"
+                app:cardBackgroundColor="@color/text_error"
                 app:cardCornerRadius="22dp"
                 app:cardElevation="0dp">
 
@@ -73,7 +73,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Terms and Conditions"
-                        android:textColor="#F2A100"
+                        android:textColor="@color/text_warning"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -83,7 +83,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:text="Your Agreement"
-                        android:textColor="#0D2B44"
+                        android:textColor="@color/heading_dark"
                         android:textSize="15sp"
                         android:textStyle="bold" />
 
@@ -93,7 +93,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:text="Last Revised: November 16, 2025"
-                        android:textColor="#000000"
+                        android:textColor="@color/text_primary"
                         android:textSize="13sp"
                         android:textStyle="bold" />
 
@@ -114,7 +114,7 @@
                             android:layout_height="wrap_content"
                             android:lineSpacingExtra="4dp"
                             android:text="Welcome to HLDSN volunteer services.\n\nBy continuing, you agree that the information submitted in this form is accurate and can be used to coordinate emergency response activities.\n\nYou understand that assignments may involve communication with local response teams and relief organizations.\n\nYou also agree to follow safety instructions, maintain respectful conduct, and protect any sensitive data shared during volunteer operations.\n\nHLDSN reserves the right to verify details and remove participants who violate policy." 
-                            android:textColor="#000000"
+                            android:textColor="@color/text_primary"
                             android:textSize="13sp" />
                     </ScrollView>
 
@@ -139,7 +139,7 @@
                             android:layout_weight="1"
                             android:lineSpacingExtra="2dp"
                             android:text="I confirm that I have read and accept the terms and conditions and privacy policy."
-                            android:textColor="#000000"
+                            android:textColor="@color/text_primary"
                             android:textSize="12sp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -159,7 +159,7 @@
         android:elevation="10dp"
         android:text="Submit"
         android:textAllCaps="false"
-        android:textColor="#FFFFFFFF"
+        android:textColor="@color/text_on_primary"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="serif"
             android:text="NGO Registration Request"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -57,7 +57,7 @@
                 android:hint="NGO Name"
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
-                android:textColor="#1F1F1F"
+                android:textColor="@color/text_primary"
                 android:textColorHint="#575757" />
 
             <EditText
@@ -69,7 +69,7 @@
                 android:hint="Registration Number"
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
-                android:textColor="#1F1F1F"
+                android:textColor="@color/text_primary"
                 android:textColorHint="#575757" />
 
             <EditText
@@ -81,7 +81,7 @@
                 android:hint="City"
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
-                android:textColor="#1F1F1F"
+                android:textColor="@color/text_primary"
                 android:textColorHint="#575757" />
 
             <EditText
@@ -94,7 +94,7 @@
                 android:inputType="phone"
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
-                android:textColor="#1F1F1F"
+                android:textColor="@color/text_primary"
                 android:textColorHint="#575757" />
 
             <EditText
@@ -108,7 +108,7 @@
                 android:inputType="textMultiLine"
                 android:minLines="4"
                 android:padding="14dp"
-                android:textColor="#1F1F1F"
+                android:textColor="@color/text_primary"
                 android:textColorHint="#575757" />
 
             <com.google.android.material.button.MaterialButton

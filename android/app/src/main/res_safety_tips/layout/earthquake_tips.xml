@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="Earthquake Tips"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textStyle="bold"
             android:textSize="24sp"
             android:fontFamily="serif"
@@ -65,7 +65,7 @@
                 android:layout_height="22dp"
                 android:layout_gravity="top|end"
                 android:background="@drawable/circle_red_badge"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textSize="12sp"
                 android:gravity="center"
                 android:textStyle="bold"
@@ -97,7 +97,7 @@
         android:layout_marginTop="12dp"
         android:layout_marginBottom="28dp"
         android:alpha="0.35"
-        android:background="#F2FBF7"
+        android:background="@color/surface_secondary"
         app:layout_constraintTop_toBottomOf="@id/appBar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -174,7 +174,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-medium"
                         android:text="EarthQuake Safety TIps"
-                        android:textColor="#172A2A"
+                        android:textColor="@color/text_primary"
                         android:textSize="22sp"
                         android:textStyle="bold" />
 
@@ -185,7 +185,7 @@
                         android:layout_marginTop="6dp"
                         android:fontFamily="sans-serif"
                         android:text="High-risk zones include Balochistan, Khyber Pakhtunkhwa, and Azad Kashmir."
-                        android:textColor="#6B7C7B"
+                        android:textColor="@color/text_tertiary"
                         android:textSize="14sp" />
 
                     <TextView
@@ -195,7 +195,7 @@
                         android:layout_marginTop="18dp"
                         android:fontFamily="sans-serif-medium"
                         android:text="Follow these tips:"
-                        android:textColor="#142121"
+                        android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
@@ -211,7 +211,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-medium"
                             android:text="1. Drop, Cover, Hold:"
-                            android:textColor="#142121"
+                            android:textColor="@color/text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
@@ -223,7 +223,7 @@
                             android:fontFamily="sans-serif"
                             android:lineSpacingExtra="3dp"
                             android:text="Drop to hands and knees, cover under furniture, hold on; protect head with arms if no table."
-                            android:textColor="#2A3B3B"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp" />
 
                     </LinearLayout>
@@ -240,7 +240,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-medium"
                             android:text="2. Stay Indoors:"
-                            android:textColor="#142121"
+                            android:textColor="@color/text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
@@ -252,7 +252,7 @@
                             android:fontFamily="sans-serif"
                             android:lineSpacingExtra="3dp"
                             android:text="Avoid running outside; stay away from windows and heavy objects."
-                            android:textColor="#2A3B3B"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp" />
 
                     </LinearLayout>
@@ -269,7 +269,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-medium"
                             android:text="3. Secure Heavy Items:"
-                            android:textColor="#142121"
+                            android:textColor="@color/text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
@@ -281,7 +281,7 @@
                             android:fontFamily="sans-serif"
                             android:lineSpacingExtra="3dp"
                             android:text="Bolt bookshelves, water heaters, gas cylinders; check via HLDSN quiz."
-                            android:textColor="#2A3B3B"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp" />
 
                     </LinearLayout>
@@ -299,7 +299,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-medium"
                             android:text="4. Plan Safe Spots:"
-                            android:textColor="#142121"
+                            android:textColor="@color/text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
@@ -311,7 +311,7 @@
                             android:fontFamily="sans-serif"
                             android:lineSpacingExtra="3dp"
                             android:text="Identify safe areas in each room; practice drills with HLDSN reminders."
-                            android:textColor="#2A3B3B"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp" />
 
                     </LinearLayout>

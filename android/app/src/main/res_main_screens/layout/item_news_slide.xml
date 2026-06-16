@@ -25,7 +25,7 @@
         android:ellipsize="end"
         android:maxLines="2"
         android:text="Disaster update in Pakistan"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/text_on_primary"
         android:textSize="15sp"
         android:textStyle="bold" />
 

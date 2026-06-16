@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA"
+    android:background="@color/surface_secondary"
     android:orientation="vertical">
 
     <!-- Header -->
@@ -34,7 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/nearby_help_title"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:text="@string/nearby_help_subtitle"
-                android:textColor="#B2DFDB"
+                android:textColor="@color/text_on_primary"
                 android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
@@ -83,7 +83,7 @@
                 android:hint="@string/nearby_help_search_hint"
                 android:importantForAutofill="no"
                 android:inputType="text"
-                android:textColor="#212121"
+                android:textColor="@color/text_primary"
                 android:textColorHint="#666666"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -256,7 +256,7 @@
             android:id="@+id/permission_overlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#FFFFFF"
+            android:background="@color/surface_primary"
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="gone">
@@ -275,7 +275,7 @@
                 android:layout_marginHorizontal="16dp"
                 android:text="@string/nearby_help_permission_denied"
                 android:textAlignment="center"
-                android:textColor="#212121"
+                android:textColor="@color/text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -285,7 +285,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/nearby_help_allow_location"
-                app:backgroundTint="#065c53" />
+                app:backgroundTint="@color/brand_green" />
         </LinearLayout>
 
         <!-- Loading Progress -->
@@ -293,7 +293,7 @@
             android:id="@+id/loading_overlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#80FFFFFF"
+            android:background="@color/surface_overlay"
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="gone">
@@ -310,7 +310,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/nearby_help_loading"
                 android:textAlignment="center"
-                android:textColor="#065c53"
+                android:textColor="@color/brand_green"
                 android:textSize="14sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -331,7 +331,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:text="Nearby Resources"
-            android:textColor="#212121"
+            android:textColor="@color/text_primary"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -368,7 +368,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/nearby_help_empty"
                 android:textAlignment="center"
-                android:textColor="#666666"
+                android:textColor="@color/text_secondary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -378,7 +378,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/nearby_help_retry"
-                app:backgroundTint="#065c53" />
+                app:backgroundTint="@color/brand_green" />
         </LinearLayout>
 
         <!-- Error State -->
@@ -404,7 +404,7 @@
                 android:layout_marginHorizontal="16dp"
                 android:text="@string/nearby_help_offline"
                 android:textAlignment="center"
-                android:textColor="#212121"
+                android:textColor="@color/text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -414,7 +414,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/nearby_help_retry"
-                app:backgroundTint="#065c53" />
+                app:backgroundTint="@color/brand_green" />
         </LinearLayout>
     </LinearLayout>
 

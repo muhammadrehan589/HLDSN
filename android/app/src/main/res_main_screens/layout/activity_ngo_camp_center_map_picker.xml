@@ -56,7 +56,7 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="12dp"
-        app:cardBackgroundColor="#F4FFFFFF"
+        app:cardBackgroundColor="@color/surface_card"
         app:cardCornerRadius="20dp"
         app:cardElevation="8dp"
         app:layout_constraintEnd_toStartOf="@id/saveSelectionButton"
@@ -76,7 +76,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Tap the map to place the camp or center pin, then save it back to the form."
-                android:textColor="#113047"
+                android:textColor="@color/heading_dark"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -86,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="No point selected yet"
-                android:textColor="#2A4458"
+                android:textColor="@color/body_text"
                 android:textSize="12sp" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

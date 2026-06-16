@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp"
-    app:cardBackgroundColor="#FFFFFF"
+    app:cardBackgroundColor="@color/surface_primary"
     app:cardCornerRadius="12dp"
     app:cardElevation="2dp">
 
@@ -49,7 +49,7 @@
                         android:layout_weight="1"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:textColor="#212121"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp"
                         android:textStyle="bold" />
 
@@ -63,7 +63,7 @@
                         android:paddingHorizontal="6dp"
                         android:paddingVertical="2dp"
                         android:text="Verified Local"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/text_on_primary"
                         android:textSize="10sp"
                         android:textStyle="bold"
                         android:visibility="gone" />
@@ -92,7 +92,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:gravity="center_vertical"
-                        android:textColor="#666666"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -106,7 +106,7 @@
             android:layout_marginTop="8dp"
             android:ellipsize="end"
             android:maxLines="2"
-            android:textColor="#666666"
+            android:textColor="@color/text_secondary"
             android:textSize="12sp" />
 
         <!-- Action Buttons -->

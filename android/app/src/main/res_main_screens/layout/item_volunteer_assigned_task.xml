@@ -17,7 +17,7 @@
             android:id="@+id/taskTitleText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#1F1F1F"
+            android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="#555555"
+            android:textColor="@color/text_secondary"
             android:textSize="13sp" />
 
         <TextView
@@ -34,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="#555555"
+            android:textColor="@color/text_secondary"
             android:textSize="13sp" />
 
         <TextView
@@ -42,7 +42,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textColor="#333333"
+            android:textColor="@color/text_primary"
             android:textSize="14sp" />
 
         <TextView
@@ -50,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textColor="#777777"
+            android:textColor="@color/text_tertiary"
             android:textSize="12sp" />
 
         <TextView
@@ -58,7 +58,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="#CC5500"
+            android:textColor="@color/text_warning"
             android:textSize="12sp"
             android:visibility="gone" />
 

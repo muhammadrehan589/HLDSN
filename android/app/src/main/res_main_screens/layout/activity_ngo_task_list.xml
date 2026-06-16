@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="serif"
             android:text="Assigned Tasks"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -57,7 +57,7 @@
         android:layout_weight="1"
         android:gravity="center"
         android:text="No tasks found"
-        android:textColor="#575757"
+        android:textColor="@color/text_secondary"
         android:textSize="16sp"
         android:visibility="gone" />
 

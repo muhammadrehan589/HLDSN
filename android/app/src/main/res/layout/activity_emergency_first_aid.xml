@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA"
+    android:background="@color/surface_secondary"
     android:orientation="vertical">
 
     <LinearLayout
@@ -33,7 +33,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                         android:text="@string/emergency_first_aid_title"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                         android:text="@string/emergency_first_aid_subtitle"
-                        android:textColor="#E0F2EF"
+                        android:textColor="@color/text_on_primary"
                 android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
@@ -79,7 +79,7 @@
                 android:hint="@string/first_aid_search_hint"
                 android:importantForAutofill="no"
                 android:inputType="text"
-                android:textColor="#212121"
+                android:textColor="@color/text_primary"
                 android:textColorHint="#666666"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -185,7 +185,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/first_aid_empty"
-            android:textColor="#666666"
+            android:textColor="@color/text_secondary"
             android:textSize="16sp"
             android:textStyle="bold"
             android:visibility="gone" />

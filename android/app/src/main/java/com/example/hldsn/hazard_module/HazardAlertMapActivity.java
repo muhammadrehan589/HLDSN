@@ -1102,7 +1102,7 @@ public class HazardAlertMapActivity extends AppCompatActivity {
                 for (String area : zone.affectedAreas) {
                     TextView areaView = new TextView(this);
                     areaView.setText("• " + area);
-                    areaView.setTextColor(0xFF406176);
+                    areaView.setTextColor(ContextCompat.getColor(HazardAlertMapActivity.this, R.color.text_secondary));
                     areaView.setTextSize(11);
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
@@ -1115,7 +1115,7 @@ public class HazardAlertMapActivity extends AppCompatActivity {
             } else {
                 TextView noAreasView = new TextView(this);
                 noAreasView.setText("No specific areas identified");
-                noAreasView.setTextColor(0xFF8EA3B8);
+                noAreasView.setTextColor(ContextCompat.getColor(HazardAlertMapActivity.this, R.color.text_tertiary));
                 noAreasView.setTextSize(11);
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,

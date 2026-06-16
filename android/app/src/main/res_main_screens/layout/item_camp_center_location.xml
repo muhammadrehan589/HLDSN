@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardBackgroundColor="#F4FFFFFF"
+    app:cardBackgroundColor="@color/surface_card"
     app:cardCornerRadius="18dp"
     app:cardElevation="6dp">
 
@@ -22,7 +22,7 @@
             android:paddingHorizontal="10dp"
             android:paddingVertical="4dp"
             android:text="Camp"
-            android:textColor="#113047"
+            android:textColor="@color/heading_dark"
             android:textSize="12sp"
             android:textStyle="bold" />
 
@@ -31,7 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:textColor="#113047"
+            android:textColor="@color/heading_dark"
             android:textSize="17sp"
             android:textStyle="bold" />
 
@@ -42,7 +42,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="#657D8A"
+            android:textColor="@color/text_tertiary"
             android:textSize="12sp" />
 
         <LinearLayout

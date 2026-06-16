@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:text="About HLDSN"
         android:textSize="28sp"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/text_on_primary"
         android:fontFamily="serif"
         android:textStyle="bold"
         android:layout_marginBottom="16dp"
@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:text="Our Mission"
                 android:textSize="18sp"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
 
@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:text="HLDSN (Humanitarian Landscape Development &amp; Support Network) is dedicated to building resilient communities through disaster management, emergency response, and humanitarian support. We empower citizens and organizations to work together in times of crisis."
                 android:textSize="14sp"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:layout_marginBottom="20dp" />
 
             <!-- Vision Section -->
@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:text="Our Vision"
                 android:textSize="18sp"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
 
@@ -67,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:text="To create a world where communities are prepared, resilient, and supported during natural disasters and humanitarian emergencies through technology, collaboration, and collective action."
                 android:textSize="14sp"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:layout_marginBottom="20dp" />
 
             <!-- Core Values Section -->
@@ -77,7 +77,7 @@
                 android:layout_height="wrap_content"
                 android:text="Core Values"
                 android:textSize="18sp"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
 
@@ -87,7 +87,7 @@
                 android:layout_height="wrap_content"
                 android:text="• Compassion: We care deeply for those affected by disasters\n• Collaboration: We unite diverse stakeholders for collective action\n• Innovation: We leverage technology for effective solutions\n• Transparency: We maintain open and honest communication\n• Accountability: We ensure responsible use of resources"
                 android:textSize="14sp"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:layout_marginBottom="20dp" />
 
             <!-- What We Do Section -->
@@ -97,7 +97,7 @@
                 android:layout_height="wrap_content"
                 android:text="What We Do"
                 android:textSize="18sp"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
 
@@ -107,7 +107,7 @@
                 android:layout_height="wrap_content"
                 android:text="• Disaster Alert System: Real-time alerts for natural hazards\n• SOS Network: Emergency response coordination\n• Volunteer Management: Connect volunteers with relief efforts\n• Resource Coordination: Efficient distribution of aid\n• Community Awareness: Safety tips and disaster preparedness\n• NGO Registration: Support and management for humanitarian organizations"
                 android:textSize="14sp"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:layout_marginBottom="16dp" />
 
         </LinearLayout>
@@ -121,7 +121,7 @@
         android:layout_height="48dp"
         android:text="Close"
         android:textSize="16sp"
-        android:backgroundTint="#FF6B6B"
+        android:backgroundTint="@color/text_error"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp" />
 

@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="No users"
-        android:textColor="#B3FFFFFF"
+        android:textColor="@color/text_tertiary"
         android:textSize="14sp"
         android:visibility="gone" />
 

@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="serif"
             android:text="Volunteer Form"
-            android:textColor="#FFFFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -87,7 +87,7 @@
                 android:layout_marginTop="48dp"
                 android:layout_gravity="center_horizontal"
                 android:text="Volunteer Basic Form"
-                android:textColor="#FFFFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -98,7 +98,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:text="Personal Details"
-                android:textColor="#E5FFFFFF"
+                android:textColor="@color/text_tertiary"
                 android:textSize="12sp" />
 
             <LinearLayout
@@ -118,7 +118,7 @@
                     android:inputType="textPersonName"
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
-                    android:textColor="#1F1F1F"
+                    android:textColor="@color/text_primary"
                     android:textColorHint="#575757"
                     android:textSize="16sp" />
 
@@ -137,7 +137,7 @@
                     android:inputType="textPersonName"
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
-                    android:textColor="#1F1F1F"
+                    android:textColor="@color/text_primary"
                     android:textColorHint="#575757"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -159,7 +159,7 @@
                     android:inputType="textPostalAddress"
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
-                    android:textColor="#1F1F1F"
+                    android:textColor="@color/text_primary"
                     android:textColorHint="#575757"
                     android:textSize="16sp" />
 
@@ -178,7 +178,7 @@
                     android:inputType="number"
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
-                    android:textColor="#1F1F1F"
+                    android:textColor="@color/text_primary"
                     android:textColorHint="#575757"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -194,7 +194,7 @@
                 android:inputType="phone"
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
-                android:textColor="#1F1F1F"
+                android:textColor="@color/text_primary"
                 android:textColorHint="#575757"
                 android:textSize="16sp" />
 
@@ -215,7 +215,7 @@
                     android:inputType="phone"
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
-                    android:textColor="#1F1F1F"
+                    android:textColor="@color/text_primary"
                     android:textColorHint="#575757"
                     android:textSize="16sp" />
 
@@ -233,7 +233,7 @@
                     android:hint="Gender"
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
-                    android:textColor="#1F1F1F"
+                    android:textColor="@color/text_primary"
                     android:textColorHint="#575757"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -249,7 +249,7 @@
                 android:inputType="textEmailAddress"
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
-                android:textColor="#1F1F1F"
+                android:textColor="@color/text_primary"
                 android:textColorHint="#575757"
                 android:textSize="16sp" />
 
@@ -263,7 +263,7 @@
                 android:hint="Select NGO"
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
-                android:textColor="#1F1F1F"
+                android:textColor="@color/text_primary"
                 android:textColorHint="#575757"
                 android:textSize="16sp" />
 
@@ -285,7 +285,7 @@
         android:elevation="10dp"
         android:text="Next"
         android:textAllCaps="false"
-        android:textColor="#FFFFFFFF"
+        android:textColor="@color/text_on_primary"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

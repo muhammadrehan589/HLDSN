@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.example.hldsn.R;
 import com.example.hldsn.notification_module.UserNotificationStore;
@@ -418,14 +419,14 @@ public class NgoTaskCreationActivity extends AppCompatActivity {
         }
         if (selectedDeadline == null) {
             deadlineDateText.setText("No deadline set");
-            deadlineDateText.setTextColor(0xFF999999);
+            deadlineDateText.setTextColor(ContextCompat.getColor(this, R.color.text_tertiary));
             if (deadlinePickerButton != null) {
                 deadlinePickerButton.setText("Set Deadline");
             }
         } else {
             String formatted = new SimpleDateFormat("dd MMM yyyy", Locale.US).format(selectedDeadline);
             deadlineDateText.setText(formatted);
-            deadlineDateText.setTextColor(0xFF1F1F1F);
+            deadlineDateText.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
             if (deadlinePickerButton != null) {
                 deadlinePickerButton.setText("Change");
             }

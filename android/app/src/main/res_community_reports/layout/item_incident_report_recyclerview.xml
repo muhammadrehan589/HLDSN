@@ -9,7 +9,7 @@
     android:layout_marginEnd="8dp"
     android:layout_marginTop="8dp"
     android:layout_marginBottom="8dp"
-    app:cardBackgroundColor="#0F1F1D"
+    app:cardBackgroundColor="@color/surface_primary"
     app:cardCornerRadius="16dp"
     app:cardElevation="4dp">
 
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Fire Outbreak"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@id/incidentImage"
@@ -53,7 +53,7 @@
             android:ellipsize="end"
             android:maxLines="3"
             android:text="A major fire has broken out in the downtown area, affecting multiple buildings."
-            android:textColor="#D9F3F0"
+            android:textColor="@color/text_on_primary"
             android:textSize="14sp"
             app:layout_constraintStart_toEndOf="@id/incidentImage"
             app:layout_constraintTop_toBottomOf="@id/incidentType"
@@ -67,7 +67,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginStart="16dp"
             android:text="Location: Downtown District, City Center"
-            android:textColor="#E6FFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textSize="14sp"
             app:layout_constraintStart_toEndOf="@id/incidentImage"
             app:layout_constraintTop_toBottomOf="@id/incidentDescription"
@@ -80,7 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Reporter is safe: Yes"
-            android:textColor="#2DD09E"
+            android:textColor="@color/safe_green"
             android:textSize="14sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@id/incidentLocation"
@@ -92,7 +92,7 @@
             android:layout_width="0dp"
             android:layout_height="200dp"
             android:layout_marginTop="12dp"
-            android:background="#1AFFFFFF"
+            android:background="@color/surface_divider"
             android:padding="12dp"
             android:visibility="gone"
             android:overScrollMode="never"
@@ -110,7 +110,7 @@
                     android:layout_height="wrap_content"
                     android:paddingVertical="6dp"
                     android:text="Emergency services responded within minutes."
-                    android:textColor="#E6FFFFFF"
+                    android:textColor="@color/text_on_primary"
                     android:textSize="14sp" />
 
                 <TextView
@@ -118,7 +118,7 @@
                     android:layout_height="wrap_content"
                     android:paddingVertical="6dp"
                     android:text="Evacuation assisted by nearby residents."
-                    android:textColor="#E6FFFFFF"
+                    android:textColor="@color/text_on_primary"
                     android:textSize="14sp" />
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
@@ -155,7 +155,7 @@
                     android:id="@+id/likeCount"
                     android:layout_marginStart="6dp"
                     android:text="113"
-                    android:textColor="#E6FFFFFF"
+                    android:textColor="@color/text_on_primary"
                     android:textSize="14sp"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"/>
@@ -181,7 +181,7 @@
                     android:id="@+id/dislikeCount"
                     android:layout_marginStart="6dp"
                     android:text="8"
-                    android:textColor="#E6FFFFFF"
+                    android:textColor="@color/text_on_primary"
                     android:textSize="14sp"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"/>
@@ -206,7 +206,7 @@
                     android:id="@+id/commentCount"
                     android:layout_marginStart="6dp"
                     android:text="0"
-                    android:textColor="#E6FFFFFF"
+                    android:textColor="@color/text_on_primary"
                     android:textSize="14sp"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"/>

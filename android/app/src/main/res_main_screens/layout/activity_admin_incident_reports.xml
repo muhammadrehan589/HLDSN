@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="serif"
             android:text="Incident Reports"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -47,7 +47,7 @@
         android:paddingTop="12dp"
         android:paddingBottom="4dp"
         android:text="All community incident reports. Tap the trash icon to remove a fake or misleading report."
-        android:textColor="#AAFFFFFF"
+        android:textColor="@color/text_tertiary"
         android:textSize="13sp" />
 
     <!-- Empty state -->
@@ -58,7 +58,7 @@
         android:gravity="center"
         android:padding="32dp"
         android:text="No reports found"
-        android:textColor="#AAFFFFFF"
+        android:textColor="@color/text_tertiary"
         android:textSize="16sp"
         android:visibility="gone" />
 

@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="Chats"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textSize="20sp"
             android:textStyle="bold"
             android:fontFamily="sans-serif-black" />
@@ -90,7 +90,7 @@
             android:paddingStart="14dp"
             android:paddingEnd="14dp"
             android:singleLine="true"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textColorHint="#80FFFFFF"
             android:textSize="14sp" />
     </FrameLayout>

@@ -48,7 +48,7 @@
                 android:background="@drawable/circle_red_badge"
                 android:gravity="center"
                 android:includeFontPadding="false"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:visibility="gone"
@@ -67,7 +67,7 @@
             android:maxLines="1"
             android:ellipsize="end"
             android:text="NGO Dashboard"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -91,7 +91,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Logged in as"
-                android:textColor="#E6FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textSize="13sp" />
 
             <TextView
@@ -100,7 +100,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:text="NGO Dashboard"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -164,7 +164,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="8dp"
                 android:text="Camp and center locations"
-                android:textColor="#E6FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textSize="13sp" />
 
             <com.google.android.material.button.MaterialButton

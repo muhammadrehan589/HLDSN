@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Legacy colors (kept for compatibility) -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="gray">#A0A0A0</color>
+    <color name="app_theme_green">#2DD09E</color>
+    <color name="teal_700">#FF03DAC5</color>
+    <color name="safe_green">#2DD09E</color>
+    <color name="shimmer_placeholder">#33FFFFFF</color>
+    <color name="lightred">#FF6B6B</color>
+
+    <!-- ==================== SEMANTIC COLORS (Dark) ==================== -->
+
+    <!-- Text colors -->
+    <color name="text_primary">#E8F0F2</color>
+    <color name="text_secondary">#A8C4D4</color>
+    <color name="text_tertiary">#6B8A9E</color>
+    <color name="text_on_primary">#FFFFFFFF</color>
+    <color name="text_link">#64B5F6</color>
+    <color name="text_error">#EF5350</color>
+    <color name="text_warning">#FFB74D</color>
+    <color name="text_success">#66BB6A</color>
+
+    <!-- Heading-specific -->
+    <color name="heading_dark">#E8F0F2</color>
+    <color name="heading_medium">#D0D8DC</color>
+    <color name="subheading">#A8C4D4</color>
+    <color name="body_text">#B0C8D8</color>
+
+    <!-- Surface colors -->
+    <color name="surface_primary">#1E1E1E</color>
+    <color name="surface_secondary">#121212</color>
+    <color name="surface_elevated">#2A2A2A</color>
+    <color name="surface_chip">#2C2C2C</color>
+    <color name="surface_card">#252525</color>
+    <color name="surface_input">#2A2A2A</color>
+    <color name="surface_divider">#20FFFFFF</color>
+    <color name="surface_overlay">#60000000</color>
+
+    <!-- Button colors -->
+    <color name="button_bg">#2A2A2A</color>
+    <color name="button_bg_tint">#2A2A2A</color>
+    <color name="button_text">#E8F0F2</color>
+    <color name="button_stroke">#30FFFFFF</color>
+
+    <!-- Chip / badge backgrounds -->
+    <color name="chip_blue_bg">#1A2A3A</color>
+    <color name="chip_green_bg">#1A2A20</color>
+    <color name="chip_orange_bg">#2A2010</color>
+    <color name="chip_dark_bg">#1A2A3A</color>
+    <color name="chip_warning_bg">#2A2010</color>
+
+    <!-- Input field -->
+    <color name="input_bg">#2A2A2A</color>
+    <color name="input_hint">#6B8A9E</color>
+    <color name="input_text">#E8F0F2</color>
+    <color name="input_stroke">#30FFFFFF</color>
+
+    <!-- Brand / accent colors (same in both modes) -->
+    <color name="brand_red">#C62828</color>
+    <color name="brand_green">#065c53</color>
+    <color name="brand_teal">#143A57</color>
+    <color name="accent_blue">#3D8DFF</color>
+    <color name="accent_orange">#F29A3F</color>
+    <color name="accent_brown">#8B6A4B</color>
+    <color name="accent_earthquake">#E75B5B</color>
+</resources>

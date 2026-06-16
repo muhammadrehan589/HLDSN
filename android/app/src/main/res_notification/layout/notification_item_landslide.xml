@@ -39,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Landslide Prediction"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textSize="16sp"
             android:textStyle="bold"
             android:fontFamily="sans-serif-medium" />
@@ -49,7 +49,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Unstable terrain detected. Landslide risk increasing. Avoid slopes and evacuate to safer ground."
-            android:textColor="#D5F0E7"
+            android:textColor="@color/text_on_primary"
             android:textSize="13sp"
             android:lineSpacingExtra="2dp" />
     </LinearLayout>
@@ -59,7 +59,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="5m ago."
-        android:textColor="#AEE3CF"
+        android:textColor="@color/text_on_primary"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

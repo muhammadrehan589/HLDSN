@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:text="Volunteer Basic Form"
-                android:textColor="#FFFFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -42,7 +42,7 @@
                 android:layout_marginTop="8dp"
                 android:gravity="center"
                 android:text="Personal Skills &amp; Resources\nDetails"
-                android:textColor="#E5FFFFFF"
+                android:textColor="@color/text_tertiary"
                 android:textSize="14sp" />
 
             <ImageView
@@ -65,7 +65,7 @@
                 android:paddingEnd="12dp"
                 android:paddingBottom="4dp"
                 android:text="Skills"
-                android:textColor="#121212"
+                android:textColor="@color/text_primary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -94,7 +94,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="First Aid"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
 
@@ -121,7 +121,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Medical"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -151,7 +151,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Search &amp; Rescue"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="14sp" />
                 </LinearLayout>
 
@@ -178,7 +178,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Driving"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -208,7 +208,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Evacuation"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
 
@@ -235,7 +235,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Others"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -259,7 +259,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Food/Water Distribution"
-                    android:textColor="#111111"
+                    android:textColor="@color/text_primary"
                     android:textSize="14sp" />
             </LinearLayout>
 
@@ -274,7 +274,7 @@
                 android:paddingEnd="12dp"
                 android:paddingBottom="4dp"
                 android:text="Exprience level"
-                android:textColor="#121212"
+                android:textColor="@color/text_primary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -303,7 +303,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Beginner"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
 
@@ -330,7 +330,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Intermediate"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
 
@@ -357,7 +357,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Expert"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -373,7 +373,7 @@
                 android:paddingEnd="12dp"
                 android:paddingBottom="4dp"
                 android:text="Resources"
-                android:textColor="#121212"
+                android:textColor="@color/text_primary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -402,7 +402,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Vehicle"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
 
@@ -429,7 +429,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Boat"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -459,7 +459,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Medical Supplies"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="14sp" />
                 </LinearLayout>
 
@@ -486,7 +486,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Food/Water"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -516,7 +516,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Tools"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
 
@@ -543,7 +543,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="None"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -559,7 +559,7 @@
                 android:paddingEnd="12dp"
                 android:paddingBottom="4dp"
                 android:text="Languages"
-                android:textColor="#121212"
+                android:textColor="@color/text_primary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -588,7 +588,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Urdu"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
 
@@ -615,7 +615,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="English"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
 
@@ -642,7 +642,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Punjabi"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -672,7 +672,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Sindhi"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
 
@@ -699,7 +699,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Pashto"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
 
@@ -726,7 +726,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Balochi"
-                        android:textColor="#111111"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -745,7 +745,7 @@
         android:elevation="10dp"
         android:text="Next"
         android:textAllCaps="false"
-        android:textColor="#FFFFFFFF"
+        android:textColor="@color/text_on_primary"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

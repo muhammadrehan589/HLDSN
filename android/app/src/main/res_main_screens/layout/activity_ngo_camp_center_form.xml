@@ -37,7 +37,7 @@
                 android:maxLines="1"
                 android:ellipsize="end"
                 android:text="Add Camps or Centers"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -49,7 +49,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            app:cardBackgroundColor="#F7FFFFFF"
+            app:cardBackgroundColor="@color/surface_card"
             app:cardCornerRadius="20dp"
             app:cardElevation="6dp">
 
@@ -64,7 +64,7 @@
                     android:layout_height="wrap_content"
                     android:lineSpacingExtra="2dp"
                     android:text="Select the exact camp or center location by tapping on the map."
-                    android:textColor="#113047"
+                    android:textColor="@color/heading_dark"
                     android:textSize="13sp" />
 
                 <TextView
@@ -72,7 +72,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:text="Type"
-                    android:textColor="#24475B"
+                    android:textColor="@color/body_text"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
@@ -87,7 +87,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:text="Name"
-                    android:textColor="#24475B"
+                    android:textColor="@color/body_text"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
@@ -100,7 +100,7 @@
                     android:hint="e.g. Flood Relief Camp"
                     android:inputType="textCapWords"
                     android:padding="12dp"
-                    android:textColor="#113047"
+                    android:textColor="@color/heading_dark"
                     android:textColorHint="#7A8A94" />
 
                 <com.google.android.material.button.MaterialButton
@@ -117,7 +117,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:textColor="#2A4458"
+                    android:textColor="@color/body_text"
                     android:textSize="12sp"
                     android:visibility="gone" />
 

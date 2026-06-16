@@ -35,7 +35,7 @@
             android:layout_weight="1"
             android:paddingStart="12dp"
             android:text="SOS Notifications"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textSize="22sp"
             android:textStyle="bold"
             android:fontFamily="sans-serif-medium" />
@@ -74,7 +74,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="No SOS alerts yet"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textSize="20sp"
             android:textStyle="bold"
             android:fontFamily="sans-serif-medium" />
@@ -84,7 +84,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="Triggered SOS alerts will appear here with a direct map link"
-            android:textColor="#B0FFFFFF"
+            android:textColor="@color/text_tertiary"
             android:textSize="16sp"
             android:gravity="center"
             android:textAlignment="center" />

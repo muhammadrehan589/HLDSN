@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="serif"
             android:text="Create Task"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -57,7 +57,7 @@
                 android:hint="Task name"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:textColor="#1F1F1F"
+                android:textColor="@color/text_primary"
                 android:textColorHint="#575757" />
 
             <EditText
@@ -70,7 +70,7 @@
                 android:hint="Task description"
                 android:minLines="3"
                 android:padding="12dp"
-                android:textColor="#1F1F1F"
+                android:textColor="@color/text_primary"
                 android:textColorHint="#575757" />
 
             <TextView
@@ -85,7 +85,7 @@
                 android:hint="Tap to select volunteers"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:textColor="#1F1F1F"
+                android:textColor="@color/text_primary"
                 android:textColorHint="#575757" />
 
             <LinearLayout
@@ -105,7 +105,7 @@
                     android:layout_height="wrap_content"
                     android:text="Set Deadline"
                     android:textAllCaps="false"
-                    android:textColor="#575757"
+                    android:textColor="@color/text_secondary"
                     app:icon="@android:drawable/ic_menu_my_calendar"
                     app:iconTint="#575757"
                     app:rippleColor="#22000000" />
@@ -117,7 +117,7 @@
                     android:layout_weight="1"
                     android:gravity="end"
                     android:text="No deadline set"
-                    android:textColor="#999999"
+                    android:textColor="@color/text_tertiary"
                     android:textSize="14sp" />
             </LinearLayout>
 

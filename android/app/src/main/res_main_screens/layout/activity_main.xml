@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F4F4"
+    android:background="@color/surface_secondary"
     android:fillViewport="true">
 
     <LinearLayout
@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:text="HLDSN"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textStyle="bold"
                 android:textSize="28sp"
                 android:fontFamily="serif"
@@ -70,7 +70,7 @@
                     android:layout_height="22dp"
                     android:layout_gravity="top|end"
                     android:background="@drawable/circle_red_badge"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/text_on_primary"
                     android:textSize="12sp"
                     android:gravity="center"
                     android:textStyle="bold"
@@ -115,10 +115,10 @@
             android:layout_height="64dp"
             android:layout_marginHorizontal="16dp"
             android:layout_marginVertical="8dp"
-            android:backgroundTint="#C62828"
+            android:backgroundTint="@color/brand_red"
             android:text="@string/emergency_sos"
             android:textAllCaps="false"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textStyle="bold"
             android:textSize="22sp"
             android:fontFamily="sans-serif" />
@@ -129,7 +129,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="12dp"
             android:layout_marginBottom="12dp"
-            android:background="#D8D8D8"
+            android:background="@color/surface_chip"
             android:elevation="1dp"
             android:orientation="vertical"
             android:paddingHorizontal="8dp"
@@ -144,7 +144,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center"
                 android:text="@string/contacts"
-                android:textColor="#3A3A3A"
+                android:textColor="@color/heading_medium"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -166,7 +166,7 @@
                     android:minHeight="120dp"
                     android:text="@string/emergency_numbers"
                     android:textAllCaps="false"
-                    android:textColor="#0A1F1F"
+                    android:textColor="@color/button_text"
                     android:textSize="11sp"
                     android:autoSizeTextType="uniform"
                     android:autoSizeMinTextSize="8sp"
@@ -175,14 +175,14 @@
                     android:textAlignment="center"
                     android:maxLines="2"
                     android:ellipsize="none"
-                    app:backgroundTint="#FFFFFFFF"
+                    app:backgroundTint="@color/button_bg"
                     app:cornerRadius="22dp"
                     app:icon="@drawable/ic_emergency_numbers"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
                     app:iconTint="@null"
-                    app:strokeColor="#1A000000"
+                    app:strokeColor="@color/button_stroke"
                     app:strokeWidth="1dp" />
 
                 <!-- Nearby Help -->
@@ -196,7 +196,7 @@
                     android:minHeight="120dp"
                     android:text="@string/nearby_help"
                     android:textAllCaps="false"
-                    android:textColor="#0A1F1F"
+                    android:textColor="@color/button_text"
                     android:textSize="11sp"
                     android:autoSizeTextType="uniform"
                     android:autoSizeMinTextSize="8sp"
@@ -205,14 +205,14 @@
                     android:textAlignment="center"
                     android:maxLines="2"
                     android:ellipsize="none"
-                    app:backgroundTint="#FFFFFFFF"
+                    app:backgroundTint="@color/button_bg"
                     app:cornerRadius="22dp"
                     app:icon="@drawable/ic_location"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
                     app:iconTint="@null"
-                    app:strokeColor="#1A000000"
+                    app:strokeColor="@color/button_stroke"
                     app:strokeWidth="1dp" />
             </LinearLayout>
 
@@ -233,7 +233,7 @@
                     android:minHeight="120dp"
                     android:text="@string/chats"
                     android:textAllCaps="false"
-                    android:textColor="#0A1F1F"
+                    android:textColor="@color/button_text"
                     android:textSize="11sp"
                     android:autoSizeTextType="uniform"
                     android:autoSizeMinTextSize="8sp"
@@ -242,14 +242,14 @@
                     android:textAlignment="center"
                     android:maxLines="2"
                     android:ellipsize="none"
-                    app:backgroundTint="#FFFFFFFF"
+                    app:backgroundTint="@color/button_bg"
                     app:cornerRadius="22dp"
                     app:icon="@drawable/ic_chat"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
                     app:iconTint="@null"
-                    app:strokeColor="#1A000000"
+                    app:strokeColor="@color/button_stroke"
                     app:strokeWidth="1dp" />
 
                 <!-- Community Chat -->
@@ -263,7 +263,7 @@
                     android:minHeight="120dp"
                     android:text="@string/community_chat"
                     android:textAllCaps="false"
-                    android:textColor="#0A1F1F"
+                    android:textColor="@color/button_text"
                     android:textSize="11sp"
                     android:autoSizeTextType="uniform"
                     android:autoSizeMinTextSize="8sp"
@@ -272,14 +272,14 @@
                     android:textAlignment="center"
                     android:maxLines="2"
                     android:ellipsize="none"
-                    app:backgroundTint="#FFFFFFFF"
+                    app:backgroundTint="@color/button_bg"
                     app:cornerRadius="22dp"
                     app:icon="@drawable/ic_community_chat"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
                     app:iconTint="@null"
-                    app:strokeColor="#1A000000"
+                    app:strokeColor="@color/button_stroke"
                     app:strokeWidth="1dp" />
 
             </LinearLayout>
@@ -291,7 +291,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="12dp"
             android:layout_marginBottom="12dp"
-            android:background="#D8D8D8"
+            android:background="@color/surface_chip"
             android:elevation="1dp"
             android:orientation="vertical"
             android:paddingHorizontal="8dp"
@@ -306,7 +306,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center"
                 android:text="@string/services"
-                android:textColor="#3A3A3A"
+                android:textColor="@color/heading_medium"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -328,7 +328,7 @@
                     android:minHeight="120dp"
                     android:text="@string/camp_locations"
                     android:textAllCaps="false"
-                    android:textColor="#0A1F1F"
+                    android:textColor="@color/button_text"
                     android:textSize="11sp"
                     android:autoSizeTextType="uniform"
                     android:autoSizeMinTextSize="8sp"
@@ -337,14 +337,14 @@
                     android:textAlignment="center"
                     android:maxLines="2"
                     android:ellipsize="none"
-                    app:backgroundTint="#FFFFFFFF"
+                    app:backgroundTint="@color/button_bg"
                     app:cornerRadius="22dp"
                     app:icon="@drawable/ic_camp"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
                     app:iconTint="@null"
-                    app:strokeColor="#1A000000"
+                    app:strokeColor="@color/button_stroke"
                     app:strokeWidth="1dp" />
 
                 <!-- Volunteer Network -->
@@ -358,7 +358,7 @@
                     android:minHeight="120dp"
                     android:text="@string/volunteer_network"
                     android:textAllCaps="false"
-                    android:textColor="#0A1F1F"
+                    android:textColor="@color/button_text"
                     android:textSize="11sp"
                     android:autoSizeTextType="uniform"
                     android:autoSizeMinTextSize="8sp"
@@ -367,14 +367,14 @@
                     android:textAlignment="center"
                     android:maxLines="2"
                     android:ellipsize="none"
-                    app:backgroundTint="#FFFFFFFF"
+                    app:backgroundTint="@color/button_bg"
                     app:cornerRadius="22dp"
                     app:icon="@drawable/ic_volunteer"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
                     app:iconTint="@null"
-                    app:strokeColor="#1A000000"
+                    app:strokeColor="@color/button_stroke"
                     app:strokeWidth="1dp" />
 
                 <!-- Hazard Alert -->
@@ -388,7 +388,7 @@
                     android:minHeight="120dp"
                     android:text="@string/hazard_alert"
                     android:textAllCaps="false"
-                    android:textColor="#0A1F1F"
+                    android:textColor="@color/button_text"
                     android:textSize="11sp"
                     android:autoSizeTextType="uniform"
                     android:autoSizeMinTextSize="8sp"
@@ -397,14 +397,14 @@
                     android:textAlignment="center"
                     android:maxLines="2"
                     android:ellipsize="none"
-                    app:backgroundTint="#FFFFFFFF"
+                    app:backgroundTint="@color/button_bg"
                     app:cornerRadius="22dp"
                     app:icon="@drawable/ic_hazard"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
                     app:iconTint="@null"
-                    app:strokeColor="#1A000000"
+                    app:strokeColor="@color/button_stroke"
                     app:strokeWidth="1dp" />
 
             </LinearLayout>
@@ -416,7 +416,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="12dp"
             android:layout_marginBottom="24dp"
-            android:background="#D8D8D8"
+            android:background="@color/surface_chip"
             android:elevation="1dp"
             android:orientation="vertical"
             android:paddingHorizontal="8dp"
@@ -431,7 +431,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center"
                 android:text="@string/information"
-                android:textColor="#3A3A3A"
+                android:textColor="@color/heading_medium"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -451,7 +451,7 @@
                     android:minHeight="120dp"
                     android:text="@string/safety_tips"
                     android:textAllCaps="false"
-                    android:textColor="#0A1F1F"
+                    android:textColor="@color/button_text"
                     android:textSize="11sp"
                     android:autoSizeTextType="uniform"
                     android:autoSizeMinTextSize="8sp"
@@ -460,14 +460,14 @@
                     android:textAlignment="center"
                     android:maxLines="2"
                     android:ellipsize="none"
-                    app:backgroundTint="#FFFFFFFF"
+                    app:backgroundTint="@color/button_bg"
                     app:cornerRadius="22dp"
                     app:icon="@drawable/ic_safety"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
                     app:iconTint="@null"
-                    app:strokeColor="#1A000000"
+                    app:strokeColor="@color/button_stroke"
                     app:strokeWidth="1dp" />
 
                 <!-- Community Chat -->
@@ -481,7 +481,7 @@
                     android:minHeight="120dp"
                     android:text="@string/emergency_first_aid_card"
                     android:textAllCaps="false"
-                    android:textColor="#0A1F1F"
+                    android:textColor="@color/button_text"
                     android:textSize="11sp"
                     android:autoSizeTextType="uniform"
                     android:autoSizeMinTextSize="8sp"
@@ -490,14 +490,14 @@
                     android:textAlignment="center"
                     android:maxLines="2"
                     android:ellipsize="none"
-                    app:backgroundTint="#FFFFFFFF"
+                    app:backgroundTint="@color/button_bg"
                     app:cornerRadius="22dp"
                     app:icon="@drawable/ic_firstaid"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
                     app:iconTint="@null"
-                    app:strokeColor="#1A000000"
+                    app:strokeColor="@color/button_stroke"
                     app:strokeWidth="1dp" />
 
             </LinearLayout>
@@ -518,7 +518,7 @@
                     android:minHeight="120dp"
                     android:text="@string/news"
                     android:textAllCaps="false"
-                    android:textColor="#0A1F1F"
+                    android:textColor="@color/button_text"
                     android:textSize="11sp"
                     android:autoSizeTextType="uniform"
                     android:autoSizeMinTextSize="8sp"
@@ -527,14 +527,14 @@
                     android:textAlignment="center"
                     android:maxLines="2"
                     android:ellipsize="none"
-                    app:backgroundTint="#FFFFFFFF"
+                    app:backgroundTint="@color/button_bg"
                     app:cornerRadius="22dp"
                     app:icon="@drawable/ic_news"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
                     app:iconTint="@null"
-                    app:strokeColor="#1A000000"
+                    app:strokeColor="@color/button_stroke"
                     app:strokeWidth="1dp" />
 
             </LinearLayout>

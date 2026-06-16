@@ -32,7 +32,7 @@
             android:background="@drawable/notification_badge_bg"
             android:gravity="center"
             android:text="2"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textSize="12sp"
             android:textStyle="bold" />
     </FrameLayout>
@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Earthquake Alert"
-            android:textColor="#FF5A43"
+            android:textColor="@color/text_error"
             android:textSize="16sp"
             android:textStyle="bold"
             android:fontFamily="sans-serif-medium" />
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Moderate tremor detected nearby. Secure heavy items and avoid elevators."
-            android:textColor="#D5F0E7"
+            android:textColor="@color/text_on_primary"
             android:textSize="13sp"
             android:lineSpacingExtra="2dp" />
     </LinearLayout>
@@ -72,7 +72,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="1m ago."
-        android:textColor="#AEE3CF"
+        android:textColor="@color/text_on_primary"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

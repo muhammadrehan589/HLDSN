@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:text="Menu"
             android:textSize="32sp"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_primary"
             android:fontFamily="serif"
             android:textStyle="bold"
             android:layout_marginTop="27dp"
@@ -72,7 +72,7 @@
                 android:focusable="true"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="6dp"
-                app:cardBackgroundColor="#1EFFFFFF">
+                app:cardBackgroundColor="@color/surface_card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -110,7 +110,7 @@
                             android:layout_height="wrap_content"
                             android:text="Profile"
                             android:textSize="17sp"
-                            android:textColor="#FFFFFF"
+                            android:textColor="@color/text_primary"
                             android:textStyle="bold"
                             android:fontFamily="sans-serif-medium" />
 
@@ -119,7 +119,7 @@
                             android:layout_height="wrap_content"
                             android:text="View and edit your account"
                             android:textSize="12sp"
-                            android:textColor="#99FFFFFF"
+                            android:textColor="@color/text_tertiary"
                             android:layout_marginTop="2dp" />
                     </LinearLayout>
 
@@ -145,7 +145,7 @@
                 android:focusable="true"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="6dp"
-                app:cardBackgroundColor="#1EFFFFFF">
+                app:cardBackgroundColor="@color/surface_card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -181,7 +181,7 @@
                             android:layout_height="wrap_content"
                             android:text="Home"
                             android:textSize="17sp"
-                            android:textColor="#FFFFFF"
+                            android:textColor="@color/text_primary"
                             android:textStyle="bold"
                             android:fontFamily="sans-serif-medium" />
 
@@ -190,7 +190,7 @@
                             android:layout_height="wrap_content"
                             android:text="Go to the main dashboard"
                             android:textSize="12sp"
-                            android:textColor="#99FFFFFF"
+                            android:textColor="@color/text_tertiary"
                             android:layout_marginTop="2dp" />
                     </LinearLayout>
 
@@ -215,7 +215,7 @@
                 android:focusable="true"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="6dp"
-                app:cardBackgroundColor="#1EFFFFFF">
+                app:cardBackgroundColor="@color/surface_card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -251,7 +251,7 @@
                             android:layout_height="wrap_content"
                             android:text="Assigned Tasks"
                             android:textSize="17sp"
-                            android:textColor="#FFFFFF"
+                            android:textColor="@color/text_primary"
                             android:textStyle="bold"
                             android:fontFamily="sans-serif-medium" />
 
@@ -260,7 +260,7 @@
                             android:layout_height="wrap_content"
                             android:text="Track your volunteer missions"
                             android:textSize="12sp"
-                            android:textColor="#99FFFFFF"
+                            android:textColor="@color/text_tertiary"
                             android:layout_marginTop="2dp" />
                     </LinearLayout>
 
@@ -285,7 +285,7 @@
                 android:focusable="true"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="6dp"
-                app:cardBackgroundColor="#1EFFFFFF">
+                app:cardBackgroundColor="@color/surface_card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -321,7 +321,7 @@
                             android:layout_height="wrap_content"
                             android:text="About Us"
                             android:textSize="17sp"
-                            android:textColor="#FFFFFF"
+                            android:textColor="@color/text_primary"
                             android:textStyle="bold"
                             android:fontFamily="sans-serif-medium" />
 
@@ -330,7 +330,7 @@
                             android:layout_height="wrap_content"
                             android:text="Learn more about HLDSN"
                             android:textSize="12sp"
-                            android:textColor="#99FFFFFF"
+                            android:textColor="@color/text_tertiary"
                             android:layout_marginTop="2dp" />
                     </LinearLayout>
 
@@ -355,7 +355,7 @@
                 android:focusable="true"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="6dp"
-                app:cardBackgroundColor="#1EFFFFFF">
+                app:cardBackgroundColor="@color/surface_card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -391,7 +391,7 @@
                             android:layout_height="wrap_content"
                             android:text="NGO Registration"
                             android:textSize="17sp"
-                            android:textColor="#FFFFFF"
+                            android:textColor="@color/text_primary"
                             android:textStyle="bold"
                             android:fontFamily="sans-serif-medium" />
 
@@ -400,7 +400,7 @@
                             android:layout_height="wrap_content"
                             android:text="Register your organization"
                             android:textSize="12sp"
-                            android:textColor="#99FFFFFF"
+                            android:textColor="@color/text_tertiary"
                             android:layout_marginTop="2dp" />
                     </LinearLayout>
 
@@ -418,7 +418,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#22FFFFFF"
+                android:background="@color/surface_divider"
                 android:layout_marginBottom="14dp" />
 
             <!-- ─────────── LOGOUT ─────────── -->
@@ -431,7 +431,7 @@
                 android:focusable="true"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="6dp"
-                app:cardBackgroundColor="#1EFFFFFF">
+                app:cardBackgroundColor="@color/surface_card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -467,7 +467,7 @@
                             android:layout_height="wrap_content"
                             android:text="Logout"
                             android:textSize="17sp"
-                            android:textColor="#FF6B6B"
+                            android:textColor="@color/text_error"
                             android:textStyle="bold"
                             android:fontFamily="sans-serif-medium" />
 
@@ -476,7 +476,7 @@
                             android:layout_height="wrap_content"
                             android:text="Sign out of your account"
                             android:textSize="12sp"
-                            android:textColor="#99FFFFFF"
+                            android:textColor="@color/text_tertiary"
                             android:layout_marginTop="2dp" />
                     </LinearLayout>
 

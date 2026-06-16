@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA"
+    android:background="@color/surface_secondary"
     android:fillViewport="true">
 
     <LinearLayout
@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:text="Emergency First Aid"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textSize="20sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -42,7 +42,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="12dp"
-            app:cardBackgroundColor="#FFFFFF"
+            app:cardBackgroundColor="@color/surface_primary"
             app:cardCornerRadius="16dp"
             app:cardElevation="2dp">
 
@@ -64,7 +64,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:textColor="#212121"
+                    android:textColor="@color/text_primary"
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
@@ -83,9 +83,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:background="#FFF3CD"
+                    android:background="@color/chip_warning_bg"
                     android:padding="10dp"
-                    android:textColor="#212121"
+                    android:textColor="@color/text_primary"
                     android:textSize="14sp" />
 
                 <TextView
@@ -94,7 +94,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:text="Do This Now"
-                    android:textColor="#212121"
+                    android:textColor="@color/text_primary"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -127,8 +127,8 @@
                     android:layout_marginTop="14dp"
                     android:text="Call Rescue 1122"
                     android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
-                    app:backgroundTint="#065c53"
+                    android:textColor="@color/text_on_primary"
+                    app:backgroundTint="@color/brand_green"
                     app:cornerRadius="14dp" />
 
                 <TextView
@@ -136,7 +136,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:text="Was this helpful?"
-                    android:textColor="#212121"
+                    android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -152,8 +152,8 @@
                         android:layout_height="wrap_content"
                         android:text="Yes"
                         android:textAllCaps="false"
-                        android:textColor="#666666"
-                        app:backgroundTint="#FFFFFF"
+                        android:textColor="@color/text_secondary"
+                        app:backgroundTint="@color/button_bg"
                         app:cornerRadius="14dp"
                         app:strokeColor="@color/app_theme_green"
                         app:strokeWidth="1dp" />
@@ -165,8 +165,8 @@
                         android:layout_marginStart="8dp"
                         android:text="No"
                         android:textAllCaps="false"
-                        android:textColor="#666666"
-                        app:backgroundTint="#FFFFFF"
+                        android:textColor="@color/text_secondary"
+                        app:backgroundTint="@color/button_bg"
                         app:cornerRadius="14dp"
                         app:strokeColor="@color/app_theme_green"
                         app:strokeWidth="1dp" />

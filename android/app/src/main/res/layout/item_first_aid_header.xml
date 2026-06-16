@@ -9,7 +9,7 @@
     android:paddingHorizontal="12dp"
     android:paddingVertical="6dp"
     android:text="Header"
-    android:textColor="#FFFFFF"
+    android:textColor="@color/text_on_primary"
     android:textSize="14sp"
     android:textStyle="bold" />
 

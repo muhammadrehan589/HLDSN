@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="HLDSN"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textStyle="bold"
             android:textSize="28sp"
             android:fontFamily="serif"
@@ -65,7 +65,7 @@
                 android:layout_height="22dp"
                 android:layout_gravity="top|end"
                 android:background="@drawable/circle_red_badge"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textSize="12sp"
                 android:gravity="center"
                 android:textStyle="bold"
@@ -166,7 +166,7 @@
                         android:background="@drawable/bg_tip_chip"
                         android:fontFamily="sans-serif-medium"
                         android:text="Floods"
-                        android:textColor="#162424"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp" />
 
                     <TextView
@@ -176,7 +176,7 @@
                         android:layout_gravity="center"
                         android:fontFamily="serif"
                         android:text="Safety Precautions for Floods"
-                        android:textColor="#B30004"
+                        android:textColor="@color/text_error"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
@@ -213,7 +213,7 @@
                         android:background="@drawable/bg_tip_chip"
                         android:fontFamily="sans-serif-medium"
                         android:text="Earthquakes"
-                        android:textColor="#162424"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp" />
 
                     <TextView
@@ -263,7 +263,7 @@
                         android:background="@drawable/bg_tip_chip"
                         android:fontFamily="sans-serif-medium"
                         android:text="Heatwaves"
-                        android:textColor="#162424"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp" />
 
                     <TextView
@@ -273,7 +273,7 @@
                         android:layout_gravity="center"
                         android:fontFamily="sans-serif-medium"
                         android:text="HEAT WAVE SAFETY"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/text_on_primary"
                         android:textSize="22sp"
                         android:textStyle="bold" />
 
@@ -309,7 +309,7 @@
                         android:background="@drawable/bg_tip_chip"
                         android:fontFamily="sans-serif-medium"
                         android:text="Landslides"
-                        android:textColor="#162424"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp" />
 
                 </FrameLayout>

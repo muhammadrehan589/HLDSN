@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="Flood Tips"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_on_primary"
             android:textStyle="bold"
             android:textSize="24sp"
             android:fontFamily="serif"
@@ -65,7 +65,7 @@
                 android:layout_height="22dp"
                 android:layout_gravity="top|end"
                 android:background="@drawable/circle_red_badge"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textSize="12sp"
                 android:gravity="center"
                 android:textStyle="bold"
@@ -97,7 +97,7 @@
         android:layout_marginTop="12dp"
         android:layout_marginBottom="28dp"
         android:alpha="0.35"
-        android:background="#F2FBF7"
+        android:background="@color/surface_secondary"
         app:layout_constraintTop_toBottomOf="@id/appBar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -174,7 +174,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-medium"
                         android:text="FLood Safty TIps"
-                        android:textColor="#172A2A"
+                        android:textColor="@color/text_primary"
                         android:textSize="22sp"
                         android:textStyle="bold" />
 
@@ -185,7 +185,7 @@
                         android:layout_marginTop="6dp"
                         android:fontFamily="sans-serif"
                         android:text="Most recurring disaster in Pakistan, driven by monsoon rains and glacial melt."
-                        android:textColor="#6B7C7B"
+                        android:textColor="@color/text_tertiary"
                         android:textSize="14sp" />
 
                     <TextView
@@ -195,7 +195,7 @@
                         android:layout_marginTop="18dp"
                         android:fontFamily="sans-serif-medium"
                         android:text="Follow these tips:"
-                        android:textColor="#142121"
+                        android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
@@ -211,7 +211,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-medium"
                             android:text="1. Stay Informed:"
-                            android:textColor="#142121"
+                            android:textColor="@color/text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
@@ -223,7 +223,7 @@
                             android:fontFamily="sans-serif"
                             android:lineSpacingExtra="3dp"
                             android:text="Monitor radio or HLDSN app alerts; set a radius for localized updates."
-                            android:textColor="#2A3B3B"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp" />
 
                     </LinearLayout>
@@ -240,7 +240,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-medium"
                             android:text="2. Elevate Valuables:"
-                            android:textColor="#142121"
+                            android:textColor="@color/text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
@@ -252,7 +252,7 @@
                             android:fontFamily="sans-serif"
                             android:lineSpacingExtra="3dp"
                             android:text="Move documents, electronics, and essentials to higher floors; store duplicates in waterproof bags."
-                            android:textColor="#2A3B3B"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp" />
 
                     </LinearLayout>
@@ -269,7 +269,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-medium"
                             android:text="3. Avoid Floodwater:"
-                            android:textColor="#142121"
+                            android:textColor="@color/text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
@@ -281,7 +281,7 @@
                             android:fontFamily="sans-serif"
                             android:lineSpacingExtra="3dp"
                             android:text="Do not walk or drive through moving water; seek higher ground immediately."
-                            android:textColor="#2A3B3B"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp" />
 
                     </LinearLayout>
@@ -299,7 +299,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-medium"
                             android:text="4. Prepare an Emergency Kit:"
-                            android:textColor="#142121"
+                            android:textColor="@color/text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
@@ -311,7 +311,7 @@
                             android:fontFamily="sans-serif"
                             android:lineSpacingExtra="3dp"
                             android:text="Keep water, food, flashlight, first-aid, clothes ready; use HLDSN checklist."
-                            android:textColor="#2A3B3B"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp" />
 
                     </LinearLayout>

@@ -48,7 +48,7 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="12dp"
-        app:cardBackgroundColor="#F4FFFFFF"
+        app:cardBackgroundColor="@color/surface_card"
         app:cardCornerRadius="20dp"
         app:cardElevation="8dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -68,7 +68,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Want to become a volunteer and part of the helping community?"
-                android:textColor="#113047"
+                android:textColor="@color/heading_dark"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -77,7 +77,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="See active volunteer teams across Pakistan."
-                android:textColor="#2A4458"
+                android:textColor="@color/body_text"
                 android:textSize="12sp" />
 
             <com.google.android.material.button.MaterialButton
@@ -92,7 +92,7 @@
                 android:paddingEnd="18dp"
                 android:text="Join Us"
                 android:textAllCaps="false"
-                android:textColor="#FFFFFFFF"
+                android:textColor="@color/text_on_primary"
                 android:textStyle="bold" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

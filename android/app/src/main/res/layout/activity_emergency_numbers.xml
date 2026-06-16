@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F6F6F6">
+    android:background="@color/surface_secondary">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -44,7 +44,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Emergency Numbers"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/text_on_primary"
                         android:textSize="22sp"
                         android:textStyle="bold" />
 
@@ -53,7 +53,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="Tap call button to open phone dialer."
-                        android:textColor="#E0F2EF"
+                        android:textColor="@color/text_on_primary"
                         android:textSize="12sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -64,7 +64,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginBottom="12dp"
-            app:cardBackgroundColor="#FFFFFF"
+            app:cardBackgroundColor="@color/surface_primary"
             app:cardCornerRadius="18dp"
             app:cardElevation="2dp">
 
@@ -98,7 +98,7 @@
                         android:hint="Search police, ambulance, fire, hospital, city…"
                         android:importantForAutofill="no"
                         android:inputType="text"
-                        android:textColor="#1B1B1B"
+                        android:textColor="@color/text_primary"
                         android:textColorHint="#888888"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -184,7 +184,7 @@
             android:layout_marginHorizontal="16dp"
             android:layout_marginBottom="8dp"
             android:text="Tap call button to open phone dialer."
-            android:textColor="#666666"
+            android:textColor="@color/text_secondary"
             android:textSize="12sp" />
 
         <FrameLayout
@@ -207,7 +207,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="No emergency contact found."
-                android:textColor="#7A7A7A"
+                android:textColor="@color/text_tertiary"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:visibility="gone" />

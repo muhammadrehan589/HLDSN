@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import androidx.core.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -225,13 +226,13 @@ public class EmergencyFirstAidActivity extends AppCompatActivity {
             Chip chip = (Chip) child;
             boolean selected = chip.getId() == selectedChipId;
             if (selected) {
-                chip.setChipBackgroundColor(ColorStateList.valueOf(0xFFD32F2F));
-                chip.setTextColor(0xFFFFFFFF);
+                chip.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.brand_red)));
+                chip.setTextColor(ContextCompat.getColor(this, R.color.text_on_primary));
             } else {
-                chip.setChipBackgroundColor(ColorStateList.valueOf(0xFFFFFFFF));
-                chip.setTextColor(0xFF666666);
+                chip.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.surface_primary)));
+                chip.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
             }
-            chip.setChipStrokeColor(ColorStateList.valueOf(0xFFD32F2F));
+            chip.setChipStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.brand_red)));
             chip.setChipStrokeWidth(1f);
         }
     }
