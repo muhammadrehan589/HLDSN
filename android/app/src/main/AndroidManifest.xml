@@ -127,6 +127,7 @@
         <activity android:name=".ngo_module.NgoTaskListActivity" android:exported="false" />
         <activity android:name=".ngo_module.NgoResourceCreationActivity" android:exported="false" />
         <activity android:name=".ngo_module.NgoResourceListActivity" android:exported="false" />
+        <activity android:name=".ngo_module.NgoDonationListActivity" android:exported="false" />
         <activity android:name=".volunteer.VolunteerBasicFormActivity" android:exported="false" />
         <activity android:name=".volunteer.VolunteerSkillsFormActivity" android:exported="false" />
         <activity android:name=".volunteer.VolunteerAgreementActivity" android:exported="false" />

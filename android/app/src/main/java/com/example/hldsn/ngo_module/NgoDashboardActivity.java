@@ -88,6 +88,12 @@ public class NgoDashboardActivity extends AppCompatActivity {
                     startActivity(new Intent(this, NgoResourceListActivity.class)));
         }
 
+        MaterialButton viewDonationsButton = findViewById(R.id.viewDonationsButton);
+        if (viewDonationsButton != null) {
+            viewDonationsButton.setOnClickListener(v ->
+                    startActivity(new Intent(this, NgoDonationListActivity.class)));
+        }
+
         if (addCampCenterButton != null) {
             addCampCenterButton.setOnClickListener(v ->
                 startActivity(new Intent(this, NgoCampCenterFormActivity.class)));

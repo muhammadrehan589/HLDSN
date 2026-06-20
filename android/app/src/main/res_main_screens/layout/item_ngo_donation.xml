@@ -13,41 +13,33 @@
         android:padding="12dp">
 
         <TextView
-            android:id="@+id/tvResourceName"
+            android:id="@+id/tvDonationName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/tvResourceQuantity"
+            android:id="@+id/tvDonationQuantity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/tvResourceLocation"
+            android:id="@+id/tvDonationLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/tvResourceDescription"
+            android:id="@+id/tvDonationDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:textSize="13sp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnEditResource"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Donate"
-            android:textAllCaps="false"
-            app:cornerRadius="8dp" />
+            android:layout_marginTop="4dp"
+            android:textSize="12sp"
+            android:textColor="#888888" />
 
     </LinearLayout>
 

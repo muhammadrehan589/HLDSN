@@ -16,18 +16,44 @@ import java.util.List;
 
 public class NgoResourceAdapter extends RecyclerView.Adapter<NgoResourceAdapter.VH> {
 
-    public interface OnEditListener { void onEdit(NgoResource resource); }
+    public interface OnDonateListener { void onDonate(NgoResource resource); }
 
-    private final List<NgoResource> items = new ArrayList<>();
-    private final OnEditListener editListener;
+    private final List<NgoResource> allItems = new ArrayList<>();
+    private final List<NgoResource> filteredItems = new ArrayList<>();
+    private final OnDonateListener donateListener;
 
-    public NgoResourceAdapter(OnEditListener editListener) {
-        this.editListener = editListener;
+    public NgoResourceAdapter(OnDonateListener donateListener) {
+        this.donateListener = donateListener;
     }
 
     public void setItems(List<NgoResource> list) {
-        items.clear();
-        if (list != null) items.addAll(list);
+        allItems.clear();
+        if (list != null) allItems.addAll(list);
+        filteredItems.clear();
+        filteredItems.addAll(allItems);
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Filters the inventory list by search query and/or category.
+     * @param query text to match against item name (case-insensitive)
+     * @param category category to filter by, or null/"All" to show all categories
+     */
+    public void filter(String query, String category) {
+        filteredItems.clear();
+        String q = (query == null) ? "" : query.trim().toLowerCase();
+        boolean hasCategory = category != null && !category.isEmpty()
+                && !category.equalsIgnoreCase("All");
+
+        for (NgoResource r : allItems) {
+            String name = r.getName() == null ? "" : r.getName().toLowerCase();
+            boolean matchesQuery = q.isEmpty() || name.contains(q);
+            boolean matchesCategory = !hasCategory || name.equalsIgnoreCase(category)
+                    || (r.getName() != null && r.getName().equalsIgnoreCase(category));
+            if (matchesQuery && matchesCategory) {
+                filteredItems.add(r);
+            }
+        }
         notifyDataSetChanged();
     }
 
@@ -40,27 +66,27 @@ public class NgoResourceAdapter extends RecyclerView.Adapter<NgoResourceAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
-        NgoResource r = items.get(position);
+        NgoResource r = filteredItems.get(position);
         holder.tvName.setText(r.getName());
         holder.tvQuantity.setText("Quantity: " + r.getQuantity());
         holder.tvLocation.setText("Location: " + (r.getLocation() == null ? "" : r.getLocation()));
         holder.tvDescription.setText(r.getDescription() == null ? "" : r.getDescription());
-        holder.btnEdit.setOnClickListener(v -> { if (editListener != null) editListener.onEdit(r); });
+        holder.btnDonate.setOnClickListener(v -> { if (donateListener != null) donateListener.onDonate(r); });
     }
 
     @Override
-    public int getItemCount() { return items.size(); }
+    public int getItemCount() { return filteredItems.size(); }
 
     static class VH extends RecyclerView.ViewHolder {
         TextView tvName, tvQuantity, tvLocation, tvDescription;
-        MaterialButton btnEdit;
+        MaterialButton btnDonate;
         VH(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvResourceName);
             tvQuantity = itemView.findViewById(R.id.tvResourceQuantity);
             tvLocation = itemView.findViewById(R.id.tvResourceLocation);
             tvDescription = itemView.findViewById(R.id.tvResourceDescription);
-            btnEdit = itemView.findViewById(R.id.btnEditResource);
+            btnDonate = itemView.findViewById(R.id.btnEditResource);
         }
     }
 }

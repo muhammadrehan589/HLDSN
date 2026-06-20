@@ -1,6 +1,7 @@
 package com.example.hldsn.ngo_module;
 
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.DocumentReference;
@@ -30,6 +31,15 @@ public class NgoResourceStore {
                 .addOnFailureListener(onFailure);
     }
 
+    public static void deductQuantity(FirebaseFirestore db, String resourceId, int amount,
+                                      OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        db.collection(COLLECTION_NAME)
+                .document(resourceId)
+                .update("quantity", FieldValue.increment(-amount))
+                .addOnSuccessListener(onSuccess)
+                .addOnFailureListener(onFailure);
+    }
+
     public static com.google.firebase.firestore.ListenerRegistration observeResourcesForNgo(FirebaseFirestore db, String ngoId, EventListener<QuerySnapshot> listener) {
         return db.collection(COLLECTION_NAME)
                 .whereEqualTo("ngoId", ngoId)
@@ -37,3 +47,4 @@ public class NgoResourceStore {
     }
 
 }
+

@@ -145,7 +145,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:text="Add Resource"
+                android:text="Add Inventory"
                 android:textAllCaps="false"
                 app:cornerRadius="12dp" />
 
@@ -154,7 +154,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:text="View Resources"
+                android:text="View Inventory"
+                android:textAllCaps="false"
+                app:cornerRadius="12dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/viewDonationsButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="View Donations"
                 android:textAllCaps="false"
                 app:cornerRadius="12dp" />
 
