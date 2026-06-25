@@ -18,7 +18,11 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class ChatsActivity extends AppCompatActivity {
 
+    public static final String EXTRA_VOLUNTEER_ONLY = "extra_volunteer_only";
+    public static final String EXTRA_NGO_ID = "extra_ngo_id";
+
     private ChatsViewModel chatsViewModel;
+    private boolean volunteerOnly = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +32,12 @@ public class ChatsActivity extends AppCompatActivity {
         FirebaseUser me = FirebaseAuth.getInstance().getCurrentUser();
         if (me == null) { finish(); return; }
         chatsViewModel = new ViewModelProvider(this).get(ChatsViewModel.class);
+
+        volunteerOnly = getIntent().getBooleanExtra(EXTRA_VOLUNTEER_ONLY, false);
+        String ngoId = getIntent().getStringExtra(EXTRA_NGO_ID);
+        if (volunteerOnly && ngoId != null) {
+            chatsViewModel.setFilter(true, ngoId);
+        }
 
 
         // ── Header buttons ───────────────────────────────────────────────────
@@ -68,7 +78,13 @@ public class ChatsActivity extends AppCompatActivity {
         usersViewPager.setCurrentItem(0, false);
 
         new TabLayoutMediator(usersTabLayout, usersViewPager,
-                (tab, position) -> tab.setText(position == 0 ? "All Users" : "Nearby Users"))
+                (tab, position) -> {
+                    if (position == 0) {
+                        tab.setText(volunteerOnly ? "Volunteers" : "All Users");
+                    } else {
+                        tab.setText(volunteerOnly ? "Nearby Volunteers" : "Nearby Users");
+                    }
+                })
                 .attach();
     }
 }

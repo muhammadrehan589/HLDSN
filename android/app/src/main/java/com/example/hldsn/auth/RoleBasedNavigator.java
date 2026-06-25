@@ -1,6 +1,7 @@
 package com.example.hldsn.auth;
 
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import com.example.hldsn.ngo_module.NgoDashboardActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 
 import java.util.Locale;
 
@@ -43,15 +45,45 @@ public final class RoleBasedNavigator {
     }
 
     private static void routeByUid(AppCompatActivity activity, String uid) {
+        // We use Source.SERVER to ensure we get the latest role from the backend.
+        // This prevents issues where a recently promoted admin/ngo is still seen 
+        // as a regular 'user' due to local Firestore caching.
+        Log.d("RoleBasedNavigator", "Fetching role for UID: " + uid + " from SERVER");
         FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(uid)
-                .get()
+                .get(Source.SERVER)
                 .addOnSuccessListener(documentSnapshot -> {
-                    String normalizedRole = normalizeRole(documentSnapshot.getString("role"));
+                    if (documentSnapshot.exists()) {
+                        String role = documentSnapshot.getString("role");
+                        Log.d("RoleBasedNavigator", "Role from SERVER: " + role);
+                        String normalizedRole = normalizeRole(role);
+                        routeTo(activity, resolveDestination(normalizedRole));
+                    } else {
+                        Log.w("RoleBasedNavigator", "Document not found on SERVER, trying CACHE");
+                        fetchFromCache(activity, uid);
+                    }
+                })
+                .addOnFailureListener(error -> {
+                    Log.e("RoleBasedNavigator", "SERVER fetch failed: " + error.getMessage() + ", trying CACHE");
+                    fetchFromCache(activity, uid);
+                });
+    }
+
+    private static void fetchFromCache(AppCompatActivity activity, String uid) {
+        Log.d("RoleBasedNavigator", "Fetching role from CACHE for UID: " + uid);
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .get(Source.CACHE)
+                .addOnSuccessListener(documentSnapshot -> {
+                    String role = documentSnapshot.getString("role");
+                    Log.d("RoleBasedNavigator", "Role from CACHE: " + role);
+                    String normalizedRole = normalizeRole(role);
                     routeTo(activity, resolveDestination(normalizedRole));
                 })
                 .addOnFailureListener(error -> {
+                    Log.e("RoleBasedNavigator", "CACHE fetch failed: " + error.getMessage());
                     Toast.makeText(activity, "Could not load role, opening home", Toast.LENGTH_SHORT).show();
                     routeTo(activity, HomePageActivity.class);
                 });

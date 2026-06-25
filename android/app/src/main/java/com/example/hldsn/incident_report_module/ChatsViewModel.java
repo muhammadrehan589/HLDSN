@@ -48,6 +48,9 @@ public class ChatsViewModel extends AndroidViewModel {
     private ListenerRegistration usersRegistration;
     private boolean streamsRunning;
 
+    private boolean volunteerOnly = false;
+    private String filterNgoId = "";
+
     private final Runnable nearbyRefreshRunnable = new Runnable() {
         @Override
         public void run() {
@@ -75,6 +78,12 @@ public class ChatsViewModel extends AndroidViewModel {
 
     public LiveData<String> getSearchQuery() {
         return searchQuery;
+    }
+
+    public void setFilter(boolean volunteerOnly, String ngoId) {
+        this.volunteerOnly = volunteerOnly;
+        this.filterNgoId = ngoId != null ? ngoId.trim() : "";
+        Log.d(TAG, "setFilter: volunteerOnly=" + volunteerOnly + ", ngoId=" + filterNgoId);
     }
 
     public void setSearchQuery(String query) {
@@ -116,8 +125,15 @@ public class ChatsViewModel extends AndroidViewModel {
         }
 
         Log.d(TAG, "startOnlineUsersListener: starting listener for users collection");
-        usersRegistration = db.collection("users")
-                .addSnapshotListener((snapshots, e) -> {
+        com.google.firebase.firestore.Query query = db.collection("users");
+
+        if (volunteerOnly && !filterNgoId.isEmpty()) {
+            Log.d(TAG, "startOnlineUsersListener: applying volunteer filters for NGO " + filterNgoId);
+            query = query.whereEqualTo("role", "volunteer")
+                    .whereEqualTo("volunteerNgoId", filterNgoId);
+        }
+
+        usersRegistration = query.addSnapshotListener((snapshots, e) -> {
                     if (e != null) {
                         Log.e(TAG, "startOnlineUsersListener: error in listener", e);
                         return;
