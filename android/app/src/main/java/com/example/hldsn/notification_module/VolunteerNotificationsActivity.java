@@ -2,6 +2,7 @@ package com.example.hldsn.notification_module;
 
 import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -31,6 +32,9 @@ import com.example.hldsn.notification_module.SosAlertStore;
 
 public class VolunteerNotificationsActivity extends AppCompatActivity {
 
+    private static final String PREFS_NOTIFICATION = "notification_prefs";
+    private static final String PREF_KEY_LAST_OPENED_NOTIFICATIONS_AT = "last_opened_notifications_at";
+
     private final List<NotificationItem> communityNotifications = new ArrayList<>();
     private final List<NotificationItem> recommendedNotifications = new ArrayList<>();
 
@@ -48,6 +52,7 @@ public class VolunteerNotificationsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
+        markNotificationsOpenedNow();
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
@@ -121,6 +126,7 @@ public class VolunteerNotificationsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        markNotificationsOpenedNow();
         refreshList();
     }
 
@@ -299,5 +305,10 @@ public class VolunteerNotificationsActivity extends AppCompatActivity {
         ObjectAnimator animator = ObjectAnimator.ofFloat(tabIndicator, "translationX", targetX);
         animator.setDuration(220);
         animator.start();
+    }
+
+    private void markNotificationsOpenedNow() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NOTIFICATION, MODE_PRIVATE);
+        prefs.edit().putLong(PREF_KEY_LAST_OPENED_NOTIFICATIONS_AT, System.currentTimeMillis()).apply();
     }
 }

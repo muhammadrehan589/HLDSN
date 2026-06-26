@@ -116,6 +116,8 @@ public class HomePageActivity extends AppCompatActivity {
     private static final String EXTRA_MESH_TEXT = "extra_mesh_text";
     private static final String PREFS_PERMISSION_GATE = "home_permission_gate";
     private static final String PREF_KEY_ALL_PERMISSIONS_PREFIX = "all_permissions_prompted_";
+    private static final String PREFS_NOTIFICATION = "notification_prefs";
+    private static final String PREF_KEY_LAST_OPENED_NOTIFICATIONS_AT = "last_opened_notifications_at";
 
     private DrawerLayout drawerLayout;
     private ImageView menuIcon, notificationIcon;
@@ -148,6 +150,7 @@ public class HomePageActivity extends AppCompatActivity {
     private final List<SosAlertRecord> sosAlerts = new ArrayList<>();
     private final List<NotificationItem> userNotifications = new ArrayList<>();
     private int userNotificationCount = 0;
+    private long notificationsLastOpenedAtMs = 0L;
 
     // Carousel fields
     private ViewPager2 newsViewPager;
@@ -264,6 +267,7 @@ public class HomePageActivity extends AppCompatActivity {
         initNotificationDrawer();
         initListeners();
         loadSeenIncidentIds();
+        loadNotificationsLastOpenedAt();
         loadSosAlerts();
         listenForUserNotifications();
 
@@ -455,6 +459,7 @@ public class HomePageActivity extends AppCompatActivity {
             notificationIcon.setOnClickListener(v -> {
                 try {
                     CrashDebugger.logButtonClick("notificationIcon", "Open notifications screen");
+                    markAllNotificationsOpened();
                     // All roles get the full-screen notification activity
                     startActivity(new Intent(this, VolunteerNotificationsActivity.class));
                 } catch (Exception e) {
@@ -618,7 +623,7 @@ public class HomePageActivity extends AppCompatActivity {
     }
 
     private void loadSeenIncidentIds() {
-        SharedPreferences prefs = getSharedPreferences("notification_prefs", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(PREFS_NOTIFICATION, MODE_PRIVATE);
         Set<String> stored = prefs.getStringSet("seen_incident_ids", null);
         if (stored != null) {
             seenIncidentIds = new HashSet<>(stored);
@@ -629,9 +634,50 @@ public class HomePageActivity extends AppCompatActivity {
     }
 
     private void saveSeenIncidentIds() {
-        SharedPreferences prefs = getSharedPreferences("notification_prefs", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(PREFS_NOTIFICATION, MODE_PRIVATE);
         prefs.edit().putStringSet("seen_incident_ids", seenIncidentIds).apply();
         Log.d(TAG, "Saved " + seenIncidentIds.size() + " seen IDs");
+    }
+
+    private void loadNotificationsLastOpenedAt() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NOTIFICATION, MODE_PRIVATE);
+        notificationsLastOpenedAtMs = prefs.getLong(PREF_KEY_LAST_OPENED_NOTIFICATIONS_AT, 0L);
+    }
+
+    private void saveNotificationsLastOpenedAt(long openedAtMs) {
+        notificationsLastOpenedAtMs = openedAtMs;
+        SharedPreferences prefs = getSharedPreferences(PREFS_NOTIFICATION, MODE_PRIVATE);
+        prefs.edit().putLong(PREF_KEY_LAST_OPENED_NOTIFICATIONS_AT, openedAtMs).apply();
+    }
+
+    private int getUnseenUserNotificationCount() {
+        int count = 0;
+        for (NotificationItem item : userNotifications) {
+            if (item != null && item.getTimestampMs() > notificationsLastOpenedAtMs) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private void markAllNotificationsOpened() {
+        long openedAtMs = System.currentTimeMillis();
+        saveNotificationsLastOpenedAt(openedAtMs);
+
+        for (IncidentModel incident : unreadIncidents) {
+            if (incident != null && incident.getId() != null) {
+                seenIncidentIds.add(incident.getId());
+            }
+        }
+        saveSeenIncidentIds();
+        unreadIncidents.clear();
+
+        SosAlertStore.markAllSeen(this);
+        loadSosAlerts();
+
+        userNotificationCount = 0;
+        updateNotificationBadge(0);
+        refreshNotificationContent();
     }
 
     private void loadSosAlerts() {
@@ -679,6 +725,7 @@ public class HomePageActivity extends AppCompatActivity {
 
         List<NotificationItem> items = buildNotificationItems();
         notificationAdapter.updateList(items);
+        userNotificationCount = getUnseenUserNotificationCount();
         updateNotificationBadge(unreadIncidents.size() + getUnseenSosCount() + userNotificationCount);
 
         if (items.isEmpty()) {
@@ -726,7 +773,7 @@ public class HomePageActivity extends AppCompatActivity {
                             userNotifications.add(NotificationItem.fromUserNotification(documentSnapshot));
                         }
                     }
-                    userNotificationCount = userNotifications.size();
+                    userNotificationCount = getUnseenUserNotificationCount();
                     refreshNotificationContent();
                 }
         );
@@ -893,7 +940,7 @@ public class HomePageActivity extends AppCompatActivity {
         if (current.isEmpty()) return;
 
         for (NotificationItem item : current) {
-            if (!item.isSosAlert() && item.getId() != null) {
+            if (NotificationItem.TYPE_INCIDENT.equals(item.getType()) && item.getId() != null) {
                 seenIncidentIds.add(item.getId());
             }
         }
@@ -1205,6 +1252,7 @@ public class HomePageActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        loadNotificationsLastOpenedAt();
         loadSosAlerts();
         startListeningToIncidents();
         ContextCompat.registerReceiver(

@@ -12,6 +12,7 @@ import com.example.hldsn.ngo_module.NgoDashboardActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 
 import java.util.Locale;
 
@@ -43,17 +44,34 @@ public final class RoleBasedNavigator {
     }
 
     private static void routeByUid(AppCompatActivity activity, String uid) {
+        // Always try the server first to get the latest role.
+        // On a fresh install the local cache is empty, so a default .get()
+        // can resolve from the empty cache with role == null, which would
+        // incorrectly route an admin to the user dashboard.
         FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(uid)
-                .get()
+                .get(Source.SERVER)
                 .addOnSuccessListener(documentSnapshot -> {
                     String normalizedRole = normalizeRole(documentSnapshot.getString("role"));
                     routeTo(activity, resolveDestination(normalizedRole));
                 })
-                .addOnFailureListener(error -> {
-                    Toast.makeText(activity, "Could not load role, opening home", Toast.LENGTH_SHORT).show();
-                    routeTo(activity, HomePageActivity.class);
+                .addOnFailureListener(serverError -> {
+                    // Server unreachable – fall back to the local cache so the
+                    // app still works offline after the first successful fetch.
+                    FirebaseFirestore.getInstance()
+                            .collection("users")
+                            .document(uid)
+                            .get(Source.CACHE)
+                            .addOnSuccessListener(cachedSnapshot -> {
+                                String normalizedRole = normalizeRole(cachedSnapshot.getString("role"));
+                                routeTo(activity, resolveDestination(normalizedRole));
+                            })
+                            .addOnFailureListener(cacheError -> {
+                                Toast.makeText(activity, "Could not load role, opening home", Toast.LENGTH_SHORT)
+                                        .show();
+                                routeTo(activity, HomePageActivity.class);
+                            });
                 });
     }
 
