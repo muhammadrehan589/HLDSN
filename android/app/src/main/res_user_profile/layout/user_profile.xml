@@ -7,135 +7,124 @@
     android:background="@drawable/login_gradient"
     tools:context=".login_module.UserProfileActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <!-- App Bar Header -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="88dp"
-            android:background="@drawable/header_gradient"
-            tools:ignore="MissingConstraints">
+            android:background="@drawable/header_gradient">
 
             <ImageView
-                android:id="@+id/menuIcon"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/ic_menu"
-                android:contentDescription="Menu"
+                android:id="@+id/backButton"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:padding="8dp"
+                android:background="@drawable/section_chip_bg"
+                android:src="@drawable/ic_back"
+                android:contentDescription="Back"
                 app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="35dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="15dp" />
+                android:layout_marginStart="16dp" />
 
             <TextView
                 android:id="@+id/profileTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Profile"
-                android:textSize="32sp"
+                android:text="My Profile"
+                android:textSize="28sp"
                 android:textColor="@color/text_primary"
                 android:fontFamily="serif"
                 android:textStyle="bold"
                 app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="27dp"
-                app:layout_constraintStart_toEndOf="@id/menuIcon"
-                android:layout_marginStart="11dp" />
-
-            <ImageView
-                android:id="@+id/notificationIcon"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/ic_notification"
-                android:contentDescription="Notifications"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="44dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginEnd="15dp" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-        <!-- Back Arrow -->
-
-        <Button
-            android:id="@+id/editprofile"
-            android:layout_width="wrap_content"
+        <!-- Profile Image Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="@color/purple_500"
-            android:text="Edit Profile"
-            android:textAllCaps="false"
-            android:textColor="@color/text_primary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.109"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/profileImage" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="12dp">
 
-        <ImageView
-            android:id="@+id/backButton"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:padding="6dp"
-            android:background="@drawable/section_chip_bg"
-            android:src="@drawable/ic_back"
-            android:contentDescription="Back"
-            app:layout_constraintTop_toBottomOf="@id/header"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="16dp" />
+            <!-- Circular profile image with edit icon overlay -->
+            <FrameLayout
+                android:layout_width="120dp"
+                android:layout_height="120dp">
 
-        <!-- Profile Image - Moved 24dp lower (7dp → 31dp) -->
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/profileImage"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="90dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_profile_avatar"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/header"
-            app:shapeAppearanceOverlay="@style/CircleImageStyle"/>
+                <androidx.cardview.widget.CardView
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    app:cardCornerRadius="60dp"
+                    app:cardElevation="8dp">
 
+                    <ImageView
+                        android:id="@+id/profileImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="Profile Picture"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_profile_avatar" />
 
-        <!-- Name, Address, Phone Card - Now independent of profile image position -->
+                </androidx.cardview.widget.CardView>
+
+            </FrameLayout>
+
+            <!-- Edit Profile button to the right -->
+            <Button
+                android:id="@+id/editprofile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:backgroundTint="@color/purple_500"
+                android:text="Edit Profile"
+                android:textAllCaps="false"
+                android:textColor="@color/text_primary" />
+
+        </LinearLayout>
+
+        <!-- Name, Address, Phone Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardName"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="32dp"
-            app:cardElevation="12dp"
-            app:cardBackgroundColor="@color/surface_card"
-            app:layout_constraintTop_toBottomOf="@id/header"
-            android:layout_marginTop="24dp"
-            app:layout_constraintStart_toEndOf="@id/profileImage"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp">
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="@color/surface_card">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="24dp">
+                android:orientation="vertical"
+                android:padding="20dp">
 
-                <!-- Name -->
                 <TextView
-                    android:id="@+id/nameLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Name"
                     android:textColor="@color/text_primary"
-                    android:textSize="20sp"
-                    android:fontFamily="sans-serif"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif" />
 
                 <TextView
                     android:id="@+id/nameField"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -143,35 +132,26 @@
                     android:textSize="14sp"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:scrollHorizontally="true"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:gravity="center_vertical|start"
-                    android:hint=""
-                    android:textColorHint="@color/text_tertiary"
-                    app:layout_constraintTop_toBottomOf="@id/nameLabel"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="12dp" />
 
-                <!-- Address -->
                 <TextView
-                    android:id="@+id/addressLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Address"
                     android:textColor="@color/text_primary"
-                    android:textSize="20sp"
-                    android:fontFamily="sans-serif"
-                    app:layout_constraintTop_toBottomOf="@id/nameField"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif" />
 
                 <TextView
                     android:id="@+id/addressField"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -179,35 +159,26 @@
                     android:textSize="14sp"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:scrollHorizontally="true"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:gravity="center_vertical|start"
-                    android:hint=""
-                    android:textColorHint="@color/text_tertiary"
-                    app:layout_constraintTop_toBottomOf="@id/addressLabel"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="12dp" />
 
-                <!-- Phone no. -->
                 <TextView
-                    android:id="@+id/phoneLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Phone no."
                     android:textColor="@color/text_primary"
-                    android:textSize="20sp"
-                    android:fontFamily="sans-serif"
-                    app:layout_constraintTop_toBottomOf="@id/addressField"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif" />
 
                 <TextView
                     android:id="@+id/phoneField"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -215,60 +186,47 @@
                     android:textSize="14sp"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:scrollHorizontally="true"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:gravity="center_vertical|start"
-                    android:hint=""
-                    android:textColorHint="@color/text_tertiary"
-                    app:layout_constraintTop_toBottomOf="@id/phoneLabel"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginTop="6dp" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 
-        <!-- Age, Blood, Height, Weight Card - Now independent of profile image -->
+        <!-- Age, Blood, Height, Weight Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardStats"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="32dp"
-            app:cardElevation="12dp"
-            app:cardBackgroundColor="@color/surface_card"
-            app:layout_constraintTop_toBottomOf="@id/header"
-            android:layout_marginTop="300dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp">
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="@color/surface_card">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="24dp">
+                android:orientation="vertical"
+                android:padding="20dp">
 
-
-                <!-- Age -->
                 <TextView
-                    android:id="@+id/ageLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Age"
                     android:textColor="@color/text_primary"
-                    android:textSize="20sp"
-
-                    android:fontFamily="sans-serif"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif" />
 
                 <TextView
                     android:id="@+id/ageField"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -276,35 +234,26 @@
                     android:textSize="14sp"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:scrollHorizontally="true"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:gravity="center_vertical|start"
-                    android:hint=""
-                    android:textColorHint="@color/text_tertiary"
-                    app:layout_constraintTop_toBottomOf="@id/ageLabel"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="12dp" />
 
-                <!-- Blood group -->
                 <TextView
-                    android:id="@+id/bloodLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Blood group"
+                    android:text="Blood Group"
                     android:textColor="@color/text_primary"
-                    android:textSize="20sp"
-                    android:fontFamily="sans-serif"
-                    app:layout_constraintTop_toBottomOf="@id/ageField"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif" />
 
                 <TextView
                     android:id="@+id/bloodField"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -312,35 +261,26 @@
                     android:textSize="14sp"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:scrollHorizontally="true"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:gravity="center_vertical|start"
-                    android:hint=""
-                    android:textColorHint="@color/text_tertiary"
-                    app:layout_constraintTop_toBottomOf="@id/bloodLabel"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="12dp" />
 
-                <!-- Height -->
                 <TextView
-                    android:id="@+id/heightLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Height"
                     android:textColor="@color/text_primary"
-                    android:textSize="20sp"
-                    android:fontFamily="sans-serif"
-                    app:layout_constraintTop_toBottomOf="@id/bloodField"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif" />
 
                 <TextView
                     android:id="@+id/heightField"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -348,35 +288,26 @@
                     android:textSize="14sp"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:scrollHorizontally="true"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:gravity="center_vertical|start"
-                    android:hint=""
-                    android:textColorHint="@color/text_tertiary"
-                    app:layout_constraintTop_toBottomOf="@id/heightLabel"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="12dp" />
 
-                <!-- Weight -->
                 <TextView
-                    android:id="@+id/weightLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Weight"
                     android:textColor="@color/text_primary"
-                    android:textSize="20sp"
-                    android:fontFamily="sans-serif"
-                    app:layout_constraintTop_toBottomOf="@id/heightField"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif" />
 
                 <TextView
                     android:id="@+id/weightField"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -384,42 +315,34 @@
                     android:textSize="14sp"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:scrollHorizontally="true"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:gravity="center_vertical|start"
-                    android:hint=""
-                    android:textColorHint="@color/text_tertiary"
-                    app:layout_constraintTop_toBottomOf="@id/weightLabel"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginTop="6dp" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 
         <!-- Emergency Contacts Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardEmergencyContacts"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="32dp"
-            app:cardElevation="12dp"
-            app:cardBackgroundColor="@color/surface_card"
-            app:layout_constraintTop_toBottomOf="@id/cardStats"
-            android:layout_marginTop="24dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp">
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="@color/surface_card">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="24dp">
+                android:orientation="vertical"
+                android:padding="20dp">
 
                 <TextView
                     android:id="@+id/emergencyTitle"
@@ -427,15 +350,14 @@
                     android:layout_height="wrap_content"
                     android:text="Emergency Contacts"
                     android:textColor="@color/text_primary"
-                    android:textSize="22sp"
+                    android:textSize="18sp"
                     android:fontFamily="sans-serif"
                     android:textStyle="bold"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    android:layout_marginBottom="12dp" />
 
                 <TextView
                     android:id="@+id/contactField1"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -443,22 +365,16 @@
                     android:textSize="14sp"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:scrollHorizontally="true"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:gravity="center_vertical|start"
-                    android:hint=""
-                    android:textColorHint="@color/text_tertiary"
-                    app:layout_constraintTop_toBottomOf="@id/emergencyTitle"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginBottom="12dp" />
 
                 <TextView
                     android:id="@+id/contactField2"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -466,22 +382,16 @@
                     android:textSize="14sp"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:scrollHorizontally="true"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:gravity="center_vertical|start"
-                    android:hint=""
-                    android:textColorHint="@color/text_tertiary"
-                    app:layout_constraintTop_toBottomOf="@id/contactField1"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginBottom="12dp" />
 
                 <TextView
                     android:id="@+id/contactField3"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -489,41 +399,33 @@
                     android:textSize="14sp"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:scrollHorizontally="true"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
-                    android:gravity="center_vertical|start"
-                    android:hint=""
-                    android:textColorHint="@color/text_tertiary"
-                    app:layout_constraintTop_toBottomOf="@id/contactField2"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:gravity="center_vertical|start" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+
         </androidx.cardview.widget.CardView>
 
         <!-- Allergies Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardAllergies"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="32dp"
-            app:cardElevation="12dp"
-            app:cardBackgroundColor="@color/surface_card"
-            app:layout_constraintTop_toBottomOf="@id/cardEmergencyContacts"
-            android:layout_marginTop="24dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp">
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="@color/surface_card">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="24dp">
+                android:orientation="vertical"
+                android:padding="20dp">
 
                 <TextView
                     android:id="@+id/allergiesTitle"
@@ -531,15 +433,14 @@
                     android:layout_height="wrap_content"
                     android:text="Allergies and Reactions"
                     android:textColor="@color/text_primary"
-                    android:textSize="22sp"
+                    android:textSize="18sp"
                     android:fontFamily="sans-serif"
                     android:textStyle="bold"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    android:layout_marginBottom="12dp" />
 
                 <TextView
                     android:id="@+id/allergyField1"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -547,22 +448,16 @@
                     android:textSize="14sp"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:scrollHorizontally="true"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:gravity="center_vertical|start"
-                    android:hint=""
-                    android:textColorHint="@color/text_tertiary"
-                    app:layout_constraintTop_toBottomOf="@id/allergiesTitle"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginBottom="12dp" />
 
                 <TextView
                     android:id="@+id/allergyField2"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -570,22 +465,16 @@
                     android:textSize="14sp"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:scrollHorizontally="true"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:gravity="center_vertical|start"
-                    android:hint=""
-                    android:textColorHint="@color/text_tertiary"
-                    app:layout_constraintTop_toBottomOf="@id/allergyField1"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginBottom="12dp" />
 
                 <TextView
                     android:id="@+id/allergyField3"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -593,59 +482,48 @@
                     android:textSize="14sp"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:scrollHorizontally="true"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
-                    android:gravity="center_vertical|start"
-                    android:hint=""
-                    android:textColorHint="@color/text_tertiary"
-                    app:layout_constraintTop_toBottomOf="@id/allergyField2"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:gravity="center_vertical|start" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 
         <!-- Injuries Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardInjuries"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="32dp"
-            app:cardElevation="12dp"
-            app:cardBackgroundColor="@color/surface_card"
-            app:layout_constraintTop_toBottomOf="@id/cardAllergies"
-            android:layout_marginTop="24dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
-            android:layout_marginBottom="24dp">
+            android:layout_marginBottom="32dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="@color/surface_card">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="24dp">
+                android:orientation="vertical"
+                android:padding="20dp">
 
                 <TextView
                     android:id="@+id/injuriesTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Post injuries and Operations done"
+                    android:text="Post Injuries and Operations"
                     android:textColor="@color/text_primary"
-                    android:textSize="22sp"
+                    android:textSize="18sp"
                     android:fontFamily="sans-serif"
                     android:textStyle="bold"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    android:layout_marginBottom="12dp" />
 
                 <TextView
                     android:id="@+id/injuryField1"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -653,22 +531,16 @@
                     android:textSize="14sp"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:scrollHorizontally="true"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:gravity="center_vertical|start"
-                    android:hint=""
-                    android:textColorHint="@color/text_tertiary"
-                    app:layout_constraintTop_toBottomOf="@id/injuriesTitle"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginBottom="12dp" />
 
                 <TextView
                     android:id="@+id/injuryField2"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -676,22 +548,16 @@
                     android:textSize="14sp"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:scrollHorizontally="true"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:gravity="center_vertical|start"
-                    android:hint=""
-                    android:textColorHint="@color/text_tertiary"
-                    app:layout_constraintTop_toBottomOf="@id/injuryField1"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginBottom="12dp" />
 
                 <TextView
                     android:id="@+id/injuryField3"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -699,23 +565,16 @@
                     android:textSize="14sp"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:scrollHorizontally="true"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
-                    android:gravity="center_vertical|start"
-                    android:hint=""
-                    android:textColorHint="@color/text_tertiary"
-                    app:layout_constraintTop_toBottomOf="@id/injuryField2"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:gravity="center_vertical|start" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

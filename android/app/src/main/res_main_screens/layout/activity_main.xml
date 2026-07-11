@@ -82,6 +82,84 @@
             </FrameLayout>
         </RelativeLayout>
 
+        <!-- Radio state warning banners (hidden by default, shown programmatically) -->
+        <LinearLayout
+            android:id="@+id/radio_warnings_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Bluetooth off warning -->
+            <LinearLayout
+                android:id="@+id/warning_bluetooth"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="#CC7A1A"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:drawablePadding="8dp"
+                    android:gravity="center_vertical"
+                    android:text="⚠  Bluetooth is off — SOS mesh unavailable"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btn_enable_bluetooth"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Turn On"
+                    android:textColor="#FFE082"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- Location off warning -->
+            <LinearLayout
+                android:id="@+id/warning_location"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="#B22222"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:drawablePadding="8dp"
+                    android:gravity="center_vertical"
+                    android:text="⚠  Location is off — SOS location sharing unavailable"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btn_enable_location"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Turn On"
+                    android:textColor="#FFE082"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
         <!-- News Carousel Section -->
         <FrameLayout
             android:layout_width="match_parent"
@@ -106,7 +184,52 @@
                 android:layout_gravity="bottom|center_horizontal"
                 android:layout_marginBottom="8dp"
                 android:orientation="horizontal" />
+
+            <!-- Skeleton loading overlay shown while news is being fetched -->
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/carousel_shimmer_loading"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/banner_card_bg">
+
+                    <!-- Skeleton image placeholder -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#2A3A5C" />
+
+                    <!-- Skeleton text line at bottom -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <View
+                            android:layout_width="220dp"
+                            android:layout_height="14dp"
+                            android:layout_marginBottom="6dp"
+                            android:background="#3D5080" />
+
+                        <View
+                            android:layout_width="160dp"
+                            android:layout_height="12dp"
+                            android:background="#3D5080" />
+
+                    </LinearLayout>
+
+                </FrameLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
         </FrameLayout>
+
 
         <!-- Emergency SOS Button -->
         <Button

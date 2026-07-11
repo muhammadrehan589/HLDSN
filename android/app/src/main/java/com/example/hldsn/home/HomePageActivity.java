@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -30,6 +31,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,6 +42,13 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
+
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.Priority;
+import com.google.android.material.snackbar.Snackbar;
 
 import com.example.hldsn.R;
 import com.example.hldsn.debug.CrashDebugger;
@@ -97,6 +106,7 @@ import com.example.hldsn.services.news.ApiNewsRepository;
 import com.example.hldsn.services.news.NewsDetailActivity;
 import com.example.hldsn.services.news.NewsItem;
 import com.example.hldsn.services.news.NewsRepository;
+import com.facebook.shimmer.ShimmerFrameLayout;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -158,6 +168,12 @@ public class HomePageActivity extends AppCompatActivity {
     private final List<NewsItem> carouselNewsList = new ArrayList<>();
     private Timer carouselTimer;
     private final Handler carouselHandler = new Handler(Looper.getMainLooper());
+    private ShimmerFrameLayout carouselShimmer;
+
+    // Warning banner views
+    private LinearLayout radioWarningsContainer;
+    private LinearLayout warningBluetooth;
+    private LinearLayout warningLocation;
 
     /** Prevents the "no internet" toast from firing on every Firestore retry. */
     private boolean hasShownNetworkError = false;
@@ -180,7 +196,8 @@ public class HomePageActivity extends AppCompatActivity {
                     Toast.makeText(this, "Some permissions were denied. App will run with limited features.", Toast.LENGTH_LONG).show();
                 }
                 requestNearbyGroupIfNeeded();
-                startMeshServiceIfReady();
+                // Chain: after runtime permissions, ask to enable Bluetooth then Location hardware
+                ensureBluetoothEnabledForSetup();
             });
 
     private final ActivityResultLauncher<String> locationLauncher =
@@ -213,6 +230,8 @@ public class HomePageActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(this, "Bluetooth is required for SOS mesh", Toast.LENGTH_LONG).show();
                 }
+                // After Bluetooth dialog (first-launch flow), always chain to Location enable
+                ensureLocationEnabled();
             });
 
     private final ActivityResultLauncher<Intent> enableWifiLauncher =
@@ -221,6 +240,19 @@ public class HomePageActivity extends AppCompatActivity {
                     continueAfterRadioReady();
                 } else {
                     Toast.makeText(this, "Wi-Fi is required for Wi-Fi Direct mesh", Toast.LENGTH_LONG).show();
+                }
+            });
+
+    // Launcher for the "Turn on Location?" system dialog (Google Play Services ResolvableApiException)
+    private final ActivityResultLauncher<IntentSenderRequest> locationEnableLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), result -> {
+                if (isLocationEnabled()) {
+                    Log.d(TAG, "Location enabled by user.");
+                    updateRadioWarningBanners();
+                    startMeshServiceIfReady();
+                } else {
+                    Log.d(TAG, "User declined to enable Location.");
+                    updateRadioWarningBanners();
                 }
             });
 
@@ -240,6 +272,18 @@ public class HomePageActivity extends AppCompatActivity {
                 if (text != null && !text.trim().isEmpty()) {
                     Toast.makeText(HomePageActivity.this, "Offline message: " + text, Toast.LENGTH_SHORT).show();
                 }
+            }
+        }
+    };
+
+    /** Monitors Bluetooth and Location hardware state changes mid-session. */
+    private final BroadcastReceiver radioStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(android.content.Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)
+                    || LocationManager.MODE_CHANGED_ACTION.equals(action)) {
+                updateRadioWarningBanners();
             }
         }
     };
@@ -289,6 +333,20 @@ public class HomePageActivity extends AppCompatActivity {
         emergencyNumbersBtn = findViewById(R.id.btn_emergency_numbers);
         emergencyFirstAidBtn = findViewById(R.id.btn_info_first_aid);
         nearbyHelpBtn = findViewById(R.id.btn_nearby_help);
+
+        // Warning banners
+        radioWarningsContainer = findViewById(R.id.radio_warnings_container);
+        warningBluetooth = findViewById(R.id.warning_bluetooth);
+        warningLocation = findViewById(R.id.warning_location);
+
+        View btnEnableBt = findViewById(R.id.btn_enable_bluetooth);
+        if (btnEnableBt != null) {
+            btnEnableBt.setOnClickListener(v -> requestBluetoothEnable());
+        }
+        View btnEnableLoc = findViewById(R.id.btn_enable_location);
+        if (btnEnableLoc != null) {
+            btnEnableLoc.setOnClickListener(v -> ensureLocationEnabled());
+        }
     }
 
     private void initNotificationDrawer() {
@@ -783,6 +841,12 @@ public class HomePageActivity extends AppCompatActivity {
         newsViewPager = findViewById(R.id.news_view_pager);
         if (newsViewPager == null) return;
 
+        carouselShimmer = findViewById(R.id.carousel_shimmer_loading);
+        if (carouselShimmer != null) {
+            carouselShimmer.setVisibility(View.VISIBLE);
+            carouselShimmer.startShimmer();
+        }
+
         newsCarouselAdapter = new NewsCarouselAdapter(this::openNewsDetail);
         newsViewPager.setAdapter(newsCarouselAdapter);
 
@@ -793,6 +857,7 @@ public class HomePageActivity extends AppCompatActivity {
         new ApiNewsRepository(this).fetchNews(false, new NewsRepository.Callback() {
             @Override
             public void onSuccess(List<NewsItem> items) {
+                stopCarouselShimmer();
                 if (items != null && !items.isEmpty()) {
                     carouselNewsList.clear();
                     // Take top 3 news
@@ -807,9 +872,17 @@ public class HomePageActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
+                stopCarouselShimmer();
                 Log.e(TAG, "Carousel news fetch error: " + message);
             }
         });
+    }
+
+    private void stopCarouselShimmer() {
+        if (carouselShimmer != null) {
+            carouselShimmer.stopShimmer();
+            carouselShimmer.setVisibility(View.GONE);
+        }
     }
 
     private void setupCarouselAutoScroll() {
@@ -1261,7 +1334,18 @@ public class HomePageActivity extends AppCompatActivity {
                 buildNotificationIntentFilter(),
                 ContextCompat.RECEIVER_NOT_EXPORTED
         );
+        // Register mid-session radio-state change receiver
+        IntentFilter radioFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+        radioFilter.addAction(LocationManager.MODE_CHANGED_ACTION);
+        ContextCompat.registerReceiver(
+                this,
+                radioStateReceiver,
+                radioFilter,
+                ContextCompat.RECEIVER_NOT_EXPORTED
+        );
         startMeshServiceIfReady();
+        // Refresh banners every time the screen is visible (catches toggling while app was in background)
+        updateRadioWarningBanners();
         handleLaunchIntent(getIntent());
     }
 
@@ -1296,5 +1380,93 @@ public class HomePageActivity extends AppCompatActivity {
         } catch (IllegalArgumentException ignored) {
             // Receiver may already be unregistered.
         }
+        try {
+            unregisterReceiver(radioStateReceiver);
+        } catch (IllegalArgumentException ignored) {
+            // Receiver may already be unregistered.
+        }
+    }
+
+    // ── Radio enable helpers ──────────────────────────────────────────────────
+
+    /**
+     * Called after runtime permissions are granted on first launch.
+     * Shows the Bluetooth enable system dialog. The enableBluetoothLauncher
+     * callback then chains into ensureLocationEnabled().
+     */
+    private void ensureBluetoothEnabledForSetup() {
+        if (!isBluetoothEnabled()) {
+            requestBluetoothEnable();
+        } else {
+            // Bluetooth already on — go straight to Location
+            ensureLocationEnabled();
+        }
+    }
+
+    /**
+     * Shows the Google Play Services "Turn on Location?" system dialog.
+     * Uses ResolvableApiException so the user sees the native OS prompt
+     * (same as Google Maps, Uber, etc.) instead of being sent to Settings.
+     */
+    private void ensureLocationEnabled() {
+        LocationRequest locationRequest = new LocationRequest.Builder(
+                Priority.PRIORITY_HIGH_ACCURACY, 10000).build();
+        LocationSettingsRequest settingsRequest = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest)
+                .setAlwaysShow(true)
+                .build();
+
+        LocationServices.getSettingsClient(this)
+                .checkLocationSettings(settingsRequest)
+                .addOnSuccessListener(response -> {
+                    // Location already enabled — just refresh banners
+                    updateRadioWarningBanners();
+                    startMeshServiceIfReady();
+                })
+                .addOnFailureListener(e -> {
+                    if (e instanceof ResolvableApiException) {
+                        try {
+                            ResolvableApiException resolvable = (ResolvableApiException) e;
+                            IntentSenderRequest request = new IntentSenderRequest.Builder(
+                                    resolvable.getResolution().getIntentSender()).build();
+                            locationEnableLauncher.launch(request);
+                        } catch (Exception ex) {
+                            Log.e(TAG, "Could not show location enable dialog", ex);
+                            // Fall back to opening Location Settings directly
+                            try {
+                                startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                            } catch (ActivityNotFoundException ignored) { }
+                        }
+                    } else {
+                        Log.e(TAG, "Location settings check failed", e);
+                    }
+                });
+    }
+
+    /** Returns true if the device's Location (GPS or Network) is currently enabled. */
+    private boolean isLocationEnabled() {
+        LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (lm == null) return false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            return lm.isLocationEnabled();
+        }
+        return lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                || lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    }
+
+    /**
+     * Shows or hides the warning banners based on current Bluetooth/Location state.
+     * Called on every onStart() and whenever the radioStateReceiver fires.
+     */
+    private void updateRadioWarningBanners() {
+        if (radioWarningsContainer == null || warningBluetooth == null || warningLocation == null) {
+            return;
+        }
+        boolean btOff = !isBluetoothEnabled();
+        boolean locOff = !isLocationEnabled();
+
+        warningBluetooth.setVisibility(btOff ? View.VISIBLE : View.GONE);
+        warningLocation.setVisibility(locOff ? View.VISIBLE : View.GONE);
+        radioWarningsContainer.setVisibility((btOff || locOff) ? View.VISIBLE : View.GONE);
     }
 }

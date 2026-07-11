@@ -5,115 +5,120 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/login_gradient"
-    tools:context=".login_module.UserProfileActivity">
+    tools:context=".login_module.SaveUserProfileActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="100dp">
-
+        android:orientation="vertical"
+        android:paddingBottom="32dp">
 
         <!-- App Bar Header -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="88dp"
-            android:background="@drawable/header_gradient"
-            app:layout_constraintTop_toTopOf="parent">
+            android:background="@drawable/header_gradient">
 
             <ImageView
-                android:id="@+id/menuIcon"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="35dp"
-                android:contentDescription="Menu"
-                android:src="@drawable/ic_menu"
+                android:id="@+id/backButton"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:padding="8dp"
+                android:background="@drawable/section_chip_bg"
+                android:src="@drawable/ic_back"
+                android:contentDescription="Back"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_marginStart="16dp" />
 
             <TextView
                 android:id="@+id/profileTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="11dp"
-                android:layout_marginTop="27dp"
-                android:fontFamily="serif"
-                android:text="Profile"
+                android:text="Edit Profile"
+                android:textSize="28sp"
                 android:textColor="@color/text_primary"
-                android:textSize="32sp"
+                android:fontFamily="serif"
                 android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@id/menuIcon"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/notificationIcon"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginEnd="15dp"
-                android:layout_marginTop="44dp"
-                android:contentDescription="Notifications"
-                android:src="@drawable/ic_notification"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Back Arrow -->
-        <ImageView
-            android:id="@+id/backButton"
-            android:layout_width="16dp"
-            android:layout_height="23dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="24dp"
-            android:contentDescription="Back"
-            android:src="@drawable/ic_back"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/header" />
+        <!-- Profile Image with camera edit overlay -->
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="12dp">
 
-        <!-- Profile Image -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/profileImageCard"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="48dp"
-            app:cardCornerRadius="70dp"
-            app:cardElevation="8dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/header">
+            <androidx.cardview.widget.CardView
+                android:id="@+id/profileImageCard"
+                android:layout_width="130dp"
+                android:layout_height="130dp"
+                app:cardCornerRadius="65dp"
+                app:cardElevation="8dp">
 
-            <ImageView
-                android:id="@+id/profileImage"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:contentDescription="Profile Picture"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_profile_avatar"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground" />
+                <ImageView
+                    android:id="@+id/profileImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="Profile Picture"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_profile_avatar"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground" />
 
-        </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Camera edit badge -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:clickable="false"
+                android:focusable="false"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="10dp"
+                app:cardBackgroundColor="@color/purple_500">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_camera"
+                    android:contentDescription="Change photo"
+                    android:tint="@color/text_primary" />
+
+            </androidx.cardview.widget.CardView>
+
+        </FrameLayout>
 
         <!-- Name, Address, Phone Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardName"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
             app:cardBackgroundColor="@color/surface_card"
-            app:cardCornerRadius="32dp"
-            app:cardElevation="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/profileImageCard"
-            app:layout_constraintTop_toTopOf="@id/profileImageCard">
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="24dp">
+                android:orientation="vertical"
+                android:padding="20dp">
 
                 <TextView
                     android:id="@+id/nameLabel"
@@ -122,13 +127,12 @@
                     android:fontFamily="sans-serif"
                     android:text="Name"
                     android:textColor="@color/text_primary"
-                    android:textSize="20sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/nameField"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -146,26 +150,22 @@
                     android:scrollHorizontally="true"
                     android:inputType="textPersonName"
                     android:imeOptions="actionNext"
-                    app:layout_constraintTop_toBottomOf="@id/nameLabel"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="12dp" />
 
                 <TextView
                     android:id="@+id/addressLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
                     android:fontFamily="sans-serif"
                     android:text="Address"
                     android:textColor="@color/text_primary"
-                    android:textSize="20sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/nameField" />
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/addressField"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -183,26 +183,22 @@
                     android:scrollHorizontally="true"
                     android:inputType="textPostalAddress"
                     android:imeOptions="actionNext"
-                    app:layout_constraintTop_toBottomOf="@id/addressLabel"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="12dp" />
 
                 <TextView
                     android:id="@+id/phoneLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
                     android:fontFamily="sans-serif"
                     android:text="Phone no."
                     android:textColor="@color/text_primary"
-                    android:textSize="20sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/addressField" />
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/phoneField"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -220,33 +216,29 @@
                     android:scrollHorizontally="true"
                     android:inputType="phone"
                     android:imeOptions="actionDone"
-                    app:layout_constraintTop_toBottomOf="@id/phoneLabel"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginTop="6dp" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+
         </androidx.cardview.widget.CardView>
 
         <!-- Age, Blood, Height, Weight Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardStats"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="130dp"
             android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
             app:cardBackgroundColor="@color/surface_card"
-            app:cardCornerRadius="32dp"
-            app:cardElevation="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/profileImageCard">
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="24dp">
+                android:orientation="vertical"
+                android:padding="20dp">
 
                 <TextView
                     android:id="@+id/ageLabel"
@@ -255,13 +247,12 @@
                     android:fontFamily="sans-serif"
                     android:text="Age"
                     android:textColor="@color/text_primary"
-                    android:textSize="20sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/ageField"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -279,26 +270,22 @@
                     android:scrollHorizontally="true"
                     android:inputType="number"
                     android:imeOptions="actionNext"
-                    app:layout_constraintTop_toBottomOf="@id/ageLabel"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="12dp" />
 
                 <TextView
                     android:id="@+id/bloodLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
                     android:fontFamily="sans-serif"
-                    android:text="Blood group"
+                    android:text="Blood Group"
                     android:textColor="@color/text_primary"
-                    android:textSize="20sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/ageField" />
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/bloodField"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -316,26 +303,22 @@
                     android:scrollHorizontally="true"
                     android:inputType="text"
                     android:imeOptions="actionNext"
-                    app:layout_constraintTop_toBottomOf="@id/bloodLabel"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="12dp" />
 
                 <TextView
                     android:id="@+id/heightLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
                     android:fontFamily="sans-serif"
                     android:text="Height"
                     android:textColor="@color/text_primary"
-                    android:textSize="20sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/bloodField" />
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/heightField"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -353,26 +336,22 @@
                     android:scrollHorizontally="true"
                     android:inputType="text"
                     android:imeOptions="actionNext"
-                    app:layout_constraintTop_toBottomOf="@id/heightLabel"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="12dp" />
 
                 <TextView
                     android:id="@+id/weightLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
                     android:fontFamily="sans-serif"
                     android:text="Weight"
                     android:textColor="@color/text_primary"
-                    android:textSize="20sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/heightField" />
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/weightField"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:background="@drawable/profile_field_background"
@@ -390,33 +369,29 @@
                     android:scrollHorizontally="true"
                     android:inputType="numberDecimal"
                     android:imeOptions="actionDone"
-                    app:layout_constraintTop_toBottomOf="@id/weightLabel"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_marginTop="6dp" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+
         </androidx.cardview.widget.CardView>
 
         <!-- Emergency Contacts Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardEmergencyContacts"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="24dp"
             android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
             app:cardBackgroundColor="@color/surface_card"
-            app:cardCornerRadius="32dp"
-            app:cardElevation="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardStats">
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="24dp">
+                android:orientation="vertical"
+                android:padding="20dp">
 
                 <TextView
                     android:id="@+id/emergencyTitle"
@@ -425,17 +400,15 @@
                     android:fontFamily="sans-serif"
                     android:text="Emergency Contacts"
                     android:textColor="@color/text_primary"
-                    android:textSize="22sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:layout_marginBottom="12dp" />
 
                 <EditText
                     android:id="@+id/contactField1"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
-                    android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
                     android:hint="Contact 1"
                     android:paddingStart="12dp"
@@ -450,16 +423,13 @@
                     android:ellipsize="end"
                     android:scrollHorizontally="true"
                     android:inputType="phone"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/emergencyTitle" />
+                    android:layout_marginBottom="12dp" />
 
                 <EditText
                     android:id="@+id/contactField2"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
-                    android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
                     android:hint="Contact 2"
                     android:paddingStart="12dp"
@@ -474,16 +444,13 @@
                     android:ellipsize="end"
                     android:scrollHorizontally="true"
                     android:inputType="phone"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/contactField1" />
+                    android:layout_marginBottom="12dp" />
 
                 <EditText
                     android:id="@+id/contactField3"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
-                    android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
                     android:hint="Contact 3"
                     android:paddingStart="12dp"
@@ -497,33 +464,29 @@
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:scrollHorizontally="true"
-                    android:inputType="phone"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/contactField2" />
+                    android:inputType="phone" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+
         </androidx.cardview.widget.CardView>
 
         <!-- Allergies Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardAllergies"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="24dp"
             android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
             app:cardBackgroundColor="@color/surface_card"
-            app:cardCornerRadius="32dp"
-            app:cardElevation="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardEmergencyContacts">
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="24dp">
+                android:orientation="vertical"
+                android:padding="20dp">
 
                 <TextView
                     android:id="@+id/allergiesTitle"
@@ -532,17 +495,15 @@
                     android:fontFamily="sans-serif"
                     android:text="Allergies and Reactions"
                     android:textColor="@color/text_primary"
-                    android:textSize="22sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:layout_marginBottom="12dp" />
 
                 <EditText
                     android:id="@+id/allergyField1"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
-                    android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
                     android:hint="e.g. Penicillin"
                     android:paddingStart="12dp"
@@ -557,16 +518,13 @@
                     android:ellipsize="end"
                     android:scrollHorizontally="true"
                     android:inputType="text"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/allergiesTitle" />
+                    android:layout_marginBottom="12dp" />
 
                 <EditText
                     android:id="@+id/allergyField2"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
-                    android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
                     android:hint=""
                     android:paddingStart="12dp"
@@ -581,16 +539,13 @@
                     android:ellipsize="end"
                     android:scrollHorizontally="true"
                     android:inputType="text"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/allergyField1" />
+                    android:layout_marginBottom="12dp" />
 
                 <EditText
                     android:id="@+id/allergyField3"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
-                    android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
                     android:hint=""
                     android:paddingStart="12dp"
@@ -604,52 +559,46 @@
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:scrollHorizontally="true"
-                    android:inputType="text"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/allergyField2" />
+                    android:inputType="text" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+
         </androidx.cardview.widget.CardView>
 
         <!-- Injuries Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardInjuries"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="24dp"
             android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
             app:cardBackgroundColor="@color/surface_card"
-            app:cardCornerRadius="32dp"
-            app:cardElevation="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardAllergies">
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="24dp">
+                android:orientation="vertical"
+                android:padding="20dp">
 
                 <TextView
                     android:id="@+id/injuriesTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif"
-                    android:text="Past injuries and Operations done"
+                    android:text="Past Injuries and Operations"
                     android:textColor="@color/text_primary"
-                    android:textSize="22sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:layout_marginBottom="12dp" />
 
                 <EditText
                     android:id="@+id/injuryField1"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
-                    android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
                     android:hint="e.g. Knee surgery 2022"
                     android:paddingStart="12dp"
@@ -664,16 +613,13 @@
                     android:ellipsize="end"
                     android:scrollHorizontally="true"
                     android:inputType="text"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/injuriesTitle" />
+                    android:layout_marginBottom="12dp" />
 
                 <EditText
                     android:id="@+id/injuryField2"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
-                    android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
                     android:hint=""
                     android:paddingStart="12dp"
@@ -688,16 +634,13 @@
                     android:ellipsize="end"
                     android:scrollHorizontally="true"
                     android:inputType="text"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/injuryField1" />
+                    android:layout_marginBottom="12dp" />
 
                 <EditText
                     android:id="@+id/injuryField3"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
-                    android:layout_marginTop="16dp"
                     android:background="@drawable/profile_field_background"
                     android:hint=""
                     android:paddingStart="12dp"
@@ -711,50 +654,43 @@
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:scrollHorizontally="true"
-                    android:inputType="text"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/injuryField2" />
+                    android:inputType="text" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+
         </androidx.cardview.widget.CardView>
 
         <!-- Save Button -->
         <Button
             android:id="@+id/saveButton"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
-            android:layout_marginTop="32dp"
             android:layout_marginEnd="32dp"
+            android:layout_marginBottom="16dp"
             android:backgroundTint="@color/purple_500"
             android:text="Save Profile"
             android:textAllCaps="false"
-            android:textColor="@color/text_primary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardInjuries" />
+            android:textColor="@color/text_primary" />
 
         <TextView
             android:id="@+id/volunteerQuestionText"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
-            android:layout_marginTop="18dp"
             android:layout_marginEnd="32dp"
+            android:layout_marginBottom="8dp"
             android:gravity="center"
             android:text="Want to become a volunteer and serve the community?"
             android:textColor="@color/text_primary"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/saveButton" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/volunteerClickHereText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground"
@@ -765,10 +701,8 @@
             android:text="@string/volunteer_click_here_underlined"
             android:textColor="@color/safe_green"
             android:textSize="17sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/volunteerQuestionText" />
+            android:textStyle="bold" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
 </androidx.core.widget.NestedScrollView>

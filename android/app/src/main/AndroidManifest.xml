@@ -148,8 +148,7 @@
         <activity android:name=".ngo_module.NgoRegistrationRequestActivity" android:exported="false" />
         <activity android:name=".ngo_module.NgoViewVolunteersActivity" android:exported="false" />
         <activity android:name=".ngo_module.NgoVolunteerDetailActivity" android:exported="false" />
-         <activity android:name=".ngo_module.NgoRegistrationRequestActivity" android:exported="false" />
-         <activity android:name=".nearby.NearbyHelpActivity" android:exported="false" />
+        <activity android:name=".nearby.NearbyHelpActivity" android:exported="false" />
 
         <service
             android:name=".sos.SosForegroundService"

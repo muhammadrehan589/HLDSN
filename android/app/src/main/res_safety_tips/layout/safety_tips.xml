@@ -17,16 +17,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/menu_icon"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="20dp"
-            android:padding="6dp"
-            android:src="@drawable/ic_menu"
-            android:contentDescription="Menu" />
 
         <TextView
             android:id="@+id/app_name"
@@ -44,37 +34,6 @@
             android:shadowDy="2"
             android:shadowRadius="2" />
 
-        <FrameLayout
-            android:id="@+id/notification_badge_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="20dp">
-
-            <ImageView
-                android:id="@+id/notification_icon"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:src="@drawable/ic_notification"
-                android:contentDescription="Notifications" />
-
-            <TextView
-                android:id="@+id/tv_notification_count"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_gravity="top|end"
-                android:background="@drawable/circle_red_badge"
-                android:textColor="@color/text_on_primary"
-                android:textSize="12sp"
-                android:gravity="center"
-                android:textStyle="bold"
-                android:visibility="gone"
-                android:includeFontPadding="false"
-                tools:text="5"
-                tools:visibility="visible" />
-
-        </FrameLayout>
 
     </RelativeLayout>
 

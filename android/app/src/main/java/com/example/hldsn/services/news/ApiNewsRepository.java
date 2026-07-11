@@ -42,7 +42,7 @@ public class ApiNewsRepository implements NewsRepository {
     private static final String[] DISASTER_TERMS = {
             "flood", "earthquake", "landslide", "heatwave", "monsoon", "cyclone", "drought", "avalanche"
     };
-    private static final int API_PAGE_SIZE = 50; // Currents free tier maximum.
+    private static final int API_PAGE_SIZE = 20; // Currents free tier maximum.
     private static final int NEWS_LIMIT = 20;
     private static final int RESPONSE_PREVIEW_CHARS = 400;
     private static final int TIMEOUT_MS = 15000;
@@ -89,9 +89,9 @@ public class ApiNewsRepository implements NewsRepository {
 
             try {
                 String latestUrl = LATEST_URL
-                        + "?country=PK"
-                        + "&language=en"
-                        + "&page_size=" + API_PAGE_SIZE;
+                        + "?apiKey=" + BuildConfig.NEWS_API_KEY
+                        + "&country=PK"
+                        + "&language=en";
                 String latestResponse = executeRequest(latestUrl, "latest-news");
                 List<NewsItem> items = parseItems(latestResponse);
 
@@ -195,7 +195,6 @@ public class ApiNewsRepository implements NewsRepository {
             URL url = new URL(urlString);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("Authorization", BuildConfig.NEWS_API_KEY);
             connection.setConnectTimeout(TIMEOUT_MS);
             connection.setReadTimeout(TIMEOUT_MS);
 
@@ -323,7 +322,8 @@ public class ApiNewsRepository implements NewsRepository {
             }
             String encodedTerm = URLEncoder.encode(term, StandardCharsets.UTF_8.name());
             String searchUrl = API_URL
-                    + "?keywords=" + encodedTerm
+                    + "?apiKey=" + BuildConfig.NEWS_API_KEY
+                    + "&keywords=" + encodedTerm
                     + "&country=PK"
                     + "&language=en"
                     + "&page_size=" + API_PAGE_SIZE;
@@ -341,7 +341,8 @@ public class ApiNewsRepository implements NewsRepository {
                 }
                 String encodedTerm = URLEncoder.encode(term, StandardCharsets.UTF_8.name());
                 String searchUrl = API_URL
-                        + "?keywords=" + encodedTerm
+                        + "?apiKey=" + BuildConfig.NEWS_API_KEY
+                        + "&keywords=" + encodedTerm
                         + "&language=en"
                         + "&page_size=" + API_PAGE_SIZE;
                 String response = executeRequest(searchUrl, "search-global:" + term);
