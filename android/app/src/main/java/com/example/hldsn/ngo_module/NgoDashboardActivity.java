@@ -122,7 +122,7 @@ public class NgoDashboardActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        findViewById(R.id.backButton).setOnClickListener(v -> finish());
+
         findViewById(R.id.notificationIcon).setOnClickListener(v ->
                 startActivity(new Intent(this, NgoNotificationsActivity.class)));
 
@@ -153,11 +153,9 @@ public class NgoDashboardActivity extends AppCompatActivity {
 
         // Bottom Navigation Click Listeners
         findViewById(R.id.navHome).setOnClickListener(v -> {
-            // Already on Dashboard Home, scroll to top
-            View scrollView = findViewById(R.id.pbOverallCompletion); // Using a view near top
-            if (scrollView != null) {
-                scrollView.getParent().requestChildFocus(scrollView, scrollView);
-            }
+            // Scroll back to top of the dashboard
+            androidx.core.widget.NestedScrollView scrollView = findViewById(R.id.mainScrollView);
+            if (scrollView != null) scrollView.smoothScrollTo(0, 0);
         });
 
         findViewById(R.id.navMap).setOnClickListener(v ->
@@ -302,7 +300,7 @@ public class NgoDashboardActivity extends AppCompatActivity {
                         return;
                     }
                     for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
-                        addActivityItem(doc.getString("title"), doc.getString("description"), doc.getDate("createdAt"));
+                        addActivityItem(doc.getString("taskTitle"), doc.getString("taskDescription"), doc.getDate("createdAt"));
                     }
                 });
     }

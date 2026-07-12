@@ -26,7 +26,7 @@ import androidx.core.content.ContextCompat;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.hldsn.R;
-import com.example.hldsn.volunteer.VolunteerBasicFormActivity;
+import com.example.hldsn.volunteer_module.VolunteerBasicFormActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 

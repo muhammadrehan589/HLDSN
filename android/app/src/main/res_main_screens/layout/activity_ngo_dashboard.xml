@@ -17,15 +17,7 @@
             android:layout_height="?attr/actionBarSize"
             android:paddingHorizontal="16dp">
 
-            <ImageView
-                android:id="@+id/backButton"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_menu"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="@android:color/white" />
+
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -56,16 +48,7 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/searchIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="16dp"
-                android:src="@android:drawable/ic_menu_search"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/notificationBadgeContainer"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="@android:color/white" />
+
 
             <FrameLayout
                 android:id="@+id/notificationBadgeContainer"
@@ -105,6 +88,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/mainScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
@@ -243,21 +227,7 @@
                         app:layout_constraintStart_toStartOf="@id/ngoDashboardNameText"
                         app:layout_constraintTop_toBottomOf="@id/ngoTagline" />
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        app:cardBackgroundColor="#1AFFFFFF"
-                        app:cardCornerRadius="10dp"
-                        app:cardElevation="0dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_info"
-                            app:tint="#00D1B2" />
-                    </com.google.android.material.card.MaterialCardView>
+
 
                     <View
                         android:id="@+id/divider1"
@@ -423,15 +393,7 @@
                             android:textSize="11sp" />
                     </LinearLayout>
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnViewAlerts"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:minHeight="32dp"
-                        android:text="View"
-                        android:textSize="11sp"
-                        app:backgroundTint="#FF5A5F"
-                        app:cornerRadius="16dp" />
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -447,13 +409,7 @@
                     android:textColor="@android:color/white"
                     android:textSize="16sp"
                     android:textStyle="bold" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:text="Details →"
-                    android:textColor="#00D1B2"
-                    android:textSize="12sp" />
+
             </RelativeLayout>
 
             <HorizontalScrollView
@@ -856,14 +812,7 @@
                     android:textColor="@android:color/white"
                     android:textSize="16sp"
                     android:textStyle="bold" />
-                <TextView
-                    android:id="@+id/btnViewAllActivity"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:text="View All ∨"
-                    android:textColor="#00D1B2"
-                    android:textSize="12sp" />
+
             </RelativeLayout>
 
             <com.google.android.material.card.MaterialCardView
@@ -1000,7 +949,8 @@
                         android:layout_gravity="top|end"
                         android:background="@drawable/circle_red_badge"
                         android:gravity="center"
-                        android:text="3"
+                        tools:text="3"
+                        android:visibility="gone"
                         android:textColor="@android:color/white"
                         android:textSize="8sp" />
                 </FrameLayout>
@@ -1037,7 +987,8 @@
                         android:layout_gravity="top|end"
                         android:background="@drawable/circle_red_badge"
                         android:gravity="center"
-                        android:text="2"
+                        tools:text="2"
+                        android:visibility="gone"
                         android:textColor="@android:color/white"
                         android:textSize="8sp" />
                 </FrameLayout>
