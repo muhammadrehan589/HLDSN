@@ -28,8 +28,12 @@ public class LoginActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         if (auth != null && auth.getCurrentUser() != null) {
-            ensureMeshIdentityAndSync(auth.getCurrentUser());
-            RoleBasedNavigator.routeAfterLogin(this, auth.getCurrentUser());
+            FirebaseUser currentUser = auth.getCurrentUser();
+            // Pass mesh sync as a callback so it runs AFTER the role is read.
+            // syncBestEffort writes to 'users/{uid}' — if it fires before the
+            // role read, the pending write poisons the snapshot on fresh installs.
+            RoleBasedNavigator.routeAfterLogin(this, currentUser,
+                    () -> ensureMeshIdentityAndSync(currentUser));
         }
     }
 
@@ -103,8 +107,9 @@ public class LoginActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         FirebaseUser user = auth.getCurrentUser();
                         if (user != null) {
-                            ensureMeshIdentityAndSync(user);
-                            RoleBasedNavigator.routeAfterLogin(LoginActivity.this, user);
+                            // Pass mesh sync as a callback — see onStart() comment.
+                            RoleBasedNavigator.routeAfterLogin(LoginActivity.this, user,
+                                    () -> ensureMeshIdentityAndSync(user));
                         }
                     } else {
                         String error = task.getException() != null

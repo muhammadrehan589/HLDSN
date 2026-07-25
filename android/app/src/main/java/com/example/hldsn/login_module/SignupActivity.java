@@ -86,7 +86,6 @@ public class SignupActivity extends AppCompatActivity {
                         String uid = currentUser.getUid();
                         String displayName = (firstName + " " + lastName).trim();
                         meshIdentityManager.getOrCreateLocalIdentity(displayName);
-                        meshIdentityManager.syncBestEffort(uid, displayName);
 
                         Map<String, Object> user = new HashMap<>();
                         user.put("firstName", firstName);
@@ -97,11 +96,15 @@ public class SignupActivity extends AppCompatActivity {
                         user.put("role",role);
                         user.put("createdAt", System.currentTimeMillis());
 
-                        // Save user data to Firestore
+                        // Save user data to Firestore FIRST, then sync mesh identity.
+                        // syncBestEffort writes to the same users/{uid} document without
+                        // the 'role' field, so it must run after the initial document
+                        // (which includes 'role') is created.
                         db.collection("users")
                                 .document(uid)
                                 .set(user)
                                 .addOnSuccessListener(aVoid -> {
+                                    meshIdentityManager.syncBestEffort(uid, displayName);
                                     Toast.makeText(this, "Signup Successful!", Toast.LENGTH_SHORT).show();
 
                                     // Move to Home or Login
