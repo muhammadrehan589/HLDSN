@@ -462,7 +462,7 @@
                     android:ellipsize="none"
                     app:backgroundTint="@color/button_bg"
                     app:cornerRadius="22dp"
-                    app:icon="@drawable/ic_camp"
+                    app:icon="@drawable/ic_service_camp_new"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
@@ -492,7 +492,7 @@
                     android:ellipsize="none"
                     app:backgroundTint="@color/button_bg"
                     app:cornerRadius="22dp"
-                    app:icon="@drawable/ic_volunteer"
+                    app:icon="@drawable/ic_service_volunteer_new"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
@@ -568,8 +568,9 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_info_safety"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="150dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_margin="6dp"
                     android:minHeight="120dp"
                     android:text="@string/safety_tips"
@@ -585,7 +586,7 @@
                     android:ellipsize="none"
                     app:backgroundTint="@color/button_bg"
                     app:cornerRadius="22dp"
-                    app:icon="@drawable/ic_safety"
+                    app:icon="@drawable/ic_info_safety_new"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
@@ -593,13 +594,13 @@
                     app:strokeColor="@color/button_stroke"
                     app:strokeWidth="1dp" />
 
-                <!-- Community Chat -->
                 <!-- First Aid Tips -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_info_first_aid"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="150dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_margin="6dp"
                     android:minHeight="120dp"
                     android:text="@string/emergency_first_aid_card"
@@ -615,7 +616,7 @@
                     android:ellipsize="none"
                     app:backgroundTint="@color/button_bg"
                     app:cornerRadius="22dp"
-                    app:icon="@drawable/ic_firstaid"
+                    app:icon="@drawable/ic_info_firstaid_new"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"
@@ -623,20 +624,13 @@
                     app:strokeColor="@color/button_stroke"
                     app:strokeWidth="1dp" />
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
-
                 <!-- News -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_info_news"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="150dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_margin="6dp"
                     android:minHeight="120dp"
                     android:text="@string/news"
@@ -652,7 +646,7 @@
                     android:ellipsize="none"
                     app:backgroundTint="@color/button_bg"
                     app:cornerRadius="22dp"
-                    app:icon="@drawable/ic_news"
+                    app:icon="@drawable/ic_info_news_new"
                     app:iconGravity="textTop"
                     app:iconPadding="4dp"
                     app:iconSize="44dp"

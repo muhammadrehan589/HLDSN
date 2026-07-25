@@ -8,6 +8,8 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.PersistentCacheSettings;
 import org.osmdroid.config.Configuration;
 
+import java.io.File;
+
 /**
  * Application entry-point.
  * Configures Firestore offline persistence with an unlimited cache so every
@@ -29,7 +31,15 @@ public class HldsnApp extends Application {
                 getApplicationContext(),
                 getSharedPreferences("osmdroid", MODE_PRIVATE)
         );
-        Configuration.getInstance().setUserAgentValue(getPackageName());
+        // Set a unique, descriptive User-Agent as required by tile providers.
+        Configuration.getInstance().setUserAgentValue("HLDSN-DisasterApp/1.0 (Android)");
+
+        // Set a writable cache directory for tile storage.
+        File cacheDir = new File(getExternalCacheDir(), "osmdroid");
+        if (!cacheDir.exists()) {
+            cacheDir.mkdirs();
+        }
+        Configuration.getInstance().setOsmdroidTileCache(cacheDir);
     }
 
     private void configureFirestoreOffline() {

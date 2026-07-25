@@ -35,6 +35,7 @@
     <color name="surface_chip">#2C2C2C</color>
     <color name="surface_card">#252525</color>
     <color name="surface_input">#2A2A2A</color>
+    <color name="section_chip_bg_color">#4A4A4A</color>
     <color name="surface_divider">#20FFFFFF</color>
     <color name="surface_overlay">#60000000</color>
 

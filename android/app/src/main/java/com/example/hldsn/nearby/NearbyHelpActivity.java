@@ -29,8 +29,9 @@ import com.example.hldsn.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
-import org.osmdroid.config.Configuration;
+
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
@@ -87,7 +88,7 @@ public class NearbyHelpActivity extends AppCompatActivity implements LocationLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nearby_help);
 
-        Configuration.getInstance().setUserAgentValue("HLDSN-APP");
+
 
         initVerifiedLocalResources();
         initViews();
@@ -317,9 +318,20 @@ public class NearbyHelpActivity extends AppCompatActivity implements LocationLis
         return results[0] / 1000.0;
     }
 
+    private static final XYTileSource CARTO_LIGHT = new XYTileSource(
+            "CartoLight",
+            0, 19, 256, ".png",
+            new String[]{
+                    "https://a.basemaps.cartocdn.com/rastertiles/voyager/",
+                    "https://b.basemaps.cartocdn.com/rastertiles/voyager/",
+                    "https://c.basemaps.cartocdn.com/rastertiles/voyager/",
+                    "https://d.basemaps.cartocdn.com/rastertiles/voyager/"
+            }
+    );
+
     private void updateMap() {
         if (mapView == null) return;
-        mapView.setTileSource(TileSourceFactory.MAPNIK);
+        mapView.setTileSource(CARTO_LIGHT);
         GeoPoint startPoint = new GeoPoint(userLatitude, userLongitude);
         mapView.getController().setCenter(startPoint);
         mapView.getController().setZoom(14.0);

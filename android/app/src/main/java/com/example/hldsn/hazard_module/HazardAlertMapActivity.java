@@ -47,6 +47,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -380,10 +381,26 @@ public class HazardAlertMapActivity extends AppCompatActivity {
 
     // ── Map Setup ─────────────────────────────────────────────────────────
 
+    /**
+     * Carto's free tile CDN - no API key required, explicitly permits app usage.
+     * Serves the same OpenStreetMap data as MAPNIK but through Carto's infrastructure,
+     * which does not block apps the way OSM's volunteer tile servers do.
+     */
+    private static final XYTileSource CARTO_LIGHT = new XYTileSource(
+            "CartoLight",
+            0, 19, 256, ".png",
+            new String[]{
+                    "https://a.basemaps.cartocdn.com/rastertiles/voyager/",
+                    "https://b.basemaps.cartocdn.com/rastertiles/voyager/",
+                    "https://c.basemaps.cartocdn.com/rastertiles/voyager/",
+                    "https://d.basemaps.cartocdn.com/rastertiles/voyager/"
+            }
+    );
+
     private void configureMapView() {
         if (mapView == null) return;
 
-        mapView.setTileSource(TileSourceFactory.MAPNIK);
+        mapView.setTileSource(CARTO_LIGHT);
         mapView.setMultiTouchControls(true);
         mapView.setBuiltInZoomControls(false);
         mapView.setHorizontalMapRepetitionEnabled(false);
