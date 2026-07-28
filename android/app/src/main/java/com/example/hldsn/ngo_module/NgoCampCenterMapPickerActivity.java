@@ -15,7 +15,7 @@ import com.example.hldsn.R;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.events.MapEventsReceiver;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -30,6 +30,17 @@ public class NgoCampCenterMapPickerActivity extends AppCompatActivity {
 
     private static final GeoPoint PAKISTAN_CENTER = new GeoPoint(30.3753, 69.3451);
     private static final BoundingBox PAKISTAN_BOUNDS = new BoundingBox(37.2, 77.9, 23.5, 60.8);
+
+    private static final XYTileSource CARTO_LIGHT = new XYTileSource(
+            "CartoLight",
+            0, 19, 256, ".png",
+            new String[]{
+                    "https://a.basemaps.cartocdn.com/rastertiles/voyager/",
+                    "https://b.basemaps.cartocdn.com/rastertiles/voyager/",
+                    "https://c.basemaps.cartocdn.com/rastertiles/voyager/",
+                    "https://d.basemaps.cartocdn.com/rastertiles/voyager/"
+            }
+    );
 
     private MapView mapView;
     private Geocoder geocoder;
@@ -113,7 +124,7 @@ public class NgoCampCenterMapPickerActivity extends AppCompatActivity {
     }
 
     private void configureMap() {
-        mapView.setTileSource(TileSourceFactory.MAPNIK);
+        mapView.setTileSource(CARTO_LIGHT);
         mapView.setMultiTouchControls(true);
         mapView.setBuiltInZoomControls(false);
         mapView.setHorizontalMapRepetitionEnabled(false);

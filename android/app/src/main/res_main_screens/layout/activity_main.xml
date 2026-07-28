@@ -61,7 +61,7 @@
                     android:id="@+id/notification_icon"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
-                    android:src="@drawable/ic_notification"
+                    android:src="@drawable/ic_bell_outline"
                     android:contentDescription="Notifications" />
 
                 <TextView

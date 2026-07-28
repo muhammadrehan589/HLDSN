@@ -30,7 +30,6 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -107,6 +106,8 @@ public class NearbyHelpActivity extends AppCompatActivity implements LocationLis
 
     private void initViews() {
         mapView = findViewById(R.id.nearby_map);
+        // Set the tile source immediately so MAPNIK is never used, even during loading
+        if (mapView != null) mapView.setTileSource(CARTO_LIGHT);
         searchEditText = findViewById(R.id.nearby_search);
         chipGroup = findViewById(R.id.nearby_chip_group);
         radiusChipGroup = findViewById(R.id.radius_chip_group);
